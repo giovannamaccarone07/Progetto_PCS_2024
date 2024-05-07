@@ -1,4 +1,8 @@
+#include <iostream>
 int main()
 {
-  return 0;
+
+    std::cout << "prova" <<std::endl;
+    return 0;
+
 }
