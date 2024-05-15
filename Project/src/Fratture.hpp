@@ -6,12 +6,13 @@ using namespace Eigen;
 
 namespace FractureLibrary{
 
-struct FractureStruct{
+struct FractureStruct
+{
 
     unsigned int NumeroFratture = 0;
     vector<unsigned int> IdFratture = {};
     vector<unsigned int> NumeroVertici = {};
-    vector<VectorXi<Vector3d>> Vertici = {};
+    vector<VectorXi> Vertici = {};
     unsigned int SpazioMemoria = 0;
 
 };

@@ -1,8 +1,31 @@
 #include <iostream>
+
+#include "Fratture.hpp"
+#include "Utils.hpp"
+
+using namespace std;
+using namespace Eigen;
+using namespace FractureLibrary;
+
 int main()
 {
+    FractureStruct fract;
 
-    std::cout << "prova" <<std::endl;
+    string nomeFile = "FR3_data";
+
+    // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
+    if(!ImportDati(nomeFile,
+                     fract))
+    {
+        cerr << "Impossibile importare i dati" << endl;
+        return 1;
+    }
+    else
+    {
+        cout << "Dati importati correttamente" << endl;
+    }
+
+
     return 0;
 
 }

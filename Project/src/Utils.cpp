@@ -9,8 +9,8 @@ using namespace std;
 
 namespace FractureLibrary{
 
-bool ImportDati(const string& NomeFile, FractureStruct& fract){
-
+bool ImportDati(const string& NomeFile, FractureStruct& fract)
+{
     ifstream file;
     file.open(NomeFile);
     if(file.fail()){
@@ -45,78 +45,85 @@ bool ImportDati(const string& NomeFile, FractureStruct& fract){
             converter1 >> id_fratture >> separatore >> n_vertici;
 
             getline(file, riga); //# Vertices
-            VectorXi<Vector3d> vertici;
-
-            // Coordinata x
-            getline(file, riga);
+            VectorXi vertici;
+            VectorXd coordinate_x, coordinate_y, coordinate_z;
             vertici.resize(n_vertici);
-            istringstream converter2(riga);
-            converter2 >> vertici(0)(0);    // con questo vorrei prendesse il primo elemento della riga delle x e lo mettesse nel primo vertice
-            for(unsigned int i = 1; i < n_vertici; i++)
-                converter2 >> separatore >> vertici(i)(0); // con questo ciclo dovrebbe mettere le x ai successivi vertici
+            // Utilizza stringstream per analizzare la riga corrente
+            istringstream riga_x(riga);
+            double coordinate;
+            while (riga_x >> coordinate) {
+                coordinate_x.conservativeResize(coordinate_x.size() + 1);
+                coordinate_x(coordinate_x.size() - 1) = coordinate;
+            }
 
-            // Coordinata y
+            // Leggi la prossima riga (coordinate y)
             getline(file, riga);
-            istringstream converter3(riga);
-            converter3 >> vertici(0)(1);
-            for(unsigned int i = 1; i < n_vertici; i++)
-                converter3 >> separatore >> vertici(i)(1);
+            istringstream riga_y(riga);
+            while (riga_y >> coordinate) {
+                coordinate_y.conservativeResize(coordinate_y.size() + 1);
+                coordinate_y(coordinate_y.size() - 1) = coordinate;
+            }
 
-            // Coordinata z
+            // Leggi la prossima riga (coordinate z)
             getline(file, riga);
-            istringstream converter4(riga);
-            converter4 >> vertici(0)(2);
-            for(unsigned int i = 1; i < n_vertici; i++)
-                converter4 >> separatore >> vertici(i)(2);
+            istringstream riga_z(riga);
+            while (riga_z >> coordinate) {
+                coordinate_z.conservativeResize(coordinate_z.size() + 1);
+                coordinate_z(coordinate_z.size() - 1) = coordinate;
+            }
+            // Verifica che il numero di coordinate sia lo stesso per x, y e z
+            if (coordinate_x.size() != coordinate_y.size() || coordinate_x.size() != coordinate_z.size()) {
+                cerr << "Errore: numero diverso di coordinate x, y e z." << endl;
+                return 1;
+            }
 
-
-
+            // Costruisci i vettori di vertici utilizzando le coordinate
+            for (int i = 0; i < coordinate_x.size(); ++i) {
+                Vector3d vertice;
+                vertice << coordinate_x(i), coordinate_y(i), coordinate_z(i);
+                fract.Vertici.push_back(vertice);
+            }
             fract.IdFratture.push_back(id_fratture);
             fract.NumeroVertici.push_back(n_vertici);
-            fract.Vertici.push_back(vertici);
-
         }
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    while(getline(file,riga)){
-        listaRighe.push_back(riga);
     }
     file.close();
-    unsigned int NumeroRighe = listaRighe.size();
-    if (NumeroRighe == 0)
-    {
-        cerr << "Il file è vuoto." << endl;
-        return false;
-    }
 
-    for (const string& riga : listaRighe)
-    {
-        istringstream converter(riga);
-        char cancelletto;
-        unsigned int id, n_vertici, n_fratture;
-        Vector3d coordinate;
+    return true;
+}
+}
 
-        if(riga[0] == '#'){
-            break;
-        }
+/*
+    // Coordinata x
+    getline(file, riga);
+
+    istringstream converter2(riga);
+    converter2 >> vertici(0)(0);    // con questo vorrei prendesse il primo elemento della riga delle x e lo mettesse nel primo vertice
+    for(unsigned int i = 1; i < n_vertici; i++)
+        converter2 >> separatore >> vertici(i)(0); // con questo ciclo dovrebbe mettere le x ai successivi vertici
+
+    // Coordinata y
+    getline(file, riga);
+    istringstream converter3(riga);
+    converter3 >> vertici(0)(1);
+    for(unsigned int i = 1; i < n_vertici; i++)
+        converter3 >> separatore >> vertici(i)(1);
+
+    // Coordinata z
+    getline(file, riga);
+    istringstream converter4(riga);
+    converter4 >> vertici(0)(2);
+    for(unsigned int i = 1; i < n_vertici; i++)
+        converter4 >> separatore >> vertici(i)(2);
+
+
+
+    fract.IdFratture.push_back(id_fratture);
+    fract.NumeroVertici.push_back(n_vertici);
+    fract.Vertici.push_back(vertici);
 */
 
 
-}
 
 
 
@@ -138,9 +145,3 @@ bool ImportDati(const string& NomeFile, FractureStruct& fract){
 
 
 
-
-
-
-
-
-}
