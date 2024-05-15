@@ -10,8 +10,8 @@ struct FractureStruct{
 
     unsigned int NumeroFratture = 0;
     vector<unsigned int> IdFratture = {};
-    unsigned int NumeroVeritici = 0;
-    vector<Vector3d> CoordinateVertici = {};
+    vector<unsigned int> NumeroVertici = {};
+    vector<VectorXi<Vector3d>> Vertici = {};
     unsigned int SpazioMemoria = 0;
 
 };

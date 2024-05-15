@@ -29,7 +29,8 @@ bool ImportDati(const string& NomeFile, FractureStruct& fract){
     list<string> listaRighe;
     fract.SpazioMemoria = listaRighe.size();
     fract.IdFratture.reserve(fract.SpazioMemoria);
-    fract.CoordinateVertici.reserve(fract.SpazioMemoria);
+    fract.Vertici.reserve(fract.SpazioMemoria);
+    fract.NumeroVertici.reserve(fract.SpazioMemoria);
 
 
     while(!file.eof()){
@@ -38,18 +39,41 @@ bool ImportDati(const string& NomeFile, FractureStruct& fract){
             getline(file, riga);
 
             getline(file, riga);
-            istringstream convertElemento(riga);
+            istringstream converter1(riga);
             char separatore;
             unsigned int id_fratture, n_vertici;
-            convertElemento >> id_fratture >> separatore >> n_vertici;
+            converter1 >> id_fratture >> separatore >> n_vertici;
 
-            getline(file, riga);
+            getline(file, riga); //# Vertices
+            VectorXi<Vector3d> vertici;
 
+            // Coordinata x
             getline(file, riga);
+            vertici.resize(n_vertici);
+            istringstream converter2(riga);
+            converter2 >> vertici(0)(0);    // con questo vorrei prendesse il primo elemento della riga delle x e lo mettesse nel primo vertice
+            for(unsigned int i = 1; i < n_vertici; i++)
+                converter2 >> separatore >> vertici(i)(0); // con questo ciclo dovrebbe mettere le x ai successivi vertici
+
+            // Coordinata y
+            getline(file, riga);
+            istringstream converter3(riga);
+            converter3 >> vertici(0)(1);
+            for(unsigned int i = 1; i < n_vertici; i++)
+                converter3 >> separatore >> vertici(i)(1);
+
+            // Coordinata z
+            getline(file, riga);
+            istringstream converter4(riga);
+            converter4 >> vertici(0)(2);
+            for(unsigned int i = 1; i < n_vertici; i++)
+                converter4 >> separatore >> vertici(i)(2);
+
+
+
             fract.IdFratture.push_back(id_fratture);
-
-
-
+            fract.NumeroVertici.push_back(n_vertici);
+            fract.Vertici.push_back(vertici);
 
         }
 
@@ -67,7 +91,7 @@ bool ImportDati(const string& NomeFile, FractureStruct& fract){
 
 
 
-
+/*
     while(getline(file,riga)){
         listaRighe.push_back(riga);
     }
@@ -78,7 +102,7 @@ bool ImportDati(const string& NomeFile, FractureStruct& fract){
         cerr << "Il file è vuoto." << endl;
         return false;
     }
-    /*
+
     for (const string& riga : listaRighe)
     {
         istringstream converter(riga);
