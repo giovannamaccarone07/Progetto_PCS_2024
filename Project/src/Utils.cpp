@@ -8,47 +8,76 @@
 using namespace std;
 
 namespace FractureLibrary{
+bool ImportaStruttura(const string& NomeFile,
+                 FractureStruct& Fract)
+{
+    if(!ImportaDati(NomeFile + "/FR3_data.txt",      // Non so perchè non apre il file
+                        Fract))
+    {
+        return false;
+    }
+    /*else
+    {
+        // Qui dovrebbe esserci una funzione che collega gli indici dei vertici della frattura alle corrispondenti coordinate
+    } */
+}
 
-bool ImportDati(const string& NomeFile, FractureStruct& fract)
+bool ImportaDati(const string& NomeFile, FractureStruct& fract)
 {
     ifstream file;
     file.open(NomeFile);
     if(file.fail()){
-        return false;
+        cerr << "impossibile aprire il file"<<endl;
     }
     string riga;
 
-    //leggo prima riga
+    //leggo la prima riga
     getline(file, riga);
-    //leggo la seconda
+    //leggo la seconda da cui prendo il numero delle fratture
     getline(file,riga);
     istringstream convertElemento(riga);
     unsigned int n_fratture;
     convertElemento >> n_fratture;
-
+    // Uso il numero delle righe del file per creare spazio nella struttura
     list<string> listaRighe;
     fract.SpazioMemoria = listaRighe.size();
     fract.IdFratture.reserve(fract.SpazioMemoria);
-    fract.Vertici.reserve(fract.SpazioMemoria);
+    fract.CoordinateVertici.reserve(fract.SpazioMemoria);
     fract.NumeroVertici.reserve(fract.SpazioMemoria);
+    fract.IndiciVertici.reserve(fract.SpazioMemoria);
 
-
+    // Il while continua fino alla fine del file
     while(!file.eof()){
-        //leggo le righe in gruppi di 6
+        // Leggo le righe in gruppi di 6 poichè a ogni frattura sono dedidicate 6 righe
+        // Inizializzo una variabile per assagnare un indice a ogni vertice
+        unsigned int indice = 0;
         for(unsigned int i = 0; i<6; i++){
-            getline(file, riga);
-
+            getline(file, riga);  // Salto la riga
+            // Leggo l'id della frattura e il numero dei vertici
             getline(file, riga);
             istringstream converter1(riga);
             char separatore;
             unsigned int id_fratture, n_vertici;
             converter1 >> id_fratture >> separatore >> n_vertici;
 
-            getline(file, riga); //# Vertices
-            VectorXi vertici;
+            getline(file, riga); // Salto la riga
+
+            // Creo un vettore di lunghezza indefinita per salvare gli indici dei vertici della frattura
+            VectorXi indici;
+            indici.resize(n_vertici);  // Gli cambio la dimensione in base al numero dei vertici che ho letto ha la frattura
+            // In questo for partendo da 0 (valore a cui ho inizializzato indice) sommo ad esso il valore di in che va fino al numero di vertici,
+            //teoricamente uscendo poi dal for il valore di indice dovrebbe aggiornarsi ma non sono sicura. Così si parte da 0 e si continua ad aumentare indice in modo crescente
+            for (int in = 0; in < n_vertici; ++in) {
+                indice = indice + in;
+                indice << indici[in];  // Metto l'indice nel vettore degli indici dei vertici della frattura
+            }
+
+            fract.IdFratture.push_back(id_fratture);     // Metto i valori trovati nel file all'interno della struttura
+            fract.NumeroVertici.push_back(n_vertici);
+            fract.IndiciVertici.push_back(indici);
+            // Creo dei vettori con la riga delle x, delle y e delle z per riuscire in un secondo momento a creare vettori con (x,y,z) prendendo un elemento per volta di ogni vettore
             VectorXd coordinate_x, coordinate_y, coordinate_z;
-            vertici.resize(n_vertici);
-            // Utilizza stringstream per analizzare la riga corrente
+            getline(file, riga);
             istringstream riga_x(riga);
             double coordinate;
             while (riga_x >> coordinate) {
@@ -78,19 +107,21 @@ bool ImportDati(const string& NomeFile, FractureStruct& fract)
             }
 
             // Costruisci i vettori di vertici utilizzando le coordinate
-            for (int i = 0; i < coordinate_x.size(); ++i) {
-                Vector3d vertice;
-                vertice << coordinate_x(i), coordinate_y(i), coordinate_z(i);
-                fract.Vertici.push_back(vertice);
+
+            for (int j = 0; j < coordinate_x.size(); ++j){
+
+                Vector3d coordinate_vertice;
+                coordinate_vertice << coordinate_x(j), coordinate_y(j), coordinate_z(j);
+                fract.CoordinateVertici.push_back(coordinate_vertice);
             }
-            fract.IdFratture.push_back(id_fratture);
-            fract.NumeroVertici.push_back(n_vertici);
         }
     }
     file.close();
 
     return true;
 }
+
+
 }
 
 /*

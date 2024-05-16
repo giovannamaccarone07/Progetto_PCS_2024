@@ -6,5 +6,8 @@
 using namespace std;
 namespace FractureLibrary
 {
-bool ImportDati(const string& NomeFile, FractureStruct& Fract);
+bool ImportaDati(const string& NomeFile, FractureStruct& Fract);         // Funzione che importa i dati da file
+bool ImportaStruttura(const string& NomeFile, FractureStruct& Fract);    // Funzione che apre con i dati ottenuti da ImportaDati dovrebbe associare gli indici dei vertici alle corrispondenti coordinate
+
 }
+
