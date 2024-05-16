@@ -8,19 +8,6 @@
 using namespace std;
 
 namespace FractureLibrary{
-bool ImportaStruttura(const string& NomeFile,
-                 FractureStruct& Fract)
-{
-    if(!ImportaDati(NomeFile + "/FR3_data.txt",      // Non so perchè non apre il file
-                        Fract))
-    {
-        return false;
-    }
-    /*else
-    {
-        // Qui dovrebbe esserci una funzione che collega gli indici dei vertici della frattura alle corrispondenti coordinate
-    } */
-}
 
 bool ImportaDati(const string& NomeFile, FractureStruct& fract)
 {
@@ -67,9 +54,10 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
             indici.resize(n_vertici);  // Gli cambio la dimensione in base al numero dei vertici che ho letto ha la frattura
             // In questo for partendo da 0 (valore a cui ho inizializzato indice) sommo ad esso il valore di in che va fino al numero di vertici,
             //teoricamente uscendo poi dal for il valore di indice dovrebbe aggiornarsi ma non sono sicura. Così si parte da 0 e si continua ad aumentare indice in modo crescente
-            for (int in = 0; in < n_vertici; ++in) {
+            for (unsigned int in = 0; in < n_vertici; ++in)
+            {
                 indice = indice + in;
-                indice << indici[in];  // Metto l'indice nel vettore degli indici dei vertici della frattura
+                indice >> indici[in];  // Metto l'indice nel vettore degli indici dei vertici della frattura
             }
 
             fract.IdFratture.push_back(id_fratture);     // Metto i valori trovati nel file all'interno della struttura
