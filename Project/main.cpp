@@ -1,7 +1,8 @@
 #include <iostream>
-
+#include <Eigen/Eigen>
 #include "Fratture.hpp"
 #include "Utils.hpp"
+
 
 using namespace std;
 using namespace Eigen;
@@ -14,8 +15,7 @@ int main()
     string NomeFile = "DFN/FR3_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
-    if(!ImportaDati(NomeFile,
-                     fract))
+    if(!ImportaDati(NomeFile, fract))
     {
         cerr << "Impossibile importare i dati" << endl;
         return 1;
@@ -25,22 +25,25 @@ int main()
         cout << "Dati importati correttamente" << endl;
     }
 
-    // Provo a stampare le coordinate della seconda frattura
-    VectorXi indici_frattura_1 = fract.IndiciVertici[1];
-    unsigned int numero_vertici = indici_frattura_1.size();
-    for (unsigned int i = 0; i < numero_vertici; i++)
+    // Provo a stampare le coordinate delle fratture
+    cout << "Ci sono " << fract.NumeroFratture << " fratture" << endl;
+    cout << endl;
+    for (unsigned int numb = 0; numb < fract.NumeroFratture; numb++)
     {
-        Vector3d coord_primo_vertice = fract.CoordinateVertici[indici_frattura_1(i)];
-        double coord_x = coord_primo_vertice(0);
-        double coord_y = coord_primo_vertice(1);
-        double coord_z = coord_primo_vertice(2);
-        cout << "La coordinata x e': " << coord_x << endl;
-        cout << "La coordinata y e': " << coord_y << endl;
-        cout << "La coordinata z e': " << coord_z << endl;
+        cout << "La Frattura numero: " << numb << " ha: " << fract.NumeroVertici[numb] << " vertici" << endl;
+        //vector<unsigned int> indici_frattura = fract.IndiciVertici[numb];
+        for (unsigned int i = 0; i < fract.NumeroVertici[numb]; i++)
+        {
+            cout << "Id vertice: " << fract.IndiciVertici[numb][i];
+            cout << " le coordinate sono: " <<"( "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][0];
+            cout <<" , "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][1];
+            cout <<" , "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][2] << " )" << endl;;
+        }
+        cout << endl;
     }
-
 
 
     return 0;
 
 }
+
