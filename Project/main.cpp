@@ -12,12 +12,13 @@ int main()
 {
     FractureStruct fract;
 
-    string NomeFile = "DFN/FR3_data.txt";
+    string NomeFile = "FR3_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
     if(!ImportaDati(NomeFile, fract))
     {
         cerr << "Impossibile importare i dati" << endl;
+
         return 1;
     }
     else
