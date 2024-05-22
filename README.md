@@ -14,8 +14,19 @@ CoordinateVertici non posso vedero come matrice NumeroVertici x 3 perchè a prio
 - SpazioMemoria
 
 - introdurre una variabile nella classe struct : tolleranza, gestione tolleranze
-- cmake debug DFN discutere con teora
-
+- come unire t e d dentro la funzione per fare i piani
+-  
 
 ### Codici di errore
+
+### Calendario 
+- 9 giugno: codice completato
+- 18 giugno: consegna
+- prima settimana (fino al 26): intersezioni, test in parallelo, dati input
+- seconda settimana (fino al 2): tracce + output
+
+(seconda parte, relazione e presentazione)
+- terza settimana (fino al 9): seconda parte
+- quarta settimana (fino al 16): seconda parte
+
 

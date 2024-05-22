@@ -1,4 +1,4 @@
-#ifndef __TESTPOLYGONS_H
+                                        #ifndef __TESTPOLYGONS_H
 #define __TESTPOLYGONS_H
 
 #include <gtest/gtest.h>

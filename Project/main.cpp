@@ -27,7 +27,7 @@ int main()
     }
 
     // Provo a stampare le coordinate delle fratture
-    cout << "Ci sono " << fract.NumeroFratture << " fratture" << endl;
+    /*cout << "Ci sono " << fract.NumeroFratture << " fratture" << endl;
     cout << endl;
     for (unsigned int numb = 0; numb < fract.NumeroFratture; numb++)
     {
@@ -41,7 +41,9 @@ int main()
             cout <<" , "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][2] << " )" << endl;;
         }
         cout << endl;
-    }
+    }*/
+
+    PianoPassantePerFrattura(fract, 1);
 
 
     return 0;
