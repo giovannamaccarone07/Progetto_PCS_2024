@@ -14,6 +14,7 @@ CoordinateVertici non posso vedero come matrice NumeroVertici x 3 perchè a prio
 - SpazioMemoria
 
 - introdurre una variabile nella classe struct : tolleranza, gestione tolleranze
+- cmake debug DFN discutere con teora
 
 
 ### Codici di errore
