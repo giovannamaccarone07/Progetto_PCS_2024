@@ -123,6 +123,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     return true;
 }
 
+
 Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int n) // test n < numero fratture
 {
     //Prendo i primi tre vertici della frattura n-esima per trovare il piano su cui giace il poligono
@@ -151,16 +152,8 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int n) /
 
 // REtta intersezione chiama PianoPassantePErFRattura due volte
 // Calcolo la retta di intersezione tra piani dopo aver controllato che non sono paralleli
-MatrixXd RettaIntersezione(const FractureStruct& fract, unsigned int n1, unsigned n2) // [coda; testa]
+MatrixXd RettaIntersezione(const FractureStruct& fract, Vector4d piano1, Vector4d piano2) // [coda; testa]
 {
-    Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
-    Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
-    double tol = numeric_limits<double>::epsilon();
-
-    double r1=piano1[0]/piano2[0];
-    double r2=piano1[1]/piano2[1];
-    double r3=piano1[2]/piano2[2];
-
     Vector3d p1;
     p1[0] = piano1[0];        // questo fa cagare
     p1[1] = piano1[1];
@@ -171,67 +164,90 @@ MatrixXd RettaIntersezione(const FractureStruct& fract, unsigned int n1, unsigne
     p2[1] = piano2[1];
     p2[2] = piano2[2];
 
+    Vector3d testa = p1.cross(p2);
+    MatrixXd A;
+    A.row(0)=p1;
+    A.row(1)=p2;
+    Vector2d b = {piano1[3], piano2[3]}; //ottimizziamo
+    Vector3d coda = A.lu().solve(b); // full piv da ottimizzare
+    MatrixXd rettaIntersezione;
+    rettaIntersezione.row(0) = coda;
+    rettaIntersezione.row(1) = testa;
+
+    return rettaIntersezione;
+}
+
+//VERIFICARE GLI INPUT IN REFERENZA
+/// CheckTraccia
+// controlla se la retta passa per la frattura che giace nel piano
+bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione, Vector4d piano1, Vector4d piano2,unsigned int n)
+{
+    Matrix<double,3,2> A;
+    Vector3d direzioneRetta = rettaIntersezione.row(0)- rettaIntersezione.row(1);
+    A.col(0) << direzioneRetta;
+    Vector3d codaRetta = rettaIntersezione.row(0);
+    Vector3d b;
+    for(unsigned int i=0; i<fract.NumeroVertici[n]-1; i++)
+    {
+        //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
+        //lato i-esimo:
+        Vector3d vertice0 = fract.CoordinateVertici[fract.IndiciVertici[n][i]];
+        Vector3d vertice1 = fract.CoordinateVertici[fract.IndiciVertici[n][i+1]];
+        Vector3d direzioneLato = vertice1 - vertice0;
+        b << codaRetta - vertice0;
+        A.col(1) << direzioneLato;
+        Vector2d x;
+        //dubbio: la matrice A è rettangolare e non quadrata
+        x = A.lu().solve(b);
+        //chiedere le formula a stefano.
+        //if (x[0])
+    }
+    //l'ultimo lato lo calcolo a mano
+    Vector3d verticeFirst = fract.CoordinateVertici[fract.IndiciVertici[n][0]];
+    Vector3d verticeLast = fract.CoordinateVertici[fract.IndiciVertici[n][fract.NumeroVertici[n]]];
+    Vector3d direzioneLato = verticeLast - verticeFirst;
+    b << codaRetta - verticeFirst;
+    A.col(1) << direzioneLato;
+    Vector2d x;
+    //dubbio: la matrice A è rettangolare e non quadrata
+    x = A.lu().solve(b);
+
+    double tol = numeric_limits<double>::epsilon();
+
+}
+
+bool pianiParalleli(const FractureStruct& fract, Vector4d piano1, Vector4d piano2)
+{
+    double tol = numeric_limits<double>::epsilon();
+
+    double r1=piano1[0]/piano2[0];
+    double r2=piano1[1]/piano2[1];
+    double r3=piano1[2]/piano2[2];
 
     if(!(abs(r1-r2)<=tol && abs(r1-r3)<=tol && abs(r2-r3)<=tol))
     {
-        Vector3d testa = p1.cross(p2);
-        MatrixXd A;
-        A.row(0)=p1;
-        A.row(1)=p2;
-        Vector2d b = {piano1[3], piano2[3]}; //ottimizziamo
-        Vector3d coda = A.lu().solve(b); // full piv da ottimizzare
-        MatrixXd rettaIntersezione;
-        rettaIntersezione.row(0) = coda;
-        rettaIntersezione.row(1) = testa;
-
-        return rettaIntersezione;
+        return true;
     }
-    else
-    {
-        MatrixXd nulla = {};
-        return nulla;
-    }
-
+    return false;
 }
 
-
-/// CheckTraccia
-// controlla se la retta passa per la frattura che giace nel piano
-bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione, unsigned int n1, unsigned n2)
+bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned n2)
 {
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
-    double tol = numeric_limits<double>::epsilon();
-
-    Vector3d vertice1 = fract.CoordinateVertici[fract.IndiciVertici[n1][0]];
-    Vector3d vertice2 = fract.CoordinateVertici[fract.IndiciVertici[n1][1]];
-
-    // controllo se interseca la frattura n1
-    // direzione segmento 1
-    Vector3d s = vertice2 - vertice1;
-    Matrix3d A;
-
-    // anzichè ritornare [coda; testa] basta ritornare la distanza (testa-coda)
-    // eventualmente da aggiornare gli oputput delle funzioni
-    Vector3d d = rettaIntersezione.row(1) - rettaIntersezione.row(0);  // calcolo (testa-coda)
-    A << s, -d;
-
-    Vector3d B = vertice2 - rettaIntersezione.row(0);
-    // A*t = B
-    Vector3d t =  A.lu().solve(B);
-
-    Vector3d nullo = {};
-    if(abs(t-nullo)< tol)
+    if(pianiParalleli(fract,piano1,piano2) == true)
     {
-        return false; //retta e segmento sono paralleli o coincidenti
+        return false;
     }
-    else
+    MatrixXd rettaIntersezione = RettaIntersezione(fract,piano1,piano2);
+    if(CheckTraccia(fract,rettaIntersezione,piano1,piano2,n1)==false && CheckTraccia(fract,rettaIntersezione,piano1,piano2,n2)==false)
     {
-        return true;
+        return false;
     }
-
-
+    //chiamare funzione che salva le info sulle tracce
+    return true;
 }
+
 
 
 } //namespace
