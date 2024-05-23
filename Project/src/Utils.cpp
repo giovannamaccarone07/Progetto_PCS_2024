@@ -149,7 +149,7 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int n) /
     return piano;
 }
 
-
+// REtta intersezione chiama PianoPassantePErFRattura due volte
 // Calcolo la retta di intersezione tra piani dopo aver controllato che non sono paralleli
 MatrixXd RettaIntersezione(const FractureStruct& fract, unsigned int n1, unsigned n2) // [coda; testa]
 {
@@ -179,7 +179,7 @@ MatrixXd RettaIntersezione(const FractureStruct& fract, unsigned int n1, unsigne
         A.row(0)=p1;
         A.row(1)=p2;
         Vector2d b = {piano1[3], piano2[3]}; //ottimizziamo
-        Vector3d coda = A.lu().solve(b);
+        Vector3d coda = A.lu().solve(b); // full piv da ottimizzare
         MatrixXd rettaIntersezione;
         rettaIntersezione.row(0) = coda;
         rettaIntersezione.row(1) = testa;
@@ -193,6 +193,46 @@ MatrixXd RettaIntersezione(const FractureStruct& fract, unsigned int n1, unsigne
     }
 
 }
+
+
+/// CheckTraccia
+// controlla se la retta passa per la frattura che giace nel piano
+bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione, unsigned int n1, unsigned n2)
+{
+    Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
+    Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
+    double tol = numeric_limits<double>::epsilon();
+
+    Vector3d vertice1 = fract.CoordinateVertici[fract.IndiciVertici[n1][0]];
+    Vector3d vertice2 = fract.CoordinateVertici[fract.IndiciVertici[n1][1]];
+
+    // controllo se interseca la frattura n1
+    // direzione segmento 1
+    Vector3d s = vertice2 - vertice1;
+    Matrix3d A;
+
+    // anzichè ritornare [coda; testa] basta ritornare la distanza (testa-coda)
+    // eventualmente da aggiornare gli oputput delle funzioni
+    Vector3d d = rettaIntersezione.row(1) - rettaIntersezione.row(0);  // calcolo (testa-coda)
+    A << s, -d;
+
+    Vector3d B = vertice2 - rettaIntersezione.row(0);
+    // A*t = B
+    Vector3d t =  A.lu().solve(B);
+
+    Vector3d nullo = {};
+    if(abs(t-nullo)< tol)
+    {
+        return false; //retta e segmento sono paralleli o coincidenti
+    }
+    else
+    {
+        return true;
+    }
+
+
+}
+
 
 } //namespace
 

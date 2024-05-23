@@ -19,9 +19,18 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract);
 //
 //
 MatrixXd RettaIntersezione(const FractureStruct& fract, unsigned int n1, unsigned n2);
-
+///
+///
+///
+///
+///
 Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int n);
 
+
+
+/// CheckTraccia
+// controlla se la retta passa per la frattura che giace nel piano
+bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione, unsigned int n1, unsigned n2);
 
 }
 
