@@ -29,7 +29,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
 
     fract.NumeroFratture = n_fratture;
     fract.IdFratture.resize(fract.NumeroFratture);
-    fract.CoordinateVertici.reserve(fract.NumeroFratture * 8); //brutto
+    fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
     fract.IndiciVertici.resize(fract.NumeroFratture);
 
@@ -72,9 +72,54 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
         fract.IndiciVertici[i] = indici;
 
 
-        /// Ora riempio l'oggetto CoordinateVertici è un vector<Vector3d>
-        // Creo dei vettori con la riga delle x, delle y e delle z per riuscire
-        // in un secondo momento a creare vettori con (x,y,z) prendendo un elemento per volta di ogni vettore
+        /// Ora riempio l'oggetto CoordinateVertici è un vector<MatrixXd>
+        // initializzo e riempio la mia MatrixXd e poi l'inserisco in coda al vector
+        MatrixXd matrice(3,n_vertici);
+
+        getline(file, riga); //NUMERO 4
+        istringstream riga_x(riga);
+
+        getline(file, riga);//NUMERO 5
+        istringstream riga_y(riga);
+
+        getline(file, riga); //NUMERO 6
+        istringstream riga_z(riga);
+
+        double coordinatex, coordinatey, coordinatez;
+        char c;
+
+        // travaso il contenuto delle tre righe che ho letto, prima le metto in veriabili coordinatex ,y, z
+        // poi inserisco le variabili nei vettori che ho costruito
+        for (unsigned int k = 0; k < n_vertici; k++)
+        {
+            riga_x >> coordinatex >> c;
+            riga_y >> coordinatey >> c;
+            riga_z >> coordinatez >> c;
+
+            matrice(0,k) = coordinatex;
+            matrice(1,k) = coordinatey;
+            matrice(2,k) = coordinatez;
+        }
+
+        // aggiungo la MatrixXd al vector CoordinateVertici
+        fract.CoordinateVertici[i] = matrice;
+
+
+    }
+
+    file.close();
+
+    return true;
+}
+
+
+} //namespace
+
+
+
+/*
+ *  vecchia versione
+ *
         vector<double> coordinate_x, coordinate_y, coordinate_z;
         coordinate_x.reserve(n_vertici);
         coordinate_y.reserve(n_vertici);
@@ -116,18 +161,10 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
             coordinate_vertice << coordinate_x[j], coordinate_y[j], coordinate_z[j];
             fract.CoordinateVertici.push_back(coordinate_vertice);
         }
-    }
-
-    file.close();
-
-    return true;
-}
-
-
-} //namespace
 
 
 
+*/
 
 
 

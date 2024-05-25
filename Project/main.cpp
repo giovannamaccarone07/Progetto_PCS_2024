@@ -36,9 +36,9 @@ int main()
         for (unsigned int i = 0; i < fract.NumeroVertici[numb]; i++)
         {
             cout << "Id vertice: " << fract.IndiciVertici[numb][i];
-            cout << " le coordinate sono: " <<"( "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][0];
-            cout <<" , "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][1];
-            cout <<" , "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][2] << " )" << endl;;
+            cout << " le coordinate sono: " <<"( "<< fract.CoordinateVertici[numb](0,i);
+            cout <<" , "<< fract.CoordinateVertici[numb](1,i);
+            cout <<" , "<< fract.CoordinateVertici[numb](2,i) << " )" << endl;;
         }
         cout << endl;
     }
