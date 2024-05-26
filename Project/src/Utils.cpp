@@ -111,13 +111,138 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     return true;
 }
 
+Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int n) // test n < numero fratture
+{
+    //Prendo i primi tre vertici della frattura n-esima per trovare il piano su cui giace il poligono
+
+    Vector3d vertice1 = fract.CoordinateVertici[n].col(0);
+    Vector3d vertice2 = fract.CoordinateVertici[n].col(1);
+    Vector3d vertice3 = fract.CoordinateVertici[n].col(2);
+
+    //trovo i vettori direzionali: fisso il vertice1 e faccio n1 = (vertice2 - vertice1) e n2 = (vertice3) - (vertice1)
+    Vector3d n1 = vertice2 - vertice1;
+    Vector3d n2 = vertice3 - vertice1;
+
+    //prodotto vettoriale t = n1 x n2
+    Vector3d t = n1.cross(n2);
+    double d = -(t[0]*vertice1[0] + t[1]*vertice1[1] + t[2]*vertice1[2]);
+    Vector4d piano;
+    piano[0] = t[0];        // questo fa cagare
+    piano[1] = t[1];
+    piano[2] = t[2];
+    piano[3] = d;
+
+    cout << piano[0] << " " << piano[1] << " " << piano[2] << " " << piano[3] << endl;
+
+    return piano;
+}
+
+// REtta intersezione chiama PianoPassantePErFRattura due volte
+// Calcolo la retta di intersezione tra piani dopo aver controllato che non sono paralleli
+MatrixXd RettaIntersezione(Vector4d piano1, Vector4d piano2) // [coda; testa]
+{
+    Vector3d p1;
+    p1[0] = piano1[0];        // questo fa cagare
+    p1[1] = piano1[1];
+    p1[2] = piano1[2];
+
+    Vector3d p2;
+    p2[0] = piano2[0];        // questo fa cagare
+    p2[1] = piano2[1];
+    p2[2] = piano2[2];
+
+    Vector3d testa = p1.cross(p2);
+    MatrixXd A;
+    A.row(0)=p1;
+    A.row(1)=p2;
+    Vector2d b = {piano1[3], piano2[3]}; //ottimizziamo
+    Vector3d coda = A.lu().solve(b); // full piv da ottimizzare
+    MatrixXd rettaIntersezione;
+    rettaIntersezione.row(0) = coda;
+    rettaIntersezione.row(1) = testa;
+
+    return rettaIntersezione;
+}
+
+//VERIFICARE GLI INPUT IN REFERENZA
+/// CheckTraccia
+// controlla se la retta passa per la frattura che giace nel piano
+bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione, Vector4d piano1, Vector4d piano2,unsigned int n)
+{
+    Matrix<double,3,2> A;
+    Vector3d direzioneRetta = rettaIntersezione.row(0)- rettaIntersezione.row(1);
+    A.col(0) << direzioneRetta;
+    Vector3d codaRetta = rettaIntersezione.row(0);
+    Vector3d b;
+    for(unsigned int i=0; i<fract.NumeroVertici[n]-1; i++)
+    {
+        //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
+        //lato i-esimo:
+        Vector3d vertice0 = fract.CoordinateVertici[n].col(i);
+        Vector3d vertice1 = fract.CoordinateVertici[n].col(i+1);
+        Vector3d direzioneLato = vertice1 - vertice0;
+        b << codaRetta - vertice0;
+        A.col(1) << direzioneLato;
+        Vector2d x;
+        //dubbio: la matrice A è rettangolare e non quadrata
+        x = A.lu().solve(b);
+        //chiedere le formula a stefano.
+        //if (x[0])
+        }
+    //l'ultimo lato lo calcolo a mano
+    Vector3d verticeFirst = fract.CoordinateVertici[n].col(0);
+        Vector3d verticeLast = fract.CoordinateVertici[n].col(fract.NumeroVertici[n]);
+    Vector3d direzioneLato = verticeLast - verticeFirst;
+    b << codaRetta - verticeFirst;
+    A.col(1) << direzioneLato;
+    Vector2d x;
+    //dubbio: la matrice A è rettangolare e non quadrata
+    x = A.lu().solve(b);
+
+    //double tol = numeric_limits<double>::epsilon();
+
+}
+
+bool pianiParalleli(Vector4d piano1, Vector4d piano2)
+{
+    double tol = numeric_limits<double>::epsilon();
+
+    double r1=piano1[0]/piano2[0];
+    double r2=piano1[1]/piano2[1];
+    double r3=piano1[2]/piano2[2];
+
+    if(!(abs(r1-r2)<=tol && abs(r1-r3)<=tol && abs(r2-r3)<=tol))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned n2)
+{
+    Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
+    Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
+    if(pianiParalleli(piano1,piano2) == true)
+    {
+        return false;
+    }
+    MatrixXd rettaIntersezione = RettaIntersezione(piano1,piano2);
+    if(CheckTraccia(fract,rettaIntersezione,piano1,piano2,n1)==false && CheckTraccia(fract,rettaIntersezione,piano1,piano2,n2)==false)
+    {
+        return false;
+    }
+    //chiamare funzione che salva le info sulle tracce
+    return true;
+}
+
+
 
 } //namespace
 
 
 
 /*
- *  vecchia versione
+ *  vecchia versione dati input
  *
         vector<double> coordinate_x, coordinate_y, coordinate_z;
         coordinate_x.reserve(n_vertici);
