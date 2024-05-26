@@ -32,10 +32,10 @@ int main()
     for (unsigned int numb = 0; numb < fract.NumeroFratture; numb++)
     {
         cout << "La Frattura numero: " << numb << " ha: " << fract.NumeroVertici[numb] << " vertici" << endl;
-        //vector<unsigned int> indici_frattura = fract.IndiciVertici[numb];
         for (unsigned int i = 0; i < fract.NumeroVertici[numb]; i++)
         {
-            cout << "Id vertice: " << fract.IndiciVertici[numb][i];
+            cout << "Id vertice: " << fract.IndiciVertici[numb][i]; //come era prima
+            //cout << "Id vertice: " << i + ;
             cout << " le coordinate sono: " <<"( "<< fract.CoordinateVertici[numb](0,i);
             cout <<" , "<< fract.CoordinateVertici[numb](1,i);
             cout <<" , "<< fract.CoordinateVertici[numb](2,i) << " )" << endl;;

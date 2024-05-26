@@ -56,20 +56,19 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
         // ogni frattura devo costruire i rispettivi vector<unsigend int> più interni.
         // Creo il vector di lunghezza indefinita per salvare gli indici dei vertici della frattura
         // Gli cambio la dimensione in base al numero dei vertici ha la frattura.
+
         vector<unsigned int> indici;
         indici.resize(n_vertici);
-
-
-        // Ciclo per incrementare il contatore 'indice' tante volte quante sono i vertici della frattura
+        //Ciclo per incrementare il contatore 'indice' tante volte quante sono i vertici della frattura
         for (unsigned int in = 0; in < n_vertici; in++)
         {
-            indici[in] = indice;  // Metto indice nel vector indici che contine i vertici della frattura
-            indice ++;
+          indici[in] = indice;  // Metto indice nel vector indici che contine i vertici della frattura
+          indice ++;
         }
 
+        fract.IndiciVertici[i] = indici;
         fract.IdFratture[i] = id_fratture;
         fract.NumeroVertici[i] = n_vertici;
-        fract.IndiciVertici[i] = indici;
 
 
         /// Ora riempio l'oggetto CoordinateVertici è un vector<MatrixXd>
