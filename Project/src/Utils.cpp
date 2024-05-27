@@ -103,6 +103,8 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     return true;
 }
 
+//****************************************************************
+
 Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n) // test n < numero fratture
 {
     //Prendo i primi tre vertici della frattura n-esima per trovare il piano su cui giace il poligono
@@ -128,6 +130,8 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n) 
 
     return piano;
 }
+
+//****************************************************************
 
 // REtta intersezione chiama PianoPassantePErFRattura due volte
 // Calcolo la retta di intersezione tra piani dopo aver controllato che non sono paralleli
@@ -155,14 +159,16 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
     return rettaIntersezione;
 }
 
+//****************************************************************
+
 //VERIFICARE GLI INPUT IN REFERENZA
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
 bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione,unsigned int& n)
 {
     //RIVEDERE DIREZIONE
-    Vector3d direzioneRetta = (rettaIntersezione.row(0)+rettaIntersezione.row(1));
-    Vector3d app = rettaIntersezione.row(1);
+    Vector3d direzioneRetta = rettaIntersezione.row(1);
+    Vector3d app = rettaIntersezione.row(0);
 
     double tol = numeric_limits<double>::epsilon();
     for(unsigned int i=0; i<fract.NumeroVertici[n]-1; i++)
@@ -177,9 +183,10 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
         //parametro lato
         double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((direzioneLato.cross(direzioneRetta)).norm()),2)); //esce segno inverso!!!!!!!!!!
         bool intersezione = false;
-        if(abs(k-tol)>=0 && abs(k-tol)<=1){
+        if(abs(k-tol )<= 0 && k<=1+tol){
             intersezione = true;
-            return intersezione;
+            cout << "intersezione" << i<< endl;
+            //return intersezione;
         }
     }
     //l'ultimo lato lo calcolo a mano
@@ -188,12 +195,14 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
     Vector3d direzioneLato = verticeLast - verticeFirst;
     double k = ((app.cross(direzioneRetta)-verticeFirst.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((direzioneLato.cross(direzioneRetta)).norm()),2));
     bool intersezione = false;
-    if(abs(k-tol)>=0 && abs(k-tol)<=1){
+    if(abs(k-tol)<=0 && abs(k-tol)<=1){ /// controllare condizione
         intersezione = true;
     }
     return intersezione;
 
 }
+
+//****************************************************************
 
 bool pianiParalleli(Vector4d& piano1, Vector4d& piano2)
 {
@@ -217,6 +226,8 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2)
 
 }
 
+//****************************************************************
+
 bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned int n2)
 {
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
@@ -234,6 +245,8 @@ bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned in
     //chiamare funzione che salva le info sulle tracce
     return true;
 }
+
+//****************************************************************
 
 
 
