@@ -163,6 +163,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
     //RIVEDERE DIREZIONE
     Vector3d direzioneRetta = (rettaIntersezione.row(0)+rettaIntersezione.row(1));
     Vector3d app = rettaIntersezione.row(1);
+
     double tol = numeric_limits<double>::epsilon();
     for(unsigned int i=0; i<fract.NumeroVertici[n]-1; i++)
     {
@@ -174,7 +175,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
         //parametro retta
         //double t = ((vertice1.cross(direzioneLato)-vertice0.cross(direzioneLato)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((vertice0.cross(vertice1)).norm()),2));
         //parametro lato
-        double k = ((vertice0.cross(direzioneRetta)-app.cross(direzioneRetta)).dot((direzioneRetta.cross(direzioneLato))))/(pow(((app.cross(vertice0)).norm()),2)); //esce segno inverso!!!!!!!!!!
+        double k = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(pow(((direzioneRetta.cross(direzioneLato)).norm()),2)); //esce segno inverso!!!!!!!!!!
         bool intersezione = false;
         if(abs(k-tol)>=0 && abs(k-tol)<=1){
             intersezione = true;
@@ -183,9 +184,9 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
     }
     //l'ultimo lato lo calcolo a mano
     Vector3d verticeFirst = fract.CoordinateVertici[n].col(0);
-    Vector3d verticeLast = fract.CoordinateVertici[n].col(fract.NumeroVertici[n]);
+    Vector3d verticeLast = fract.CoordinateVertici[n].col(fract.NumeroVertici[n]-1);
     Vector3d direzioneLato = verticeLast - verticeFirst;
-    double k = ((verticeFirst.cross(direzioneRetta)-verticeLast.cross(direzioneRetta)).dot((direzioneRetta.cross(direzioneLato))))/(pow(((verticeLast.cross(verticeFirst)).norm()),2));
+    double k = ((verticeFirst.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(pow(((direzioneRetta.cross(direzioneLato)).norm()),2));
     bool intersezione = false;
     if(abs(k-tol)>=0 && abs(k-tol)<=1){
         intersezione = true;
