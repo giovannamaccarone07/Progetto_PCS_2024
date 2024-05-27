@@ -15,7 +15,7 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 - SpazioMemoria
 
 - introdurre una variabile nella classe struct : tolleranza, gestione tolleranze
-- cmake debug DFN discutere con teora
+- rivedere funzione piani paralleli
 
 
 ### Codici di errore
