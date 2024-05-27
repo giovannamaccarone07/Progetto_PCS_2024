@@ -175,7 +175,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
         //parametro retta
         //double t = ((vertice1.cross(direzioneLato)-vertice0.cross(direzioneLato)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((vertice0.cross(vertice1)).norm()),2));
         //parametro lato
-        double k = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(pow(((direzioneRetta.cross(direzioneLato)).norm()),2)); //esce segno inverso!!!!!!!!!!
+        double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((direzioneLato.cross(direzioneRetta)).norm()),2)); //esce segno inverso!!!!!!!!!!
         bool intersezione = false;
         if(abs(k-tol)>=0 && abs(k-tol)<=1){
             intersezione = true;
@@ -186,7 +186,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
     Vector3d verticeFirst = fract.CoordinateVertici[n].col(0);
     Vector3d verticeLast = fract.CoordinateVertici[n].col(fract.NumeroVertici[n]-1);
     Vector3d direzioneLato = verticeLast - verticeFirst;
-    double k = ((verticeFirst.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(pow(((direzioneRetta.cross(direzioneLato)).norm()),2));
+    double k = ((app.cross(direzioneRetta)-verticeFirst.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((direzioneLato.cross(direzioneRetta)).norm()),2));
     bool intersezione = false;
     if(abs(k-tol)>=0 && abs(k-tol)<=1){
         intersezione = true;
