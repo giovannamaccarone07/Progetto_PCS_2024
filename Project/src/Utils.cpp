@@ -167,7 +167,7 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
 bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione,unsigned int& n)
 {
     //RIVEDERE DIREZIONE
-    Vector3d direzioneRetta = rettaIntersezione.row(1);
+    Vector3d direzioneRetta = rettaIntersezione.row(1) ;
     Vector3d app = rettaIntersezione.row(0);
 
     double tol = numeric_limits<double>::epsilon();
@@ -181,9 +181,17 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
         //parametro retta
         //double t = ((vertice1.cross(direzioneLato)-vertice0.cross(direzioneLato)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((vertice0.cross(vertice1)).norm()),2));
         //parametro lato
-        double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((direzioneLato.cross(direzioneRetta)).norm()),2)); //esce segno inverso!!!!!!!!!!
+
+
+        Matrix<double,3,2> A;
+        A.col(0) = direzioneLato;
+        A.col(1) = direzioneRetta;
+
+        Vector3d b = app-vertice0;
+        Vector3d x = A.colPivHouseholderQr().solve(b);
+
         bool intersezione = false;
-        if(abs(k-tol )<= 0 && k<=1+tol){
+        if(abs(x[0]-tol )<= 0 && x[0]<=1+tol){
             intersezione = true;
             cout << "intersezione" << i<< endl;
             //return intersezione;
@@ -255,6 +263,7 @@ bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned in
 
 
 
+//        double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(pow(((direzioneLato.cross(direzioneRetta)).norm()),2)); //esce segno inverso!!!!!!!!!!
 
 
 
