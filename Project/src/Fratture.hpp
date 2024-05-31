@@ -48,6 +48,32 @@ struct TracesStruct
 {
     ///ContatoreTracce
     unsigned int ct = 0;
+<<<<<<< HEAD
+=======
+
+    ///VettoreIdTracce
+    // Vettore che salva gli id delle tracce
+    vector<unsigned int> IdTracce = {};                 /// dim: 1 x ct
+
+    ///CoordinateEstremiTracce
+    // Vettore che salva le coordinate degli estremi delle tracce: la i-esima coordinata del vettore corrisponde alla traccia di indice i.
+    //Inoltre, la matrice della posizione i-esima è 2x3 dove la prima riga contiene le coordinate del primo estremo e analogamente la seconda.
+    vector<Matrix<double,2,3>> EstremiTracce = {};      /// dim: 1 x ct
+
+    ///LunghezzaTracce
+    // Vettore che salva la lunghezza di ogni traccia
+    vector<double> LunghezzaTracce = {};                /// dim: 1 x ct
+
+    ///MatriceCaratteristicheTraccia
+    // Vettore di matrici quadrate 2x2. La matrice che si trova in posizione i-esima è relativa alla traccia di id i e le due righe indicano le fratture tra cui esiste la traccia.
+    // Ogni riga è formata da frattura  e un booleano a cui è associato True se la traccia è passante per quella frattura o False se non lo è.
+    vector<Matrix2d> PNP = {};                          /// dim: 1 x ct
+
+
+};
+
+}
+>>>>>>> 2c1da455e868b3c76a3061ff5be937874440ba40
 
     ///VettoreIdTracce
     // Vettore che salva gli id delle tracce

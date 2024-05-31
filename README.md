@@ -8,6 +8,7 @@ CoordinateVertici non posso vedero come matrice NumeroVertici x 3 perchè a prio
 Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura dimensiono un vettore della giusta grandezza e travaso la lista.?? Il problema è IndiciVertici che non so quanto senso abbia ora perchè i vertici della frattura sono gia dentro la corrispettiva matrice, li trovo tutti li, non ho bisogno di distinguerli nella matriciona grande che avevamo prima.  
 
 ### Cose da Discutere
+
 - meglio usare VectorX di Eigen oppure vector di STL nell'input dei file ? capire qual'è la sostanziale differenza, i vettori di Eigen permettono operazioni matematiche migliori ?
 
 - meglio fare un resize anzichè reserve + push_back 
@@ -18,7 +19,23 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 - rivedere funzione piani paralleli
 - capire perché la direzione del lato si calcola come punto iniziale - punto finale e non viceversa
 - rivedere l'indice del ciclo for e scriverlo in modulo 6
+- rivedere le strutture in fratture.hpp perché abbiamo creato delle matrici di double ma abbiamo intenzione di inserirci dei booleani. Potrebbe andare 0/1?
+- 
 
 
 ### Codici di errore
+
+## COSE DA CHIEDERE ALLA TEORA
+
+- rivedere le strutture in fratture.hpp perché abbiamo creato delle matrici di double ma abbiamo intenzione di inserirci dei booleani. Potrebbe andare 0/1?
+- rivedere l'indice del ciclo for e scriverlo in modulo 6
+- rivedere valore k
+- paraview
+- test
+- come si fanno le 24 condizioni
+- 1 file per ogni frattura?
+
+
+
+
 

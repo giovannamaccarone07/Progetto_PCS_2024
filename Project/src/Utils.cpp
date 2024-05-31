@@ -204,7 +204,11 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
                     ts.push_back(t);
 
                 }
+<<<<<<< HEAD
                 cout << "intersezione" << i1 << endl;
+=======
+            cout << "intersezione" << i1 << endl;
+>>>>>>> 2c1da455e868b3c76a3061ff5be937874440ba40
             }
         }
         else

@@ -33,6 +33,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
 ///CheckIntersezione
 // controlla se c'è intersezione
 bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned int n2);
+bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2);
 
 
 }
