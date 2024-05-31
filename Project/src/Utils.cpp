@@ -320,7 +320,6 @@ bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned in
         cout << "I piani sono paralleli" << endl;
         return false; //non c'è intersezione
     }
-
     else
     {
         if(BoundingBox(fract,n1,n2) == false)

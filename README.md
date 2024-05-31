@@ -34,6 +34,8 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 - test
 - come si fanno le 24 condizioni
 - 1 file per ogni frattura?
+-   Vector3d vettoreMax1(-1e100, -1e100, -1e100); Nella boundingBox come inizializzo dei vettori vuoti in modo che possa fare dei paragoni con le x,y,z che trovo? 
+
 
 
 
