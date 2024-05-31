@@ -164,19 +164,26 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
 //VERIFICARE GLI INPUT IN REFERENZA
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
-bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione,unsigned int& n)
+bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione,unsigned int& n1, unsigned int& n2)
 {
 
     //RIVEDERE DIREZIONE
     Vector3d direzioneRetta = rettaIntersezione.row(1);
     Vector3d app = rettaIntersezione.row(0);
     double tol = numeric_limits<double>::epsilon();
-    for(unsigned int i=0; i<fract.NumeroVertici[n]-1; i++) //modificare e inserire il modulo per togliere il caso particolare 192-197
+
+
+    unsigned int j1 = 0;
+    unsigned int i1;
+    unsigned int p1;
+    while(j1<fract.NumeroVertici[n1])
     {
+        i1 = j1%(fract.NumeroVertici[n1]);
+        p1 = (j1+1)%(fract.NumeroVertici[n1]);
         //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
         //lato i-esimo:
-        Vector3d vertice0 = fract.CoordinateVertici[n].col(i);
-        Vector3d vertice1 = fract.CoordinateVertici[n].col(i+1);
+        Vector3d vertice0 = fract.CoordinateVertici[n1].col(i1);
+        Vector3d vertice1 = fract.CoordinateVertici[n1].col(p1);
         Vector3d direzioneLato = vertice0 - vertice1;
         //parametro lato
         bool intersezione = false;
@@ -198,36 +205,58 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
                     Vector3d t1 = app + t*direzioneRetta;
                     Traccia.push_back(t1); //aggiustare dimensione vector traccia
                 }
-            cout << "intersezione" << i<< endl;
+            cout << "intersezione" << i1 << endl;
             //return intersezione;
             }
         }
         else
         {
             cout << "Sono paralleli" << endl;
+            return intersezione;
         }
     }
-    //l'ultimo lato lo calcolo a mano
-    Vector3d verticeFirst = fract.CoordinateVertici[n].col(0);
-    Vector3d verticeLast = fract.CoordinateVertici[n].col(fract.NumeroVertici[n]-1);
-    Vector3d direzioneLato = verticeFirst - verticeLast;
-    bool intersezione = false;
-    if((direzioneLato.cross(direzioneRetta)).norm() > tol)
-    { //no abs perchè la norma è positiva //da ottimizzare
-        double k = ((app.cross(direzioneRetta)-verticeFirst.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm()); //esce segno inverso!!!!!!!!!!
-        if(k >= -tol && k<=1+tol)
-        {
-            intersezione = true;
-            if(abs(k-1)<tol)
+    unsigned int j2 = 0;
+    unsigned int i2;
+    unsigned int p2;
+    while(j2<fract.NumeroVertici[n2])
+    {
+        i2 = j2%(fract.NumeroVertici[n2]);
+        p2 = (j2+1)%(fract.NumeroVertici[n2]);
+        //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
+        //lato i-esimo:
+        Vector3d vertice0 = fract.CoordinateVertici[n2].col(i2);
+        Vector3d vertice1 = fract.CoordinateVertici[n2].col(p2);
+        Vector3d direzioneLato = vertice0 - vertice1;
+        //parametro lato
+        bool intersezione = false;
+        if((direzioneLato.cross(direzioneRetta)).norm() > tol)
+        { //no abs perchè la norma è positiva //da ottimizzare
+            vector<Vector3d> Traccia;
+            double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+            if(k >= -tol && k<=1+tol)
             {
-                cout << "Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
+                intersezione = true;
+                if(abs(k-1)<tol)
+                {
+                    cout << "Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
+                }
+                else
+                {
+                    //parametro retta
+                    double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+                    Vector3d t1 = app + t*direzioneRetta;
+                    Traccia.push_back(t1); //aggiustare dimensione vector traccia
+                }
+                cout << "intersezione" << i2 << endl;
+                //return intersezione;
             }
-            cout << "intersezione" << endl;
-            //return intersezione;
+        }
+        else
+        {
+            cout << "Sono paralleli" << endl;
+            return intersezione;
         }
     }
-    return intersezione;
-
 }
 
 //****************************************************************
@@ -265,24 +294,94 @@ bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned in
         cout << "I piani sono paralleli" << endl;
         return false; //non c'è intersezione
     }
-    MatrixXd rettaIntersezione = RettaIntersezione(piano1,piano2);
-    if(CheckTraccia(fract,rettaIntersezione,n1)==false && CheckTraccia(fract,rettaIntersezione,n2)==false)
+
+    else
     {
-        return false;
+        if(BoundingBox(fract,n1,n2) == false)
+        {
+            return false;
+        }
+        else
+        {
+            MatrixXd rettaIntersezione = RettaIntersezione(piano1,piano2);
+            if(CheckTraccia(fract,rettaIntersezione,n1,n2)==false) //modificare una volta che si è modificata checktraccia
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
     }
+
     //chiamare funzione che salva le info sulle tracce
-    return true;
+
+
 }
 
 //****************************************************************
-bool BoundingBox()
+bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2)
 {
-
-
-
+    Vector3d vettoreMax1(-1e100, -1e100, -1e100);
+    Vector3d vettoreMax2(-1e100, -1e100, -1e100);
+    Vector3d vettoreMin1(1e100, 1e100, 1e100);
+    Vector3d vettoreMin2(1e100, 1e100, 1e100);
+    for(unsigned int i=0;i<fract.NumeroVertici[n1];i++)
+    {
+        Vector3d vertice = fract.CoordinateVertici[n1].col(i);
+        double x = vertice[0];
+        double y = vertice[1];
+        double z = vertice[2];
+        //check massimi
+        if(vettoreMax1[0]<x)
+            vettoreMax1[0] = x;
+        if(vettoreMax1[1]<y)
+            vettoreMax1[1] = y;
+        if(vettoreMax1[2]<z)
+            vettoreMax1[2] = z;
+        //check minimi
+        if(vettoreMin1[0]>x)
+            vettoreMin1[0] = x;
+        if(vettoreMin1[1]>y)
+            vettoreMin1[1] = y;
+        if(vettoreMin1[2]>z)
+            vettoreMin1[2] = z;
+    }
+    for(unsigned int i=0;i<fract.NumeroVertici[n2];i++)
+    {
+        Vector3d vertice = fract.CoordinateVertici[n2].col(i);
+        double x = vertice[0];
+        double y = vertice[1];
+        double z = vertice[2];
+        //check massimi
+        if(vettoreMax2[0]<x)
+            vettoreMax2[0] = x;
+        if(vettoreMax2[1]<y)
+            vettoreMax2[1] = y;
+        if(vettoreMax2[2]<z)
+            vettoreMax2[2] = z;
+        //check minimi
+        if(vettoreMin2[0]>x)
+            vettoreMin2[0] = x;
+        if(vettoreMin2[1]>y)
+            vettoreMin2[1] = y;
+        if(vettoreMin2[2]>z)
+            vettoreMin2[2] = z;
+    }
+    //check intersezione bbox
+    if(vettoreMin1[0]<= vettoreMax2[0] && vettoreMax1[0]>= vettoreMin2[0] &&
+        vettoreMin1[1]<= vettoreMax2[1] && vettoreMax1[1]>= vettoreMin2[1] &&
+        vettoreMin1[2]<= vettoreMax2[2] && vettoreMax1[2]>= vettoreMin2[2])
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
-
-
 
 } //namespace
 
