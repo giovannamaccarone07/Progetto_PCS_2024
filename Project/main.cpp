@@ -25,24 +25,30 @@ int main()
     {
         cout << "Dati importati correttamente" << endl;
     }
-
+    /*
     // Provo a stampare le coordinate delle fratture
     cout << "Ci sono " << fract.NumeroFratture << " fratture" << endl;
     cout << endl;
+
     for (unsigned int numb = 0; numb < fract.NumeroFratture; numb++)
     {
         cout << "La Frattura numero: " << numb << " ha: " << fract.NumeroVertici[numb] << " vertici" << endl;
-        //vector<unsigned int> indici_frattura = fract.IndiciVertici[numb];
         for (unsigned int i = 0; i < fract.NumeroVertici[numb]; i++)
         {
-            cout << "Id vertice: " << fract.IndiciVertici[numb][i];
-            cout << " le coordinate sono: " <<"( "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][0];
-            cout <<" , "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][1];
-            cout <<" , "<< fract.CoordinateVertici[fract.IndiciVertici[numb][i]][2] << " )" << endl;;
+            cout << "Id vertice: " << fract.IndiciVertici[numb][i]; //come era prima
+            //cout << "Id vertice: " << i + ;
+            cout << " le coordinate sono: " <<"( "<< fract.CoordinateVertici[numb](0,i);
+            cout <<" , "<< fract.CoordinateVertici[numb](1,i);
+            cout <<" , "<< fract.CoordinateVertici[numb](2,i) << " )" << endl;;
         }
         cout << endl;
     }
-
+    */
+    bool result = checkIntersezione(fract,0,1);
+    if(result == false)
+        cout << "non c'è intersezione" << endl;
+    else
+        cout << "c'é intersezione" << endl;
 
     return 0;
 
