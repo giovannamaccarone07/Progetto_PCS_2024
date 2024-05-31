@@ -16,6 +16,8 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 
 - introdurre una variabile nella classe struct : tolleranza, gestione tolleranze
 - rivedere funzione piani paralleli
+- capire perché la direzione del lato si calcola come punto iniziale - punto finale e non viceversa
+- rivedere l'indice del ciclo for e scriverlo in modulo 6
 
 
 ### Codici di errore
