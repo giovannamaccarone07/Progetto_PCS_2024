@@ -46,11 +46,13 @@ int main()
     */
     bool result = checkIntersezione(fract,0,1);
     if(result == false)
-        cout << "non c'è intersezione" << endl;
+        cout << "Main: non c'è intersezione" << endl;
     else
-        cout << "c'é intersezione" << endl;
+        cout << "Main: c'é intersezione" << endl;
+
+
 
     return 0;
-
 }
+
 

@@ -14,7 +14,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     ifstream file;
     file.open(NomeFile);
     if(file.fail()){
-        cerr << "impossibile aprire il file"<<endl;
+        cerr << "ImportaDati: impossibile aprire il file"<<endl;
         return false;
     }
     string riga;
@@ -126,7 +126,7 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n) 
     piano[2] = t[2];
     piano[3] = d;
 
-    cout << piano[0] << " " << piano[1] << " " << piano[2] << " " << piano[3] << endl;
+    //cout << piano[0] << " " << piano[1] << " " << piano[2] << " " << piano[3] << endl;
 
     return piano;
 }
@@ -179,6 +179,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
     unsigned int p1;
     while(j1<fract.NumeroVertici[n1])
     {
+
         i1 = j1%(fract.NumeroVertici[n1]);
         p1 = (j1+1)%(fract.NumeroVertici[n1]);
         //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
@@ -195,7 +196,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
             {
                 if(abs(k-1)<tol)
                 {
-                    cout << "Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
+                    cout << "CheckTraccia: Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
                 }
                 else
                 {
@@ -204,23 +205,21 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
                     ts.push_back(t);
 
                 }
-<<<<<<< HEAD
-                cout << "intersezione" << i1 << endl;
-=======
-            cout << "intersezione" << i1 << endl;
->>>>>>> 2c1da455e868b3c76a3061ff5be937874440ba40
+                cout << "CheckTraccia: intersezione: " << i1 <<" frattura: " << n1 << endl;
             }
         }
         else
         {
-            cout << "Sono paralleli" << endl;
+            cout << "CheckTraccia: Sono paralleli. lato: "<<i1<< "frattura: "<<n1<< endl;
         }
+        j1 ++;
     }
     unsigned int j2 = 0;
     unsigned int i2;
     unsigned int p2;
     while(j2<fract.NumeroVertici[n2])
     {
+
         i2 = j2%(fract.NumeroVertici[n2]);
         p2 = (j2+1)%(fract.NumeroVertici[n2]);
         //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
@@ -236,7 +235,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
             {
                 if(abs(k-1)<tol)
                 {
-                    cout << "Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
+                    cout << "CheckTraccia: Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
                 }
                 else
                 {
@@ -244,15 +243,14 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
                     double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
                     ts.push_back(t);
                 }
-                cout << "intersezione" << i2 << endl;
+                cout << "CheckTraccia: intersezione: " << i2 <<" frattura: " << n2 << endl;
             }
         }
         else
         {
-            cout << "Sono paralleli" << endl;
+            cout << "CheckTraccia: Sono paralleli. lato: "<<i2<< "frattura: "<<n2<< endl;
         }
-
-
+        j2++;
     }
     bool intersezione = false;
     if(ts.size()<4)
@@ -317,13 +315,14 @@ bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned in
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
     if(pianiParalleli(piano1,piano2) == true)
     {
-        cout << "I piani sono paralleli" << endl;
+        cout << "CheckIntersezione: I piani sono paralleli" << endl;
         return false; //non c'è intersezione
     }
     else
     {
         if(BoundingBox(fract,n1,n2) == false)
         {
+            cout << "Boundingbox: i poligono non si toccano" << endl;
             return false;
         }
         else
