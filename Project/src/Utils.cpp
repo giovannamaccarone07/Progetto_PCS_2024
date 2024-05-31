@@ -407,10 +407,10 @@ bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2)
 }
 
 //****************************************************************
+/*
+bool ComputeTraces(){}
 
-bool ComputeTraces()
-
-
+*/
 } //namespace
 
 
