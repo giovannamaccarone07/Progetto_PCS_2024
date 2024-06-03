@@ -35,6 +35,14 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
 bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned int n2);
 bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2);
 
-
+/// ComputeTrace
+///
+///
+bool ComputeTrace(TracesStruct trac,
+                  const FractureStruct& fract,
+                  double ts1, double ts2,
+                  const MatrixXd& rettaIntersezione,
+                  unsigned int n1, unsigned int n2,
+                  bool pass1,bool pass2);
 }
 

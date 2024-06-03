@@ -258,6 +258,8 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
     }
 
     bool intersezione = false;
+    bool pass1;
+    bool pass2;
     if(ts.size()<4)
     {
         return intersezione;
@@ -277,12 +279,44 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
         }
         else
         {
+            if((ts[0]==ts[2] && ts[1]==ts[3]) ||
+                (ts[0]== ts[3] && ts[1]==ts[2]))
+            {
+                pass1 = true;
+                pass2 = true;
+            }
+            else if((ts[0]<ts[2] && ts[2]<ts[3] && ts[3]<ts[1]) ||
+                    (ts[0]<ts[3] && ts[3]<ts[2] && ts[2]<ts[1]) ||
+                    (ts[1]<ts[2] && ts[2]<ts[3] && ts[3]<ts[0]) ||
+                    (ts[1]<ts[3] && ts[3]<ts[2] && ts[2]<ts[0])) //seconda traccia passante
+            {
+                pass1 = false;
+                pass2 = true;
+
+            }
+            else if((ts[2]<ts[0] && ts[0]<ts[1] && ts[1]<ts[3]) ||
+                    (ts[2]<ts[1] && ts[1]<ts[0] && ts[0]<ts[3]) ||
+                    (ts[3]<ts[0] && ts[0]<ts[1] && ts[1]<ts[2]) ||
+                    (ts[3]<ts[1] && ts[1]<ts[0] && ts[0]<ts[2]))
+            {
+                pass1 = true;
+                pass2 = false;
+            }
+            else
+            {
+                pass1 = false;
+                pass2 = false;
+            }
+
             //ordino il vettore
             sort(ts.begin(),ts.end());
             intersezione = true;
             //passo i valori centrali che rappresentano gli estremi della traccia
-            //ComputeTrace(trac,fract,ts[1],ts[2],rettaIntersezione,n1,n2,pass1,pass2);
-
+            bool traccia = ComputeTrace(trac,fract,ts[1],ts[2],rettaIntersezione,n1,n2,pass1,pass2);
+            if(traccia == false)
+            {
+                cerr << "ComputeTrace non memorizza la traccia";
+            }
         }
     }
     return intersezione;
@@ -414,8 +448,53 @@ bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2)
 }
 
 //****************************************************************
-/*
-bool ComputeTraces(){}
 
-*/
+bool ComputeTrace(TracesStruct trac, const FractureStruct& fract, double ts1, double ts2,
+                  const MatrixXd& rettaIntersezione, unsigned int n1, unsigned int n2,
+                  bool pass1,bool pass2)
+{
+    int num = trac.ct;
+    trac.IdTracce.push_back(num);
+    Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts1;
+    Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts2;
+    Matrix<double,2,3> M;
+    M.row(0)=p1;
+    M.row(1)=p2;
+    trac.EstremiTracce[num]=M;
+    double len = abs(p2-p1);
+    trac.LunghezzaTracce[num]=len;
+    Matrix<double,2,2> Traccia;
+    double passante1 = 0;
+    double passante2 = 0;
+    if (pass1 == false)
+    {
+        passante1 = 1;
+    }
+    if (pass2 == false)
+    {
+        passante2 = 1;
+    }
+    Vector2i riga1(n1,passante1);
+    Vector2i riga2(n2,passante2);
+    Traccia.row(0)  = riga1;
+    Traccia.row(1)  = riga2;
+    trac.PNP[num] = Traccia;
+
+
+    array<int> = infoN1(num,passante1);
+    array<int> = infoN2(num,passante2);
+
+    fract.NumeroTracce[n1].append(infoN1);
+    fract.NumeroTracce[n2].append(infoN2);
+
+
+    trac.ct ++;
+
+    return true ;//se è andato a buon fine il salvataggio
+
+}
+
+//****************************************************************
+
+
 } //namespace

@@ -38,7 +38,7 @@ struct FractureStruct
     vector<vector<unsigned int>> IndiciVertici = {};    /// dim: vector<unsigned int> x NumeroFratture
     vector<MatrixXd> CoordinateVertici = {};            /// dim: MatrixXd x NumeroVertici
     unsigned int SpazioMemoria = 0;
-    vector<MatrixXd> NumeroTracce = {};
+    vector<list<array<int,2>>> NumeroTracce = {};
 
 
 };
@@ -65,7 +65,7 @@ struct TracesStruct
     ///MatriceCaratteristicheTraccia
     // Vettore di matrici quadrate 2x2. La matrice che si trova in posizione i-esima è relativa alla traccia di id i e le due righe indicano le fratture tra cui esiste la traccia.
     // Ogni riga è formata da frattura  e un booleano a cui è associato True se la traccia è passante per quella frattura o False se non lo è.
-    vector<Matrix2d> PNP = {};                          /// dim: 1 x ct
+    vector<Matrix2i> PNP = {};                          /// dim: 1 x ct
 };
 
 }
