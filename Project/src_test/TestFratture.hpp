@@ -1,18 +1,20 @@
-#ifndef __TESTPOLYGONS_H
-#define __TESTPOLYGONS_H
+#ifndef __TESTFRATTURE_H
+#define __TESTFRATTURE_H
 
 #include <gtest/gtest.h>
-#include "Polygons.hpp"
+#include "Fratture.hpp"
 #include "Eigen/Eigen"
 #include <iostream>
 #include "UCDUtilities.hpp"
+#include <math.h>
+#include "Utils.hpp"
 
 using namespace Eigen;
 using namespace std;
 
-namespace GeometryLibrary {
+namespace FractureLibrary {
 //********************************
-TEST(TRIANGLETEST, TestComputeArea){
+/*TEST(TRIANGLETEST, TestComputeArea){
 
     Matrix3d vertices = Matrix3d::Zero();
 
@@ -25,8 +27,9 @@ TEST(TRIANGLETEST, TestComputeArea){
     double area = t.computeArea();
     EXPECT_EQ(area, 0.5);
 }
-//********************************
-TEST(POLYGONTEST, TestPlotParaviewTriangles){
+*///********************************
+/*
+TEST(FRACTURE_TEST, TestPlotParaviewFractures){
 
     MatrixXd points = MatrixXd::Zero(3, 4);
 
@@ -85,8 +88,29 @@ TEST(POLYGONTEST, TestPlotParaviewPolygons){
                             materials);
 }
 //********************************
+*/
+TEST(ImportaDatiTest, NumeroVertici)
+{
+    FractureStruct fract;
+    ImportaDati("FR3_data.txt",fract);
+    unsigned int vertici = fract.NumeroVertici[0]; // controllo che la prima frattura abbia 4 vertici
+    ASSERT_EQ(4,vertici);
+
+}
+/*/ ***************************************************************************
+TEST(SquareRootTest, NegativeNos)
+{
+    ASSERT_EQ(-1.0, squareRoot(-15.0));
+    ASSERT_EQ(-1.0, squareRoot(-0.2));
+}
+/*/
+
+
+
 }
 
 
 
 #endif
+
+
