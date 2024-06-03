@@ -196,6 +196,10 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
             {
                 if(abs(k-1)<tol)
                 {
+                    /// ATTENZIONE STIAMO ESCLUDENDO IL CASO PARALLELI E COINCIDENTI
+                    /// QUESTO PEZZO VA SOSTITUITO E MESSO NELL'ESLE
+                    ///
+                    ///
                     cout << "CheckTraccia: Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
                 }
                 else
@@ -252,6 +256,7 @@ bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione
         }
         j2++;
     }
+
     bool intersezione = false;
     if(ts.size()<4)
     {

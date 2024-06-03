@@ -20,8 +20,8 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 - capire perché la direzione del lato si calcola come punto iniziale - punto finale e non viceversa
 - rivedere l'indice del ciclo for e scriverlo in modulo 6
 - rivedere le strutture in fratture.hpp perché abbiamo creato delle matrici di double ma abbiamo intenzione di inserirci dei booleani. Potrebbe andare 0/1?
-- 
-
+- IMPORTANTE CheckTraccia va considerato il caso retta parallela al segmento opp coincidente
+- BISOGNA implementare le variabili booleane pass1 e pass2 in CheckTraccia 
 
 ### Codici di errore
 
