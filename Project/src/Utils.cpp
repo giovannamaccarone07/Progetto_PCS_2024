@@ -164,7 +164,7 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
 //VERIFICARE GLI INPUT IN REFERENZA
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
-bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione,unsigned int& n1, unsigned int& n2)
+bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const MatrixXd& rettaIntersezione,unsigned int& n1, unsigned int& n2)
 {
 
     //RIVEDERE DIREZIONE
@@ -348,7 +348,7 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2)
 
 //****************************************************************
 
-bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned int n2)
+bool checkIntersezione(const FractureStruct& fract, TracesStruct trac, unsigned int n1, unsigned int n2)
 {
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
@@ -367,7 +367,7 @@ bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned in
         else
         {
             MatrixXd rettaIntersezione = RettaIntersezione(piano1,piano2);
-            if(CheckTraccia(fract,rettaIntersezione,n1,n2)==false) //modificare una volta che si è modificata checktraccia
+            if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2)==false) //modificare una volta che si è modificata checktraccia
             {
                 return false;
             }
@@ -449,11 +449,11 @@ bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2)
 
 //****************************************************************
 
-bool ComputeTrace(TracesStruct trac, const FractureStruct& fract, double ts1, double ts2,
+bool ComputeTrace(TracesStruct trac, FractureStruct fract, double ts1, double ts2,
                   const MatrixXd& rettaIntersezione, unsigned int n1, unsigned int n2,
                   bool pass1,bool pass2)
 {
-    int num = trac.ct;
+    unsigned int num = trac.ct;
     trac.IdTracce.push_back(num);
     Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts1;
     Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts2;
@@ -461,11 +461,11 @@ bool ComputeTrace(TracesStruct trac, const FractureStruct& fract, double ts1, do
     M.row(0)=p1;
     M.row(1)=p2;
     trac.EstremiTracce[num]=M;
-    double len = abs(p2-p1);
+    double len = (p2-p1).norm();
     trac.LunghezzaTracce[num]=len;
-    Matrix<double,2,2> Traccia;
-    double passante1 = 0;
-    double passante2 = 0;
+    Matrix<unsigned int,2,2> Traccia;
+    unsigned int passante1 = 0;
+    unsigned int passante2 = 0;
     if (pass1 == false)
     {
         passante1 = 1;
@@ -474,18 +474,19 @@ bool ComputeTrace(TracesStruct trac, const FractureStruct& fract, double ts1, do
     {
         passante2 = 1;
     }
-    Vector2i riga1(n1,passante1);
-    Vector2i riga2(n2,passante2);
-    Traccia.row(0)  = riga1;
-    Traccia.row(1)  = riga2;
+    Vector<unsigned int,2> riga1(n1,passante1);
+    Vector<unsigned int,2> riga2(n2,passante2);
+    Traccia.row(0) = riga1;
+    Traccia.row(1) = riga2;
     trac.PNP[num] = Traccia;
 
 
-    array<int> = infoN1(num,passante1);
-    array<int> = infoN2(num,passante2);
+    array<unsigned int,2> infoN1 = {num,passante1};
+    array<unsigned int,2> infoN2 = {num,passante2};
 
-    fract.NumeroTracce[n1].append(infoN1);
-    fract.NumeroTracce[n2].append(infoN2);
+
+    fract.NumeroTracce[n1].push_back(infoN1);
+    fract.NumeroTracce[n2].push_back(infoN2);
 
 
     trac.ct ++;

@@ -29,17 +29,17 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n);
 
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
-bool CheckTraccia(const FractureStruct& fract, const MatrixXd& rettaIntersezione,unsigned int& n);
+bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const MatrixXd& rettaIntersezione,unsigned int& n);
 ///CheckIntersezione
 // controlla se c'è intersezione
-bool checkIntersezione(const FractureStruct& fract, unsigned int n1, unsigned int n2);
+bool checkIntersezione(const FractureStruct& fract, TracesStruct trac, unsigned int n1, unsigned int n2);
 bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2);
 
 /// ComputeTrace
 ///
 ///
 bool ComputeTrace(TracesStruct trac,
-                  const FractureStruct& fract,
+                  FractureStruct fract,
                   double ts1, double ts2,
                   const MatrixXd& rettaIntersezione,
                   unsigned int n1, unsigned int n2,

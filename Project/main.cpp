@@ -11,6 +11,7 @@ using namespace FractureLibrary;
 int main()
 {
     FractureStruct fract;
+    TracesStruct trac;
 
     string NomeFile = "FR3_data.txt";
 
@@ -44,7 +45,7 @@ int main()
         cout << endl;
     }
     */
-    bool result = checkIntersezione(fract,0,1);
+    bool result = checkIntersezione(fract,trac,0,1);
     if(result == false)
         cout << "Main: non c'è intersezione" << endl;
     else

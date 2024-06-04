@@ -60,7 +60,7 @@ TEST(FRACTURE_TEST, TestPlotParaviewFractures){
 
 
 }
-//********************************
+/********************************
 TEST(POLYGONTEST, TestPlotParaviewPolygons){
 
     MatrixXd points = MatrixXd::Zero(3, 4);
@@ -87,7 +87,7 @@ TEST(POLYGONTEST, TestPlotParaviewPolygons){
                             {},
                             materials);
 }
-//********************************
+/********************************
 */
 TEST(ImportaDatiTest, NumeroVertici)
 {

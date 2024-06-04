@@ -16,6 +16,7 @@ int main(int argc, char **argv)
     testing::InitGoogleTest(&argc, argv);
 
     FractureStruct fract;
+    TracesStruct trac;
 
     string NomeFile = "FR3_data.txt";
 
@@ -30,7 +31,7 @@ int main(int argc, char **argv)
         cout << "Dati importati correttamente" << endl;
     }
 
-    bool result = checkIntersezione(fract,0,1);
+    bool result = checkIntersezione(fract,trac,0,1);
     if(result == false)
         cout << "Main: non c'è intersezione" << endl;
     else
