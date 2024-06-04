@@ -14,7 +14,7 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 - meglio fare un resize anzichè reserve + push_back 
 - IdFRatture tanto è un vettore ordinato da 0 a n_fratture
 - SpazioMemoria
-
+- inserire reference sulle chiamate di funzione&? 
 - introdurre una variabile nella classe struct : tolleranza, gestione tolleranze
 - rivedere funzione piani paralleli
 - capire perché la direzione del lato si calcola come punto iniziale - punto finale e non viceversa

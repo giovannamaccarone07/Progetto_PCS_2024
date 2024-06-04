@@ -52,6 +52,18 @@ int main()
         cout << "Main: c'é intersezione" << endl;
 
 
+    if(Output(trac, fract) == false)
+    {
+        cerr << "Impossibile stampare i dati" << endl;
+
+        return 2;
+    }
+    else
+    {
+        cout << "Dati stampati correttamente" << endl;
+    }
+
+
 
     return 0;
 }

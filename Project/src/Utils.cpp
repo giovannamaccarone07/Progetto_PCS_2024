@@ -164,7 +164,8 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
 //VERIFICARE GLI INPUT IN REFERENZA
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
-bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const MatrixXd& rettaIntersezione,unsigned int& n1, unsigned int& n2)
+bool CheckTraccia(const FractureStruct& fract, TracesStruct trac,
+                  const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2)
 {
 
     //RIVEDERE DIREZIONE
@@ -493,6 +494,80 @@ bool ComputeTrace(TracesStruct trac, FractureStruct fract, double ts1, double ts
 
     return true ;//se è andato a buon fine il salvataggio
 
+}
+
+//****************************************************************
+
+bool OutputTraces(const TracesStruct& trac)
+{
+    // Open File
+    ofstream file;
+    string outputFileName = "./OutputTraces.txt";
+    file.open(outputFileName);
+
+    if (file.fail())
+    {
+        cerr<< "file open failed"<< endl;
+        return false;
+    }
+
+    unsigned int num = trac.ct;
+    file << "# Number of Traces" << endl;
+    file << num << endl;
+    file << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
+    char sep = "; ";
+    for (i=0; i < num; i++)
+    {
+        file << i << sep << trac.PNP[i].row(0)[0] << sep << trac.PNP[i].row(1)[0]
+             << sep << trac.EstremiTracce[i].row(0)[0] << sep << trac.EstremiTracce[i].row(0)[1] << sep << trac.EstremiTracce[i].row(0)[2]
+             << sep << trac.EstremiTracce[i].row(1)[0] << sep << trac.EstremiTracce[i].row(1)[1] << sep << trac.EstremiTracce[i].row(1)[2]
+             << endl;
+    }
+
+    // Close File
+    file.close();
+
+
+    return true;
+}
+
+//****************************************************************
+
+bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
+{
+
+    return true;
+}
+
+//****************************************************************
+
+bool Output(const TracesStruct& trac, const FractureStruct& frac)
+{
+    bool stampaTracce = false;
+    bool stampaFratture = false;
+
+    if(OutputTraces(trac) == true)
+    {
+        stampaTracce = true;
+        cout << "Tracce stampate correttamente" << endl;
+    }
+    else
+    {
+        cerr << "Impossibile stampare le tracce" << endl;
+    }
+
+    if(OutputFractures(trac,frac) == true)
+    {
+        stampaFratture = true;
+        cout << "Fratture stampate correttamente" << endl;
+    }
+    else
+    {
+        cerr << "Impossibile stampare le fratture" << endl;
+    }
+
+    bool result = stampaTracce && stampaFratture;
+    return result;
 }
 
 //****************************************************************
