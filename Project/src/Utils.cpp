@@ -142,6 +142,7 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
     //vettore normale al secondo piano
     Vector3d p2 = piano2.head(3);
     Vector3d tangente = p1.cross(p2);
+
     //documento vicini
     Matrix3d A;
     A.row(0) = p1;
