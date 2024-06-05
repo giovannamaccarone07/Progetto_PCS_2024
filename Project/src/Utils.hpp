@@ -17,7 +17,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& Fract);
 /// PianoPassantePerFrattura
 //
 //
-MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2);
+Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2);
 ///
 ///
 ///

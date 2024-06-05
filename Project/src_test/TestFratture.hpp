@@ -89,6 +89,10 @@ TEST(POLYGONTEST, TestPlotParaviewPolygons){
 }
 /********************************
 */
+
+
+double tol = numeric_limits<double>::epsilon();
+
 TEST(ImportaDatiTest, NumeroVertici)
 {
     FractureStruct fract;
@@ -97,6 +101,83 @@ TEST(ImportaDatiTest, NumeroVertici)
     ASSERT_EQ(4,vertici);
 
 }
+
+//TEST funzione RettaIntersezione
+/*
+TEST(RettaIntersezioneTest, PianiSecanti)
+{
+    //Valori dati
+    Vector4d piano1(1,1,1,1);
+    Vector4d piano2(1,1,1,2);
+
+    MatrixXd rettaCalcolata = RettaIntersezione(piano1, piano2);
+    MatrixXd rettaCorretta;
+    Vector3d appCorretta(1,0,0);
+    Vector3d tangCorretta(1,0,-1);
+    rettaCorretta.row(0) = appCorretta;
+    rettaCorretta.row(1) = tangCorretta;
+
+    unsigned int rows = 2;
+    unsigned int columns = 3;
+
+    for(unsigned j = 0; j< columns; j++){
+        for(unsigned int i = 0; i< rows; i++)
+        {
+            EXPECT_NEAR(rettaCalcolata(i,j),rettaCorretta(i,j), tol);
+        }
+    }
+}
+*/
+TEST(RettaIntersezioneTest, PuntiAppartenentiPiani)
+{
+    Vector4d piano1(1,1,1,-1); //CONTROLLARE IL SEGNO DI d
+    Vector4d piano2(1,1,0,-2);
+    MatrixXd retta = RettaIntersezione(piano1, piano2);
+
+    //Calcolo le distanze punto-retta considerando come punti: il punto di applicazione della retta e il punto indicato dalla tangente della retta
+    double d1 = (abs(piano1[0]*retta.row(0)[0]+piano1[1]*retta.row(0)[1]+piano1[2]*retta.row(0)[2])+piano1[3])/sqrt(piano1[0]*piano1[0]+piano1[1]*piano1[1]+piano1[2]*piano1[2]);
+    //double d2 = (abs(piano1[0]*retta.row(1)[0]+piano1[1]*retta.row(1)[1]+piano1[2]*retta.row(1)[2])+piano1[3])/sqrt(piano1[0]*piano1[0]+piano1[1]*piano1[1]+piano1[2]*piano1[2]);
+    double d3 = (abs(piano2[0]*retta.row(0)[0]+piano2[1]*retta.row(0)[1]+piano2[2]*retta.row(0)[2])+piano2[3])/sqrt(piano2[0]*piano2[0]+piano2[1]*piano2[1]+piano2[2]*piano2[2]);
+    //double d4 = (abs(piano2[0]*retta.row(1)[0]+piano2[1]*retta.row(1)[1]+piano2[2]*retta.row(1)[2])+piano2[3])/sqrt(piano2[0]*piano2[0]+piano2[1]*piano2[1]+piano2[2]*piano2[2]);
+
+    EXPECT_NEAR(d1,0,tol);
+    //EXPECT_NEAR(d2,0,tol);
+    EXPECT_NEAR(d3,0,tol);
+    //EXPECT_NEAR(d4,0,tol);
+ }
+
+TEST(RettaIntersezioneTest, PianiPoligoni01)
+{
+    Vector4d piano1(0,0,1,0); //CONTROLLARE IL SEGNO DI d
+    Vector4d piano2(0.4,0,0,-0.32);
+    MatrixXd retta = RettaIntersezione(piano1, piano2);
+
+    //Calcolo le distanze punto-retta considerando come punti: il punto di applicazione della retta e il punto indicato dalla tangente della retta
+    double d1 = (abs(piano1[0]*retta.row(0)[0]+piano1[1]*retta.row(0)[1]+piano1[2]*retta.row(0)[2])+piano1[3])/sqrt(piano1[0]*piano1[0]+piano1[1]*piano1[1]+piano1[2]*piano1[2]);
+    //double d2 = (abs(piano1[0]*retta.row(1)[0]+piano1[1]*retta.row(1)[1]+piano1[2]*retta.row(1)[2])+piano1[3])/sqrt(piano1[0]*piano1[0]+piano1[1]*piano1[1]+piano1[2]*piano1[2]);
+    double d3 = (abs(piano2[0]*retta.row(0)[0]+piano2[1]*retta.row(0)[1]+piano2[2]*retta.row(0)[2])+piano2[3])/sqrt(piano2[0]*piano2[0]+piano2[1]*piano2[1]+piano2[2]*piano2[2]);
+    //double d4 = (abs(piano2[0]*retta.row(1)[0]+piano2[1]*retta.row(1)[1]+piano2[2]*retta.row(1)[2])+piano2[3])/sqrt(piano2[0]*piano2[0]+piano2[1]*piano2[1]+piano2[2]*piano2[2]);
+
+    EXPECT_NEAR(d1,0,tol);
+    //EXPECT_NEAR(d2,0,tol);
+    EXPECT_NEAR(d3,0,tol);
+    //EXPECT_NEAR(d4,0,tol);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*/ ***************************************************************************
 TEST(SquareRootTest, NegativeNos)
 {
