@@ -30,6 +30,8 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
     fract.IndiciVertici.resize(fract.NumeroFratture);
+    fract.NumeroTracce.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+
 
     unsigned int indice = 0; // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
 
@@ -164,7 +166,7 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
 //VERIFICARE GLI INPUT IN REFERENZA
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
-bool CheckTraccia(const FractureStruct& fract, TracesStruct trac,
+bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
                   const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2)
 {
 
@@ -380,7 +382,7 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2)
 
 //****************************************************************
 
-bool checkIntersezione(const FractureStruct& fract, TracesStruct trac, unsigned int n1, unsigned int n2)
+bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int n1, unsigned int n2)
 {
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
@@ -478,7 +480,7 @@ bool BoundingBox(const FractureStruct& fract, unsigned int n1,unsigned int n2)
 
 //****************************************************************
 
-bool ComputeTrace(TracesStruct trac, FractureStruct fract, double ts1, double ts2,
+bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double ts2,
                   const MatrixXd& rettaIntersezione, unsigned int n1, unsigned int n2,
                   bool pass1,bool pass2)
 {
@@ -510,16 +512,24 @@ bool ComputeTrace(TracesStruct trac, FractureStruct fract, double ts1, double ts
     trac.PNP.push_back(Traccia);
 
 
-    array<unsigned int,2> infoN1 = {num,passante1};
-    array<unsigned int,2> infoN2 = {num,passante2};
+    vector<unsigned int> infoN1 = {num,passante1};
+    vector<unsigned int> infoN2 = {num,passante2};
 
-    //(fract.NumeroTracce[n1]).push_back(infoN1);
+    (fract.NumeroTracce[n1]).push_back(infoN1);
+    fract.NumeroTracce.resize(fract.NumeroFratture);
+    //list<vector<unsigned int>> lista;
+    //fract.NumeroTracce[n1] = lista;
+    //lista.push_back(infoN1);
+    //fract.NumeroTracce[n1] = lista;
 
-   //vector<array<unsigned int,2>> lista =  fract.NumeroTracce[n1];
-   //lista.push_back(infoN1);
-   //fract.NumeroTracce[n1] = lista;
+    (fract.NumeroTracce[n2]).push_back(infoN2);
+    //list<vector<unsigned int>> lista;
+    //fract.NumeroTracce[n2] = lista;
+    //lista.push_back(infoN2);
+    //fract.NumeroTracce[n2] = lista;
 
-    //(fract.NumeroTracce[n2]).push_back(infoN2);
+
+
 
     trac.ct ++;
 
@@ -544,7 +554,7 @@ bool OutputTraces(const TracesStruct& trac)
 
     unsigned int num = trac.ct;
     file << "# Number of Traces" << endl;
-    file << num << endl;
+    file << num << endl; //attENZIONE HO AGGIUNTO +1
     file << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
     string sep = "; ";
     for (unsigned int i=0; i < num; i++)
