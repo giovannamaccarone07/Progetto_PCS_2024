@@ -44,5 +44,19 @@ bool ComputeTrace(TracesStruct trac,
                   const MatrixXd& rettaIntersezione,
                   unsigned int n1, unsigned int n2,
                   bool pass1,bool pass2);
+
+/// OutputTraces
+///
+bool OutputTraces(const TracesStruct& trac);
+
+/// Output
+///
+bool Output(const TracesStruct& trac, const FractureStruct& frac);
+
+/// OutputFractures
+///
+bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac );
+
+
 }
 

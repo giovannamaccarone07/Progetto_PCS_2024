@@ -40,7 +40,6 @@ struct FractureStruct
     unsigned int SpazioMemoria = 0;
     vector<list<array<unsigned int,2>>> NumeroTracce = {};
 
-
 };
 
 
