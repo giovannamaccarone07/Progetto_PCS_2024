@@ -44,5 +44,19 @@ bool ComputeTrace(TracesStruct trac,
                   const MatrixXd& rettaIntersezione,
                   unsigned int n1, unsigned int n2,
                   bool pass1,bool pass2);
-}
 
+
+Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n);
+
+bool Output(const TracesStruct& trac, const FractureStruct& frac);
+bool pianiParalleli(Vector4d& piano1, Vector4d& piano2);
+
+bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac);
+
+bool OutputTraces(const TracesStruct& trac);
+
+
+
+
+
+}

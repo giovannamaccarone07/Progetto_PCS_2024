@@ -38,7 +38,7 @@ struct FractureStruct
     vector<vector<unsigned int>> IndiciVertici = {};    /// dim: vector<unsigned int> x NumeroFratture
     vector<MatrixXd> CoordinateVertici = {};            /// dim: MatrixXd x NumeroVertici
     unsigned int SpazioMemoria = 0;
-    vector<list<array<unsigned int,2>>> NumeroTracce = {};
+    //vector<vector<array<unsigned int,2>>> NumeroTracce = {};
 
 
 };
