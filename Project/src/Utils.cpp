@@ -576,7 +576,7 @@ bool OutputTraces(const TracesStruct& trac)
 
 bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
 {
-    /*unsigned int num_fratture = frac.NumeroFratture;
+    unsigned int num_fratture = frac.NumeroFratture;
     string sep = "; ";
     ofstream file;
     string outputFileName = "./OutputFractures.txt";
@@ -590,16 +590,46 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
 
     for (unsigned int i; i < num_fratture; i++)
     {
-        if (frac.NumeroTracce[i]!= null)
+        if (!frac.NumeroTracce[i].empty())
         {
-            unsigned int lungh_lista = (frac.NumeroTracce[i]).len();
+            unsigned int lungh_lista = (frac.NumeroTracce[i]).size();
             vector<unsigned int> passanti;
             vector<unsigned int> non_passanti;
-            passanti.resize();
+            passanti.resize(lungh_lista);
+            non_passanti.resize(lungh_lista);
 
+            for (vector<unsigned int> colonna : frac.NumeroTracce[i])
+            {
+                if (colonna[1] == 1)
+                {
+                    non_passanti.push_back(colonna[0]);
+                }
+                else
+                {
+                    passanti.push_back(colonna[0]);
+                }
+            }
+            file << "# FractureId; NumTraces" << endl;
+            file << i << sep << lungh_lista << endl;
+            file <<  "# TraceId; Tips; Length" << endl;
+            /*vector<unsigned int> ordinato_passanti = ordina(passanti);
+            vector<unsigned int> ordinato_non_passanti = ordina(non_passanti);
+
+            for (unsigned int j = 0; j < ordinato_passanti.size(); j++)
+            {
+                unsigned int id_traccia = ordinato_passanti[j];
+                file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
+            }
+            for (unsigned int j = 0; j < ordinato_non_passanti.size(); j++)
+            {
+                unsigned int id_traccia = ordinato_non_passanti[j];
+                file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
+            }
+            */
         }
     }
-    */
+    file.close();
+
     return true;
 }
 
