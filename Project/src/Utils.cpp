@@ -576,7 +576,30 @@ bool OutputTraces(const TracesStruct& trac)
 
 bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
 {
+    /*unsigned int num_fratture = frac.NumeroFratture;
+    string sep = "; ";
+    ofstream file;
+    string outputFileName = "./OutputFractures.txt";
+    file.open(outputFileName);
 
+    if (file.fail())
+    {
+        cerr<< "file open failed"<< endl;
+        return false;
+    }
+
+    for (unsigned int i; i < num_fratture; i++)
+    {
+        if (frac.NumeroTracce[i]!= null)
+        {
+            unsigned int lungh_lista = (frac.NumeroTracce[i]).len();
+            vector<unsigned int> passanti;
+            vector<unsigned int> non_passanti;
+            passanti.resize();
+
+        }
+    }
+    */
     return true;
 }
 
