@@ -164,7 +164,63 @@ TEST(RettaIntersezioneTest, PianiPoligoni01)
     //EXPECT_NEAR(d4,0,tol);
 }
 
+TEST(PianoPassantePerFratturaTest, PianoPassante)
+{
+    //FractureStruct fract;
+    Vector4d pianoCalcolato1 = PianoPassantePerFrattura(fract,0);
+    Vector4d pianoCorretto1(0,0,1,0);
 
+    for(unsigned int i=0;i<pianoCorretto1.size();i++)
+    {
+        EXPECT_NEAR(pianoCalcolato1[i],pianoCorretto1[i],tol);
+    }
+
+    Vector4d pianoCalcolato2 = PianoPassantePerFrattura(fract,1);
+    Vector4d pianoCorretto2(0.4,0,0,-0.32);
+
+    for(unsigned int i=0;i<pianoCorretto2.size();i++)
+    {
+        EXPECT_NEAR(pianoCalcolato2[i],pianoCorretto2[i],tol);
+    }
+}
+
+TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
+{
+    Matrix<double,2,3> BBoxCalcolata = ComputeBoundingBox(fract,0);
+    Matrix<double,2,3> ExpectedBBox;
+    Vector3d firstRow(0,0,0);
+    Vector3d secondRow(1,1,0);
+    ExpectedBBox.row(0) = firstRow;
+    ExpectedBBox.row(1) = secondRow;
+
+    for(unsigned int i = 0; i< 2; i++){
+        for(unsigned int j = 0; j<3;j++){
+            ASSERT_EQ(BBoxCalcolata(i,j),ExpectedBBox(i,j)); // se =
+            EXPECT_NEAR(BBoxCalcolata(i,j),ExpectedBBox(i,j),tol);
+        }
+    }
+
+}
+
+TEST(CheckBoundingBoxTest, CheckBoundingBox){
+
+    ASSERT_TRUE(CheckBoundingBox(fract,0,1));
+    ASSERT_FALSE(CheckBoundingBox(fract,1,2));
+
+}
+
+TEST(pianiParalleliTest, PianiParalleli){
+
+    Vector4d piano1(2,3,4,5);
+    Vector4d piano2(2,3,4,-7);
+    ASSERT_TRUE(pianiParalleli(piano1,piano2));
+
+    Vector4d piano3(1,2,3,-4);
+    Vector4d piano4(2,-1,1,1);
+    ASSERT_FALSE(pianiParalleli(piano3,piano4));
+
+
+}
 
 
 

@@ -31,10 +31,10 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 - rivedere l'indice del ciclo for e scriverlo in modulo 6
 - rivedere valore k
 - paraview
-- test
 - come si fanno le 24 condizioni FILOSOFIA DI GIOVANNA
 - 1 file per ogni frattura?
 -   Vector3d vettoreMax1(-1e100, -1e100, -1e100); Nella boundingBox come inizializzo dei vettori vuoti in modo che possa fare dei paragoni con le x,y,z che trovo? 
+- come devo definire la fract nei test??
 
 
 - MEMORIZZARE IN MODO EFFICIENTE I DATI NELLA STRUCT TRAC
