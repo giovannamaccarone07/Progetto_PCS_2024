@@ -30,6 +30,8 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
     fract.IndiciVertici.resize(fract.NumeroFratture);
+    fract.NumeroTracce.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+
 
     unsigned int indice = 0; // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
 
@@ -164,12 +166,15 @@ Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [cod
 //VERIFICARE GLI INPUT IN REFERENZA
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
-bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const Matrix<double,2,3>& rettaIntersezione,unsigned int& n1, unsigned int& n2)
+
+bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
+                  const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2)
+
 {
 
     //RIVEDERE DIREZIONE
     Vector3d direzioneRetta = rettaIntersezione.row(1);
-    Vector3d app = rettaIntersezione.row(0);
+    Vector3d app = -rettaIntersezione.row(0);
     vector<double> ts; // ts sono i parametri di intersezione tra la retta e le fratture
     double tol = numeric_limits<double>::epsilon();
 
@@ -186,12 +191,26 @@ bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const Matrix<d
         //lato i-esimo:
         Vector3d vertice0 = fract.CoordinateVertici[n1].col(i1);
         Vector3d vertice1 = fract.CoordinateVertici[n1].col(p1);
-        Vector3d direzioneLato = vertice0 - vertice1;
+        Vector3d direzioneLato = vertice1 - vertice0;
         //parametro lato
         if((direzioneLato.cross(direzioneRetta)).norm() > tol)
         { //no abs perchè la norma è positiva //da ottimizzare
+            double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+            Vector3d punto = (app+t*direzioneRetta);
 
-            double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+            Matrix<double,2,3> BBox = ComputeBoundingBox(fract,n1);
+            Vector3d vettoreMax = BBox.row(0);
+            Vector3d vettoreMin = BBox.row(1);
+
+            if(vettoreMin[0]-tol<= punto[0] && punto[0] <= vettoreMax[0]+tol &&
+                vettoreMin[1]-tol<= punto[1] && punto[1] <= vettoreMax[1]+tol &&
+                vettoreMin[2]-tol<= punto[2] && punto[2] <= vettoreMax[2]+tol)
+            {
+                ts.push_back(t);
+            }
+
+            //double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+            /*
             if(k >= -tol && k<=1+tol)
             {
                 if(abs(k-1)<tol)
@@ -211,6 +230,7 @@ bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const Matrix<d
                 }
                 cout << "CheckTraccia: intersezione: " << i1 <<" frattura: " << n1 << endl;
             }
+            */
         }
         else
         {
@@ -230,11 +250,12 @@ bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const Matrix<d
         //lato i-esimo:
         Vector3d vertice0 = fract.CoordinateVertici[n2].col(i2);
         Vector3d vertice1 = fract.CoordinateVertici[n2].col(p2);
-        Vector3d direzioneLato = vertice0 - vertice1;
+        Vector3d direzioneLato = vertice1 - vertice0;
         //parametro lato
         if((direzioneLato.cross(direzioneRetta)).norm() > tol)
         { //no abs perchè la norma è positiva //da ottimizzare
-            double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+            //double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+            /*
             if(k >= -tol && k<=1+tol)
             {
                 if(abs(k-1)<tol)
@@ -248,6 +269,21 @@ bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const Matrix<d
                     ts.push_back(t);
                 }
                 cout << "CheckTraccia: intersezione: " << i2 <<" frattura: " << n2 << endl;
+            }
+            */
+            double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+
+            Vector3d punto = (app+t*direzioneRetta);
+
+            Matrix<double,2,3> BBox = ComputeBoundingBox(fract,n2);
+            Vector3d vettoreMax = BBox.row(0);
+            Vector3d vettoreMin = BBox.row(1);
+
+            if(vettoreMin[0]-tol<= punto[0] && punto[0] <= vettoreMax[0]+tol &&
+                vettoreMin[1]-tol<= punto[1] && punto[1] <= vettoreMax[1]+tol &&
+                vettoreMin[2]-tol<= punto[2] && punto[2] <= vettoreMax[2]+tol)
+            {
+                ts.push_back(t);
             }
         }
         else
@@ -309,7 +345,7 @@ bool CheckTraccia(const FractureStruct& fract, TracesStruct trac, const Matrix<d
             }
 
             //ordino il vettore
-            sort(ts.begin(),ts.end());
+            sort(ts.begin(),ts.end()); //rivedere il metodo di ordinamento
             intersezione = true;
             //passo i valori centrali che rappresentano gli estremi della traccia
             bool traccia = ComputeTrace(trac,fract,ts[1],ts[2],rettaIntersezione,n1,n2,pass1,pass2);
@@ -348,7 +384,7 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2)
 
 //****************************************************************
 
-bool checkIntersezione(const FractureStruct& fract, TracesStruct trac, unsigned int n1, unsigned int n2)
+bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int n1, unsigned int n2)
 {
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
@@ -385,55 +421,52 @@ bool checkIntersezione(const FractureStruct& fract, TracesStruct trac, unsigned 
 }
 
 //****************************************************************
-
-bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2)
+Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n)
 {
-    Vector3d vettoreMax1(-1e100, -1e100, -1e100);
-    Vector3d vettoreMax2(-1e100, -1e100, -1e100);
-    Vector3d vettoreMin1(1e100, 1e100, 1e100);
-    Vector3d vettoreMin2(1e100, 1e100, 1e100);
-    for(unsigned int i=0;i<fract.NumeroVertici[n1];i++)
+    Vector3d vettoreMax(-1e100, -1e100, -1e100);
+    Vector3d vettoreMin(1e100, 1e100, 1e100);
+    for(unsigned int i=0;i<fract.NumeroVertici[n];i++)
     {
-        Vector3d vertice = fract.CoordinateVertici[n1].col(i);
+        Vector3d vertice = fract.CoordinateVertici[n].col(i);
         double x = vertice[0];
         double y = vertice[1];
         double z = vertice[2];
         //check massimi
-        if(vettoreMax1[0]<x)
-            vettoreMax1[0] = x;
-        if(vettoreMax1[1]<y)
-            vettoreMax1[1] = y;
-        if(vettoreMax1[2]<z)
-            vettoreMax1[2] = z;
+        if(vettoreMax[0]<x)
+            vettoreMax[0] = x;
+        if(vettoreMax[1]<y)
+            vettoreMax[1] = y;
+        if(vettoreMax[2]<z)
+            vettoreMax[2] = z;
         //check minimi
-        if(vettoreMin1[0]>x)
-            vettoreMin1[0] = x;
-        if(vettoreMin1[1]>y)
-            vettoreMin1[1] = y;
-        if(vettoreMin1[2]>z)
-            vettoreMin1[2] = z;
+        if(vettoreMin[0]>x)
+            vettoreMin[0] = x;
+        if(vettoreMin[1]>y)
+            vettoreMin[1] = y;
+        if(vettoreMin[2]>z)
+            vettoreMin[2] = z;
     }
-    for(unsigned int i=0;i<fract.NumeroVertici[n2];i++)
-    {
-        Vector3d vertice = fract.CoordinateVertici[n2].col(i);
-        double x = vertice[0];
-        double y = vertice[1];
-        double z = vertice[2];
-        //check massimi
-        if(vettoreMax2[0]<x)
-            vettoreMax2[0] = x;
-        if(vettoreMax2[1]<y)
-            vettoreMax2[1] = y;
-        if(vettoreMax2[2]<z)
-            vettoreMax2[2] = z;
-        //check minimi
-        if(vettoreMin2[0]>x)
-            vettoreMin2[0] = x;
-        if(vettoreMin2[1]>y)
-            vettoreMin2[1] = y;
-        if(vettoreMin2[2]>z)
-            vettoreMin2[2] = z;
-    }
+
+    Matrix<double,2,3> BBox;
+    BBox.row(0) = vettoreMax;
+    BBox.row(1) = vettoreMin;
+    return BBox;
+
+}
+
+//****************************************************************
+
+bool BoundingBox(const FractureStruct& fract, unsigned int n1,unsigned int n2)
+{
+    Matrix<double,2,3> BBox1 = ComputeBoundingBox(fract,n1);
+    Matrix<double,2,3> BBox2 = ComputeBoundingBox(fract,n2);
+
+
+    Vector3d vettoreMax1 = BBox1.row(0);
+    Vector3d vettoreMin1 = BBox1.row(1);
+    Vector3d vettoreMax2 = BBox2.row(0);
+    Vector3d vettoreMin2 = BBox2.row(1);
+
     //check intersezione bbox
     if(vettoreMin1[0]<= vettoreMax2[0] && vettoreMax1[0]>= vettoreMin2[0] &&
         vettoreMin1[1]<= vettoreMax2[1] && vettoreMax1[1]>= vettoreMin2[1] &&
@@ -449,7 +482,7 @@ bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2)
 
 //****************************************************************
 
-bool ComputeTrace(TracesStruct trac, FractureStruct fract, double ts1, double ts2,
+bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double ts2,
                   const MatrixXd& rettaIntersezione, unsigned int n1, unsigned int n2,
                   bool pass1,bool pass2)
 {
@@ -460,9 +493,9 @@ bool ComputeTrace(TracesStruct trac, FractureStruct fract, double ts1, double ts
     Matrix<double,2,3> M;
     M.row(0)=p1;
     M.row(1)=p2;
-    trac.EstremiTracce[num]=M;
+    trac.EstremiTracce.push_back(M);
     double len = (p2-p1).norm();
-    trac.LunghezzaTracce[num]=len;
+    trac.LunghezzaTracce.push_back(len);
     Matrix<unsigned int,2,2> Traccia;
     unsigned int passante1 = 0;
     unsigned int passante2 = 0;
@@ -478,21 +511,159 @@ bool ComputeTrace(TracesStruct trac, FractureStruct fract, double ts1, double ts
     Vector<unsigned int,2> riga2(n2,passante2);
     Traccia.row(0) = riga1;
     Traccia.row(1) = riga2;
-    trac.PNP[num] = Traccia;
+    trac.PNP.push_back(Traccia);
 
 
-    array<unsigned int,2> infoN1 = {num,passante1};
-    array<unsigned int,2> infoN2 = {num,passante2};
+    vector<unsigned int> infoN1 = {num,passante1};
+    vector<unsigned int> infoN2 = {num,passante2};
+
+    (fract.NumeroTracce[n1]).push_back(infoN1);
+    fract.NumeroTracce.resize(fract.NumeroFratture);
+    //list<vector<unsigned int>> lista;
+    //fract.NumeroTracce[n1] = lista;
+    //lista.push_back(infoN1);
+    //fract.NumeroTracce[n1] = lista;
+
+    (fract.NumeroTracce[n2]).push_back(infoN2);
+    //list<vector<unsigned int>> lista;
+    //fract.NumeroTracce[n2] = lista;
+    //lista.push_back(infoN2);
+    //fract.NumeroTracce[n2] = lista;
 
 
-    fract.NumeroTracce[n1].push_back(infoN1);
-    fract.NumeroTracce[n2].push_back(infoN2);
 
 
     trac.ct ++;
 
     return true ;//se è andato a buon fine il salvataggio
 
+}
+
+//****************************************************************
+
+bool OutputTraces(const TracesStruct& trac)
+{
+    // Open File
+    ofstream file;
+    string outputFileName = "./OutputTraces.txt";
+    file.open(outputFileName);
+
+    if (file.fail())
+    {
+        cerr<< "file open failed"<< endl;
+        return false;
+    }
+
+    unsigned int num = trac.ct;
+    file << "# Number of Traces" << endl;
+    file << num << endl; //attENZIONE HO AGGIUNTO +1
+    file << "# TraceId; FractureId1; FractureId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
+    string sep = "; ";
+    for (unsigned int i=0; i < num; i++)
+    {
+        file << i << sep << trac.PNP[i].row(0)[0] << sep << trac.PNP[i].row(1)[0]
+             << sep << trac.EstremiTracce[i].row(0)[0] << sep << trac.EstremiTracce[i].row(0)[1] << sep << trac.EstremiTracce[i].row(0)[2]
+             << sep << trac.EstremiTracce[i].row(1)[0] << sep << trac.EstremiTracce[i].row(1)[1] << sep << trac.EstremiTracce[i].row(1)[2]
+             << endl;
+    }
+
+    // Close File
+    file.close();
+
+
+    return true;
+}
+
+//****************************************************************
+
+bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
+{
+    unsigned int num_fratture = frac.NumeroFratture;
+    string sep = "; ";
+    ofstream file;
+    string outputFileName = "./OutputFractures.txt";
+    file.open(outputFileName);
+
+    if (file.fail())
+    {
+        cerr<< "file open failed"<< endl;
+        return false;
+    }
+
+    for (unsigned int i; i < num_fratture; i++)
+    {
+        if (!frac.NumeroTracce[i].empty())
+        {
+            unsigned int lungh_lista = (frac.NumeroTracce[i]).size();
+            vector<unsigned int> passanti;
+            vector<unsigned int> non_passanti;
+            passanti.resize(lungh_lista);
+            non_passanti.resize(lungh_lista);
+
+            for (vector<unsigned int> colonna : frac.NumeroTracce[i])
+            {
+                if (colonna[1] == 1)
+                {
+                    non_passanti.push_back(colonna[0]);
+                }
+                else
+                {
+                    passanti.push_back(colonna[0]);
+                }
+            }
+            file << "# FractureId; NumTraces" << endl;
+            file << i << sep << lungh_lista << endl;
+            file <<  "# TraceId; Tips; Length" << endl;
+            /*vector<unsigned int> ordinato_passanti = ordina(passanti);
+            vector<unsigned int> ordinato_non_passanti = ordina(non_passanti);
+
+            for (unsigned int j = 0; j < ordinato_passanti.size(); j++)
+            {
+                unsigned int id_traccia = ordinato_passanti[j];
+                file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
+            }
+            for (unsigned int j = 0; j < ordinato_non_passanti.size(); j++)
+            {
+                unsigned int id_traccia = ordinato_non_passanti[j];
+                file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
+            }
+            */
+        }
+    }
+    file.close();
+
+    return true;
+}
+
+//****************************************************************
+
+bool Output(const TracesStruct& trac, const FractureStruct& frac)
+{
+    bool stampaTracce = false;
+    bool stampaFratture = false;
+
+    if(OutputTraces(trac) == true)
+    {
+        stampaTracce = true;
+        cout << "Tracce stampate correttamente" << endl;
+    }
+    else
+    {
+        cerr << "Impossibile stampare le tracce" << endl;
+    }
+
+    if(OutputFractures(trac,frac) == true)
+    {
+        stampaFratture = true;
+        cout << "Fratture stampate correttamente" << endl;
+    }
+    else
+    {
+        cerr << "Impossibile stampare le fratture" << endl;
+    }
+
+    bool result = stampaTracce && stampaFratture;
+    return result;
 }
 
 //****************************************************************
