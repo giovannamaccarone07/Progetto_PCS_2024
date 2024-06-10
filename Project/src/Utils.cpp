@@ -137,7 +137,7 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n) 
 
 // REtta intersezione chiama PianoPassantePErFRattura due volte
 // Calcolo la retta di intersezione tra piani dopo aver controllato che non sono paralleli
-MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
+Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
 {
     //vettore normale al primo piano
     Vector3d p1 = piano1.head(3);    // prende le prime 3 componenti
@@ -166,8 +166,10 @@ MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
 //VERIFICARE GLI INPUT IN REFERENZA
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
+
 bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
                   const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2)
+
 {
 
     //RIVEDERE DIREZIONE
@@ -400,7 +402,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int 
         }
         else
         {
-            MatrixXd rettaIntersezione = RettaIntersezione(piano1,piano2);
+            Matrix<double,2,3> rettaIntersezione = RettaIntersezione(piano1,piano2);
             if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2)==false) //modificare una volta che si è modificata checktraccia
             {
                 return false;
