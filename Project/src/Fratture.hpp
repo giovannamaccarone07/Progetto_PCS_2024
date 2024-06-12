@@ -51,7 +51,6 @@ struct TracesStruct
     ///VettoreIdTracce
     // Vettore che salva gli id delle tracce
     vector<unsigned int> IdTracce = {};                 /// dim: 1 x ct
-
     ///CoordinateEstremiTracce
     // Vettore che salva le coordinate degli estremi delle tracce: la i-esima coordinata del vettore corrisponde alla traccia di indice i.
     //Inoltre, la matrice della posizione i-esima è 2x3 dove la prima riga contiene le coordinate del primo estremo e analogamente la seconda.

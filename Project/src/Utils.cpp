@@ -5,8 +5,10 @@
 #include <cmath>
 #include <vector>
 #include <limits>
+#include <iomanip>
 using namespace std;
 
+//#define TEST
 namespace FractureLibrary{
 
 bool ImportaDati(const string& NomeFile, FractureStruct& fract)
@@ -107,7 +109,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
 
 //****************************************************************
 
-Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n) // test n < numero fratture
+Vector4d PianoPassantePerFrattura(const FractureStruct& fract, const unsigned int& n) // test n < numero fratture
 {
     //Prendo i primi tre vertici della frattura n-esima per trovare il piano su cui giace il poligono
 
@@ -123,12 +125,10 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n) 
     Vector3d t = n1.cross(n2);
     double d = -(t[0]*vertice1[0] + t[1]*vertice1[1] + t[2]*vertice1[2]); //d = -(ax+by+cz)
     Vector4d piano;
-    piano[0] = t[0];        // questo fa cagare
+    piano[0] = t[0];
     piano[1] = t[1];
     piano[2] = t[2];
     piano[3] = d;
-
-    //cout << piano[0] << " " << piano[1] << " " << piano[2] << " " << piano[3] << endl;
 
     return piano;
 }
@@ -168,7 +168,7 @@ Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [cod
 // controlla se la retta passa per la frattura che giace nel piano
 
 bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
-                  const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2)
+                  const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2, const double& tol)
 
 {
 
@@ -176,7 +176,6 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
     Vector3d direzioneRetta = rettaIntersezione.row(1);
     Vector3d app = -rettaIntersezione.row(0);
     vector<double> ts; // ts sono i parametri di intersezione tra la retta e le fratture
-    double tol = numeric_limits<double>::epsilon();
 
 
     unsigned int j1 = 0;
@@ -187,14 +186,36 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
 
         i1 = j1%(fract.NumeroVertici[n1]);
         p1 = (j1+1)%(fract.NumeroVertici[n1]);
+
         //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
         //lato i-esimo:
         Vector3d vertice0 = fract.CoordinateVertici[n1].col(i1);
         Vector3d vertice1 = fract.CoordinateVertici[n1].col(p1);
         Vector3d direzioneLato = vertice1 - vertice0;
+
         //parametro lato
-        if((direzioneLato.cross(direzioneRetta)).norm() > tol)
-        { //no abs perchè la norma è positiva //da ottimizzare
+        if((direzioneLato.cross(direzioneRetta)).norm() < tol && ((vertice0-app).cross(direzioneRetta)).norm() < tol) //  caso paralleli e coincidenti
+        {
+            // sono coincidenti
+            ts.push_back((vertice0-app).norm());
+            ts.push_back((vertice1-app).norm());
+            cout << "CheckTraccia: Sono paralleli. lato: "<<i1<< "frattura: "<<n1<< endl;
+
+        }
+        else if((direzioneLato.cross(direzioneRetta)).norm() > tol)
+        {
+            double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+
+            if(k >tol && k<=1+tol)
+            {
+                //parametro retta
+                double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+                ts.push_back(t);
+
+                cout << "CheckTraccia: intersezione: " << i1 <<" frattura: " << n1 << endl;
+            }
+
+#ifdef TEST
             double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
             Vector3d punto = (app+t*direzioneRetta);
 
@@ -209,32 +230,8 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
                 ts.push_back(t);
             }
 
-            //double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
-            /*
-            if(k >= -tol && k<=1+tol)
-            {
-                if(abs(k-1)<tol)
-                {
-                    /// ATTENZIONE STIAMO ESCLUDENDO IL CASO PARALLELI E COINCIDENTI
-                    /// QUESTO PEZZO VA SOSTITUITO E MESSO NELL'ESLE
-                    ///
-                    ///
-                    cout << "CheckTraccia: Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
-                }
-                else
-                {
-                    //parametro retta
-                    double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
-                    ts.push_back(t);
+#endif
 
-                }
-                cout << "CheckTraccia: intersezione: " << i1 <<" frattura: " << n1 << endl;
-            }
-            */
-        }
-        else
-        {
-            cout << "CheckTraccia: Sono paralleli. lato: "<<i1<< "frattura: "<<n1<< endl;
         }
         j1 ++;
     }
@@ -246,36 +243,25 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
 
         i2 = j2%(fract.NumeroVertici[n2]);
         p2 = (j2+1)%(fract.NumeroVertici[n2]);
-        //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
-        //lato i-esimo:
+
         Vector3d vertice0 = fract.CoordinateVertici[n2].col(i2);
         Vector3d vertice1 = fract.CoordinateVertici[n2].col(p2);
         Vector3d direzioneLato = vertice1 - vertice0;
         //parametro lato
-        if((direzioneLato.cross(direzioneRetta)).norm() > tol)
-        { //no abs perchè la norma è positiva //da ottimizzare
-            //double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
-            /*
-            if(k >= -tol && k<=1+tol)
-            {
-                if(abs(k-1)<tol)
-                {
-                    cout << "CheckTraccia: Il lato e la retta sono coincidenti" << endl; //introdurre variabile per dire che i lati sono o meno coincidenti
-                }
-                else
-                {
-                    //parametro retta
-                    double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
-                    ts.push_back(t);
-                }
-                cout << "CheckTraccia: intersezione: " << i2 <<" frattura: " << n2 << endl;
-            }
-            */
-            double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+        if((direzioneLato.cross(direzioneRetta)).norm() < tol && ((vertice0-app).cross(direzioneRetta)).norm() < tol) //  caso paralleli e coincidenti
+        {
+            // sono coincidenti
+            ts.push_back((vertice0-app).norm());
+            ts.push_back((vertice1-app).norm());
+            cout << "CheckTraccia: Sono paralleli. lato: "<<i1<< "frattura: "<<n1<< endl;
 
+        }
+        else if((direzioneLato.cross(direzioneRetta)).norm() > tol)
+        { //no abs perchè la norma è positiva //da ottimizzare
+            /*    double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
             Vector3d punto = (app+t*direzioneRetta);
 
-            Matrix<double,2,3> BBox = ComputeBoundingBox(fract,n2);
+            Matrix<double,2,3> BBox = ComputeBoundingBox(fract,n1);
             Vector3d vettoreMax = BBox.row(0);
             Vector3d vettoreMin = BBox.row(1);
 
@@ -285,12 +271,20 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             {
                 ts.push_back(t);
             }
+*/
+            double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+
+            if(k >tol && k<=1+tol)
+            {
+                //parametro retta
+                double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+                ts.push_back(t);
+
+                cout << "CheckTraccia: intersezione: " << i1 <<" frattura: " << n1 << endl;
+            }
+
         }
-        else
-        {
-            cout << "CheckTraccia: Sono paralleli. lato: "<<i2<< "frattura: "<<n2<< endl;
-        }
-        j2++;
+        j2 ++;
     }
 
     bool intersezione = false;
@@ -302,38 +296,26 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
     }
     else
     {
-        if((ts[0]<ts[1] && ts[1]<ts[2] && ts[2]<ts[3]) ||
-            (ts[1]<ts[0] && ts[0]<ts[2] && ts[2]<ts[3]) ||
-            (ts[0]<ts[1] && ts[1]<ts[3] && ts[3]<ts[2]) ||
-            (ts[1]<ts[0] && ts[0]<ts[3] && ts[3]<ts[2]) ||
-            (ts[2]<ts[3] && ts[3]<ts[0] && ts[0]<ts[1]) ||
-            (ts[3]<ts[2] && ts[2]<ts[0] && ts[0]<ts[1]) ||
-            (ts[2]<ts[3] && ts[3]<ts[1] && ts[1]<ts[0]) ||
-            (ts[3]<ts[2] && ts[2]<ts[1] && ts[1]<ts[0]))
+        if(max(ts[0],ts[1]) <= min(ts[2],ts[3]) + tol ||
+           max(ts[2],ts[3]) <= min(ts[0],ts[1]) + tol) // caso disgiunti o vertici intermedi coincidenti
         {
             return intersezione;
         }
         else
         {
-            if((ts[0]==ts[2] && ts[1]==ts[3]) ||
-                (ts[0]== ts[3] && ts[1]==ts[2]))
+            if((abs(ts[0]-ts[2])<tol && abs(ts[1]-ts[3])<tol) ||
+                (abs(ts[0]-ts[3])<tol && abs(ts[1]-ts[2])<tol)) //caso esattamente coincidenti
             {
                 pass1 = true;
                 pass2 = true;
             }
-            else if((ts[0]<ts[2] && ts[2]<ts[3] && ts[3]<ts[1]) ||
-                    (ts[0]<ts[3] && ts[3]<ts[2] && ts[2]<ts[1]) ||
-                    (ts[1]<ts[2] && ts[2]<ts[3] && ts[3]<ts[0]) ||
-                    (ts[1]<ts[3] && ts[3]<ts[2] && ts[2]<ts[0])) //seconda traccia passante
+            else if((min(ts[2],ts[3]) >= min(ts[1],ts[0]) + tol && max(ts[2],ts[3]) <= max(ts[0],ts[1]))+ tol) // passante per la seconda frattura
             {
                 pass1 = false;
                 pass2 = true;
 
             }
-            else if((ts[2]<ts[0] && ts[0]<ts[1] && ts[1]<ts[3]) ||
-                    (ts[2]<ts[1] && ts[1]<ts[0] && ts[0]<ts[3]) ||
-                    (ts[3]<ts[0] && ts[0]<ts[1] && ts[1]<ts[2]) ||
-                    (ts[3]<ts[1] && ts[1]<ts[0] && ts[0]<ts[2]))
+            else if((min(ts[0],ts[1]) >= min(ts[2],ts[3]) + tol && max(ts[0],ts[1]) <= max(ts[2],ts[3]))+ tol) // passante per la prima frattura
             {
                 pass1 = true;
                 pass2 = false;
@@ -345,57 +327,95 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             }
 
             //ordino il vettore
-            sort(ts.begin(),ts.end()); //rivedere il metodo di ordinamento
+            sort(ts.begin(),ts.end()); // costo computazionale o(nlogn)
             intersezione = true;
-            //passo i valori centrali che rappresentano gli estremi della traccia
-            bool traccia = ComputeTrace(trac,fract,ts[1],ts[2],rettaIntersezione,n1,n2,pass1,pass2);
-            if(traccia == false)
+            //passo i valori centrali che rappresentano gli estremi della tracciA
+
+            //COMPUTE TRACE
+
+            unsigned int num = trac.ct;
+            trac.IdTracce.push_back(num);
+            Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[1];
+            Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[2];
+            Matrix<double,2,3> M;
+            M.row(0)=p1;
+            M.row(1)=p2;
+            trac.EstremiTracce.push_back(M);
+            double len = (p2-p1).norm();
+            trac.LunghezzaTracce.push_back(len);
+            Matrix<unsigned int,2,2> Traccia;
+            unsigned int passante1 = 0;
+            unsigned int passante2 = 0;
+            if (pass1 == false)
             {
-                cerr << "ComputeTrace non memorizza la traccia";
+                passante1 = 1;
             }
+            if (pass2 == false)
+            {
+                passante2 = 1;
+            }
+            Vector<unsigned int,2> riga1(n1,passante1);
+            Vector<unsigned int,2> riga2(n2,passante2);
+            Traccia.row(0) = riga1;
+            Traccia.row(1) = riga2;
+            trac.PNP.push_back(Traccia);
+
+
+            vector<unsigned int> infoN1 = {num,passante1};
+            vector<unsigned int> infoN2 = {num,passante2};
+
+            (fract.NumeroTracce[n1]).push_back(infoN1);
+            fract.NumeroTracce.resize(fract.NumeroFratture);
+            //list<vector<unsigned int>> lista;
+            //fract.NumeroTracce[n1] = lista;
+            //lista.push_back(infoN1);
+            //fract.NumeroTracce[n1] = lista;
+
+            (fract.NumeroTracce[n2]).push_back(infoN2);
+            //list<vector<unsigned int>> lista;
+            //fract.NumeroTracce[n2] = lista;
+            //lista.push_back(infoN2);
+            //fract.NumeroTracce[n2] = lista;
+
+
+
+
+            trac.ct ++;
         }
     }
+
+
     return intersezione;
 }
 
 //****************************************************************
-
-bool pianiParalleli(Vector4d& piano1, Vector4d& piano2)
+ //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
+bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 {
-    double tol = numeric_limits<double>::epsilon();
+
     double dotProduct = piano1[0]*piano2[0]+piano1[1]*piano2[1]+piano1[2]*piano2[2];
 
     if(abs(dotProduct)>tol){
         return true; //sono paralleli
     }
-
-    /*
-    double r1=piano1[0]/piano2[0];
-    double r2=piano1[1]/piano2[1];
-    double r3=piano1[2]/piano2[2];
-
-    if(!(abs(r1-r2)<=tol && abs(r1-r3)<=tol && abs(r2-r3)<=tol))
-    {
-        return true;
-    }*/
     return false;
 
 }
 
 //****************************************************************
 
-bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int n1, unsigned int n2)
+bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int n1, unsigned int n2, const double& tol)
 {
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
-    if(pianiParalleli(piano1,piano2) == true)
+    if(pianiParalleli(piano1,piano2,tol) == true)
     {
         cout << "CheckIntersezione: I piani sono paralleli" << endl;
         return false; //non c'è intersezione
     }
     else
     {
-        if(BoundingBox(fract,n1,n2) == false)
+        if(IntersezioneBoundingBox(fract,n1,n2) == false)
         {
             cout << "Boundingbox: i poligono non si toccano" << endl;
             return false;
@@ -403,7 +423,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int 
         else
         {
             Matrix<double,2,3> rettaIntersezione = RettaIntersezione(piano1,piano2);
-            if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2)==false) //modificare una volta che si è modificata checktraccia
+            if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2,tol)==false) //modificare una volta che si è modificata checktraccia
             {
                 return false;
             }
@@ -423,8 +443,8 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int 
 //****************************************************************
 Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n)
 {
-    Vector3d vettoreMax(-1e100, -1e100, -1e100);
-    Vector3d vettoreMin(1e100, 1e100, 1e100);
+    Vector3d vettoreMax(numeric_limits<double>::min(), numeric_limits<double>::min(), numeric_limits<double>::min());
+    Vector3d vettoreMin(numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max());
     for(unsigned int i=0;i<fract.NumeroVertici[n];i++)
     {
         Vector3d vertice = fract.CoordinateVertici[n].col(i);
@@ -456,7 +476,7 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int 
 
 //****************************************************************
 
-bool BoundingBox(const FractureStruct& fract, unsigned int n1,unsigned int n2)
+bool IntersezioneBoundingBox(const FractureStruct& fract, unsigned int n1,unsigned int n2)
 {
     Matrix<double,2,3> BBox1 = ComputeBoundingBox(fract,n1);
     Matrix<double,2,3> BBox2 = ComputeBoundingBox(fract,n2);
@@ -481,7 +501,7 @@ bool BoundingBox(const FractureStruct& fract, unsigned int n1,unsigned int n2)
 }
 
 //****************************************************************
-
+/*
 bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double ts2,
                   const MatrixXd& rettaIntersezione, unsigned int n1, unsigned int n2,
                   bool pass1,bool pass2)
@@ -538,6 +558,7 @@ bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double 
     return true ;//se è andato a buon fine il salvataggio
 
 }
+*/
 
 //****************************************************************
 
@@ -561,9 +582,14 @@ bool OutputTraces(const TracesStruct& trac)
     string sep = "; ";
     for (unsigned int i=0; i < num; i++)
     {
-        file << i << sep << trac.PNP[i].row(0)[0] << sep << trac.PNP[i].row(1)[0]
-             << sep << trac.EstremiTracce[i].row(0)[0] << sep << trac.EstremiTracce[i].row(0)[1] << sep << trac.EstremiTracce[i].row(0)[2]
-             << sep << trac.EstremiTracce[i].row(1)[0] << sep << trac.EstremiTracce[i].row(1)[1] << sep << trac.EstremiTracce[i].row(1)[2]
+        file << i << sep << trac.PNP[i].row(0)[0]
+             << sep << trac.PNP[i].row(1)[0]
+             << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(0)[0]
+             << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(0)[1]
+             << sep <<fixed << setprecision(16) << trac.EstremiTracce[i].row(0)[2]
+             << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(1)[0]
+             << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(1)[1]
+             << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(1)[2]
              << endl;
     }
 
@@ -590,7 +616,7 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
         return false;
     }
 
-    for (unsigned int i; i < num_fratture; i++)
+    for (unsigned int i=0; i < num_fratture; i++)
     {
         if (!frac.NumeroTracce[i].empty())
         {
@@ -614,20 +640,21 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
             file << "# FractureId; NumTraces" << endl;
             file << i << sep << lungh_lista << endl;
             file <<  "# TraceId; Tips; Length" << endl;
-            /*vector<unsigned int> ordinato_passanti = ordina(passanti);
+            /*
+            vector<unsigned int> ordinato_passanti = ordina(passanti);
             vector<unsigned int> ordinato_non_passanti = ordina(non_passanti);
 
             for (unsigned int j = 0; j < ordinato_passanti.size(); j++)
             {
                 unsigned int id_traccia = ordinato_passanti[j];
-                file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
+                file << id_traccia << sep << fixed << setprecision(16) << false << trac.LunghezzaTracce[id_traccia] << endl;
             }
             for (unsigned int j = 0; j < ordinato_non_passanti.size(); j++)
             {
                 unsigned int id_traccia = ordinato_non_passanti[j];
                 file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
             }
-            */
+*/
         }
     }
     file.close();

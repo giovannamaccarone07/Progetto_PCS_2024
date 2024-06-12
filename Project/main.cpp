@@ -12,7 +12,7 @@ int main()
 {
     FractureStruct fract;
     TracesStruct trac;
-
+    double tol = 10e-10;
     string NomeFile = "FR3_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
@@ -45,7 +45,7 @@ int main()
         cout << endl;
     }
     */
-    bool result = checkIntersezione(fract,trac,0,1);
+    bool result = checkIntersezione(fract,trac,0,1,tol);
     if(result == false)
         cout << "Main: non c'è intersezione" << endl;
     else

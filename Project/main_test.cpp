@@ -31,7 +31,7 @@ int main(int argc, char **argv)
         cout << "Dati importati correttamente" << endl;
     }
 
-    bool result = checkIntersezione(fract,trac,0,1);
+    bool result = checkIntersezione(fract,trac,0,1, tol);
     if(result == false)
         cout << "Main: non c'è intersezione" << endl;
     else

@@ -13,21 +13,8 @@ using namespace Eigen;
 using namespace std;
 
 namespace FractureLibrary {
+
 //********************************
-/*TEST(TRIANGLETEST, TestComputeArea){
-
-    Matrix3d vertices = Matrix3d::Zero();
-
-    vertices << 0.0, 1.0, 0.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 0.0;
-
-    Triangle t(vertices);
-
-    double area = t.computeArea();
-    EXPECT_EQ(area, 0.5);
-}
-*///********************************
 /*
 TEST(FRACTURE_TEST, TestPlotParaviewFractures){
 
@@ -166,13 +153,15 @@ TEST(RettaIntersezioneTest, PianiPoligoni01)
 
 TEST(PianoPassantePerFratturaTest, PianoPassante)
 {
-    //FractureStruct fract;
-    Vector4d pianoCalcolato1 = PianoPassantePerFrattura(fract,0);
+    FractureStruct fract;
+    ImportaDati("FR3_data.txt",fract);
+
+    Vector4d pianoCalcolato1 = PianoPassantePerFrattura(fract, 0);
     Vector4d pianoCorretto1(0,0,1,0);
 
     for(unsigned int i=0;i<pianoCorretto1.size();i++)
     {
-        EXPECT_NEAR(pianoCalcolato1[i],pianoCorretto1[i],tol);
+        EXPECT_NEAR(pianoCalcolato1[i], pianoCorretto1[i],tol);
     }
 
     Vector4d pianoCalcolato2 = PianoPassantePerFrattura(fract,1);
@@ -180,12 +169,15 @@ TEST(PianoPassantePerFratturaTest, PianoPassante)
 
     for(unsigned int i=0;i<pianoCorretto2.size();i++)
     {
-        EXPECT_NEAR(pianoCalcolato2[i],pianoCorretto2[i],tol);
+        EXPECT_NEAR(pianoCalcolato2[i], pianoCorretto2[i],tol);
     }
 }
 
 TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
 {
+    FractureStruct fract;
+    ImportaDati("FR3_data.txt",fract);
+
     Matrix<double,2,3> BBoxCalcolata = ComputeBoundingBox(fract,0);
     Matrix<double,2,3> ExpectedBBox;
     Vector3d firstRow(0,0,0);
@@ -193,9 +185,12 @@ TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
     ExpectedBBox.row(0) = firstRow;
     ExpectedBBox.row(1) = secondRow;
 
+
+    EXPECT_EQ(BBoxCalcolata, ExpectedBBox);
+
     for(unsigned int i = 0; i< 2; i++){
         for(unsigned int j = 0; j<3;j++){
-            ASSERT_EQ(BBoxCalcolata(i,j),ExpectedBBox(i,j)); // se =
+            EXPECT_EQ(BBoxCalcolata(i,j),ExpectedBBox(i,j)); // se =
             EXPECT_NEAR(BBoxCalcolata(i,j),ExpectedBBox(i,j),tol);
         }
     }
@@ -203,9 +198,11 @@ TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
 }
 
 TEST(CheckBoundingBoxTest, CheckBoundingBox){
+    FractureStruct fract;
 
-    ASSERT_TRUE(CheckBoundingBox(fract,0,1));
-    ASSERT_FALSE(CheckBoundingBox(fract,1,2));
+
+    ASSERT_TRUE(BoundingBox(fract,0,1));
+    ASSERT_FALSE(BoundingBox(fract,1,2));
 
 }
 
