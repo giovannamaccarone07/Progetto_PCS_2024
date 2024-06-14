@@ -14,49 +14,60 @@ namespace FractureLibrary
 //
 bool ImportaDati(const string& NomeFile, FractureStruct& Fract);
 
-/// PianoPassantePerFrattura
+/// RettaIntersezione
 //
 //
 MatrixXd RettaIntersezione(Vector4d& piano1, Vector4d& piano2);
-///
-///
-///
-///
-///
+
+////// PianoPassantePerFrattura
+//
+//
 Vector4d PianoPassantePerFrattura(const FractureStruct& fract, unsigned int& n);
-
-
 
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
+//
 bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& rettaIntersezione,unsigned int& n);
+
 ///CheckIntersezione
 // controlla se c'è intersezione
+//
 bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int n1, unsigned int n2);
+
+///BoundingBox
+//
+//
 bool BoundingBox(const FractureStruct& fract, unsigned int n1, unsigned int n2);
 
 /// ComputeTrace
-///
-///
-bool ComputeTrace(TracesStruct& trac,
-                  FractureStruct& fract,
-                  double ts1, double ts2,
-                  const MatrixXd& rettaIntersezione,
-                  unsigned int n1, unsigned int n2,
-                  bool pass1,bool pass2);
+//
+//
+bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double ts2,
+                  const MatrixXd& rettaIntersezione, unsigned int n1, unsigned int n2, bool pass1,bool pass2);
 
-
+/// ComputeBoundingBox
+//
+//
 Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n);
 
+/// Output
+//
+//
 bool Output(const TracesStruct& trac, const FractureStruct& frac);
+
+///pianiParalleli
+//
+//
 bool pianiParalleli(Vector4d& piano1, Vector4d& piano2);
 
+///OutputFractures
+//
+//
 bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac);
 
+///OutputTraces
+//
+//
 bool OutputTraces(const TracesStruct& trac);
-
-
-
-
 
 }

@@ -64,7 +64,7 @@ struct TracesStruct
     ///MatriceCaratteristicheTraccia
     // Vettore di matrici quadrate 2x2. La matrice che si trova in posizione i-esima è relativa alla traccia di id i e le due righe indicano le fratture tra cui esiste la traccia.
     // Ogni riga è formata da frattura  e un booleano a cui è associato True se la traccia è passante per quella frattura o False se non lo è.
-    vector<Matrix<unsigned int,2,2>> PNP = {};                          /// dim: 1 x ct
+    vector<Matrix<unsigned int,2,2>> PNP = {};          /// dim: 1 x ct
 };
 
 }
