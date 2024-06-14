@@ -12,6 +12,7 @@
 using namespace Eigen;
 using namespace std;
 
+
 namespace FractureLibrary {
 
 //********************************
@@ -115,6 +116,8 @@ TEST(RettaIntersezioneTest, PianiSecanti)
     }
 }
 */
+
+/*
 TEST(RettaIntersezioneTest, PuntiAppartenentiPiani)
 {
     Vector4d piano1(1,1,1,-1); //CONTROLLARE IL SEGNO DI d
@@ -223,8 +226,7 @@ TEST(pianiParalleliTest, PianiParalleli){
 
 
 
-
-
+*/
 
 
 

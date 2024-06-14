@@ -168,7 +168,7 @@ Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [cod
 // controlla se la retta passa per la frattura che giace nel piano
 
 bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
-                  const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2, const double& tol)
+                  const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol)
 
 {
 
@@ -395,7 +395,7 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 
     double dotProduct = piano1[0]*piano2[0]+piano1[1]*piano2[1]+piano1[2]*piano2[2];
 
-    if(abs(dotProduct)>tol){
+    if(abs(dotProduct)>tol){   ///???DISUGUAGLIAnza giusta???
         return true; //sono paralleli
     }
     return false;
@@ -404,17 +404,23 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 
 //****************************************************************
 
-bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int n1, unsigned int n2, const double& tol)
+bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const unsigned int& n2, const double& tol)
 {
+
+
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
+/*
     if(pianiParalleli(piano1,piano2,tol) == true)
     {
         cout << "CheckIntersezione: I piani sono paralleli" << endl;
         return false; //non c'è intersezione
     }
+
     else
     {
+
+*/
         if(IntersezioneBoundingBox(fract,n1,n2) == false)
         {
             cout << "Boundingbox: i poligono non si toccano" << endl;
@@ -433,7 +439,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int 
             }
 
         }
-    }
+    //}
 
     //chiamare funzione che salva le info sulle tracce
 
@@ -441,7 +447,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int 
 }
 
 //****************************************************************
-Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n)
+Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int n)
 {
     Vector3d vettoreMax(numeric_limits<double>::min(), numeric_limits<double>::min(), numeric_limits<double>::min());
     Vector3d vettoreMin(numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max());
@@ -476,7 +482,7 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int 
 
 //****************************************************************
 
-bool IntersezioneBoundingBox(const FractureStruct& fract, unsigned int n1,unsigned int n2)
+bool IntersezioneBoundingBox(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2) // METTERE LA TOLLERANZA
 {
     Matrix<double,2,3> BBox1 = ComputeBoundingBox(fract,n1);
     Matrix<double,2,3> BBox2 = ComputeBoundingBox(fract,n2);
@@ -694,6 +700,15 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 }
 
 //****************************************************************
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 
 } //namespace
