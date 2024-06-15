@@ -60,7 +60,7 @@ struct Elemento
     unsigned int valore;
     double valore_associato;
 };
-void  ordineDecrescente(TracesStruct& trac, list<Elemento>& lista, const Elemento& nuovoElemento);
+void  ordineDecrescente(const FractureStruct& fract, TracesStruct& trac, list<Elemento>& lista, const Elemento& nuovoElemento);
 
 
 }
