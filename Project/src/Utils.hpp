@@ -55,8 +55,12 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac);
 
 bool OutputTraces(const TracesStruct& trac);
 
-
-
+struct Elemento
+{
+    unsigned int valore;
+    double valore_associato;
+};
+void  ordineDecrescente(TracesStruct& trac, list<Elemento>& lista, const Elemento& nuovoElemento);
 
 
 }

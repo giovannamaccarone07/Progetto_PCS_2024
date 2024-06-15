@@ -32,8 +32,8 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
     fract.IndiciVertici.resize(fract.NumeroFratture);
-    fract.NumeroTracce.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
-
+    fract.NumeroTracceP.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+    fract.NumeroTracceN.resize(fract.NumeroFratture);
 
     unsigned int indice = 0; // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
 
@@ -331,6 +331,7 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             intersezione = true;
             //passo i valori centrali che rappresentano gli estremi della tracciA
 
+
             //COMPUTE TRACE
 
             unsigned int num = trac.ct;
@@ -349,10 +350,20 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             if (pass1 == false)
             {
                 passante1 = 1;
+                ordineDecrescente(trac, fract.NumeroTracceN[n1], num);
+            }
+            else
+            {
+                ordineDecrescente(trac, fract.NumeroTracceP[n1], num);
             }
             if (pass2 == false)
             {
                 passante2 = 1;
+                ordineDecrescente(trac, fract.NumeroTracceN[n2], num);
+            }
+            else
+            {
+                ordineDecrescente(trac, fract.NumeroTracceP[n2], num);
             }
             Vector<unsigned int,2> riga1(n1,passante1);
             Vector<unsigned int,2> riga2(n2,passante2);
@@ -360,7 +371,7 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             Traccia.row(1) = riga2;
             trac.PNP.push_back(Traccia);
 
-
+            /*
             vector<unsigned int> infoN1 = {num,passante1};
             vector<unsigned int> infoN2 = {num,passante2};
 
@@ -376,7 +387,7 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             //fract.NumeroTracce[n2] = lista;
             //lista.push_back(infoN2);
             //fract.NumeroTracce[n2] = lista;
-
+            */
 
 
 
@@ -387,6 +398,19 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
 
     return intersezione;
 }
+
+
+void  ordineDecrescente(TracesStruct& trac, list<Elemento>& lista, const Elemento& nuovoElemento)
+{
+    auto posizione =lista.begin();
+    double valore_associato =trac.LunghezzaTracce[nuovoElemento];
+    while (posizione != lista.end() && posizione -> valore_associato > nuovoElemento.valore_associato)
+    {
+        ++posizione;
+    }
+    lista.insert(posizione, nuovoElemento);
+}
+
 
 //****************************************************************
  //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
@@ -604,7 +628,7 @@ bool OutputTraces(const TracesStruct& trac)
 
 bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
 {
-    unsigned int num_fratture = frac.NumeroFratture;
+    /*unsigned int num_fratture = frac.NumeroFratture;
     string sep = "; ";
     ofstream file;
     string outputFileName = "./OutputFractures.txt";
@@ -654,7 +678,7 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
                 unsigned int id_traccia = ordinato_non_passanti[j];
                 file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
             }
-*/
+            */
         }
     }
     file.close();
