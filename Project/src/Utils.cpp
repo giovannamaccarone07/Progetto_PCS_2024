@@ -32,7 +32,8 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
     fract.IndiciVertici.resize(fract.NumeroFratture);
-    fract.NumeroTracce.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+    fract.NumeroTracceN.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+    fract.NumeroTracceP.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
 
 
     unsigned int indice = 0; // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
@@ -331,6 +332,7 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             intersezione = true;
             //passo i valori centrali che rappresentano gli estremi della tracciA
 
+            /*
             //COMPUTE TRACE
 
             unsigned int num = trac.ct;
@@ -376,6 +378,64 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             //fract.NumeroTracce[n2] = lista;
             //lista.push_back(infoN2);
             //fract.NumeroTracce[n2] = lista;
+            */
+
+            //COMPUTE TRACE
+
+            unsigned int num = trac.ct;
+            trac.IdTracce.push_back(num);
+            Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[1];
+            Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[2];
+            Matrix<double,2,3> M;
+            M.row(0)=p1;
+            M.row(1)=p2;
+            trac.EstremiTracce.push_back(M);
+            double len = (p2-p1).norm();
+            trac.LunghezzaTracce.push_back(len);
+            Matrix<unsigned int,2,2> Traccia;
+            unsigned int passante1 = 0;
+            unsigned int passante2 = 0;
+            if (pass1 == false)
+            {
+                passante1 = 1;
+                ordineDecrescente(fract, trac, fract.NumeroTracceN[n1], num);
+            }
+            else
+            {
+                ordineDecrescente(fract, trac, fract.NumeroTracceP[n1], num);
+            }
+            if (pass2 == false)
+            {
+                passante2 = 1;
+                ordineDecrescente(fract, trac, fract.NumeroTracceN[n2], num);
+            }
+            else
+            {
+                ordineDecrescente(fract, trac, fract.NumeroTracceP[n2], num);
+            }
+            Vector<unsigned int,2> riga1(n1,passante1);
+            Vector<unsigned int,2> riga2(n2,passante2);
+            Traccia.row(0) = riga1;
+            Traccia.row(1) = riga2;
+            trac.PNP.push_back(Traccia);
+
+            /*
+            vector<unsigned int> infoN1 = {num,passante1};
+            vector<unsigned int> infoN2 = {num,passante2};
+
+            (fract.NumeroTracce[n1]).push_back(infoN1);
+            fract.NumeroTracce.resize(fract.NumeroFratture);
+            //list<vector<unsigned int>> lista;
+            //fract.NumeroTracce[n1] = lista;
+            //lista.push_back(infoN1);
+            //fract.NumeroTracce[n1] = lista;
+
+            (fract.NumeroTracce[n2]).push_back(infoN2);
+            //list<vector<unsigned int>> lista;
+            //fract.NumeroTracce[n2] = lista;
+            //lista.push_back(infoN2);
+            //fract.NumeroTracce[n2] = lista;
+            */
 
 
 
