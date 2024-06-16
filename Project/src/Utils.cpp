@@ -32,7 +32,8 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
     fract.IndiciVertici.resize(fract.NumeroFratture);
-    fract.NumeroTracce.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+    fract.NumeroTracceN.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+    fract.NumeroTracceP.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
 
 
     unsigned int indice = 0; // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
@@ -168,7 +169,7 @@ Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [cod
 // controlla se la retta passa per la frattura che giace nel piano
 
 bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
-                  const MatrixXd& rettaIntersezione, unsigned int& n1, unsigned int& n2, const double& tol)
+                  const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol)
 
 {
 
@@ -296,8 +297,8 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
     }
     else
     {
-        if(max(ts[0],ts[1]) <= min(ts[2],ts[3]) + tol ||
-           max(ts[2],ts[3]) <= min(ts[0],ts[1]) + tol) // caso disgiunti o vertici intermedi coincidenti
+        if(max(ts[0],ts[1])  <= min(ts[2],ts[3]) + tol  ||
+           max(ts[2],ts[3])  <= min(ts[0],ts[1]) + tol ) // caso disgiunti o vertici intermedi coincidenti
         {
             return intersezione;
         }
@@ -331,6 +332,7 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             intersezione = true;
             //passo i valori centrali che rappresentano gli estremi della tracciA
 
+            /*
             //COMPUTE TRACE
 
             unsigned int num = trac.ct;
@@ -376,6 +378,64 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             //fract.NumeroTracce[n2] = lista;
             //lista.push_back(infoN2);
             //fract.NumeroTracce[n2] = lista;
+            */
+
+            //COMPUTE TRACE
+
+            unsigned int num = trac.ct;
+            trac.IdTracce.push_back(num);
+            Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[1];
+            Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[2];
+            Matrix<double,2,3> M;
+            M.row(0)=p1;
+            M.row(1)=p2;
+            trac.EstremiTracce.push_back(M);
+            double len = (p2-p1).norm();
+            trac.LunghezzaTracce.push_back(len);
+            Matrix<unsigned int,2,2> Traccia;
+            unsigned int passante1 = 0;
+            unsigned int passante2 = 0;
+            if (pass1 == false)
+            {
+                passante1 = 1;
+                ordineDecrescente(trac, fract.NumeroTracceN[n1], num);
+            }
+            else
+            {
+                ordineDecrescente(trac, fract.NumeroTracceP[n1], num);
+            }
+            if (pass2 == false)
+            {
+                passante2 = 1;
+                ordineDecrescente(trac, fract.NumeroTracceN[n2], num);
+            }
+            else
+            {
+                ordineDecrescente(trac, fract.NumeroTracceP[n2], num);
+            }
+            Vector<unsigned int,2> riga1(n1,passante1);
+            Vector<unsigned int,2> riga2(n2,passante2);
+            Traccia.row(0) = riga1;
+            Traccia.row(1) = riga2;
+            trac.PNP.push_back(Traccia);
+
+            /*
+            vector<unsigned int> infoN1 = {num,passante1};
+            vector<unsigned int> infoN2 = {num,passante2};
+
+            (fract.NumeroTracce[n1]).push_back(infoN1);
+            fract.NumeroTracce.resize(fract.NumeroFratture);
+            //list<vector<unsigned int>> lista;
+            //fract.NumeroTracce[n1] = lista;
+            //lista.push_back(infoN1);
+            //fract.NumeroTracce[n1] = lista;
+
+            (fract.NumeroTracce[n2]).push_back(infoN2);
+            //list<vector<unsigned int>> lista;
+            //fract.NumeroTracce[n2] = lista;
+            //lista.push_back(infoN2);
+            //fract.NumeroTracce[n2] = lista;
+            */
 
 
 
@@ -388,6 +448,37 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
     return intersezione;
 }
 
+//***************************************************************
+
+void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num)
+{
+
+    double length = trac.LunghezzaTracce[num];
+   /* auto posizione =lista.begin();
+    double valoreAssociato =trac.LunghezzaTracce[nuovoElemento.valore];
+    while (posizione != lista.end() && posizione -> valoreAssociato > nuovoElemento.valoreAssociato)
+    {
+        ++posizione;
+    }
+    lista.insert(posizione, nuovoElemento);
+*/
+
+    auto itor = lista.begin();
+    while( length < trac.LunghezzaTracce[*itor] && itor != lista.end())
+    { 
+        itor ++;
+
+    }
+    lista.insert(itor,num);
+
+    if (lista.empty())
+    {
+        lista.push_back(num);
+
+    }
+
+}
+
 //****************************************************************
  //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
 bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
@@ -395,7 +486,7 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 
     double dotProduct = piano1[0]*piano2[0]+piano1[1]*piano2[1]+piano1[2]*piano2[2];
 
-    if(abs(dotProduct)>tol){
+    if(abs(dotProduct)>tol){   ///???DISUGUAGLIAnza giusta???
         return true; //sono paralleli
     }
     return false;
@@ -404,17 +495,23 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 
 //****************************************************************
 
-bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int n1, unsigned int n2, const double& tol)
+bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const unsigned int& n2, const double& tol)
 {
+
+
     Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
     Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
+/*
     if(pianiParalleli(piano1,piano2,tol) == true)
     {
         cout << "CheckIntersezione: I piani sono paralleli" << endl;
         return false; //non c'è intersezione
     }
+
     else
     {
+
+*/
         if(IntersezioneBoundingBox(fract,n1,n2) == false)
         {
             cout << "Boundingbox: i poligono non si toccano" << endl;
@@ -433,7 +530,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int 
             }
 
         }
-    }
+    //}
 
     //chiamare funzione che salva le info sulle tracce
 
@@ -441,7 +538,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, unsigned int 
 }
 
 //****************************************************************
-Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n)
+Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int n)
 {
     Vector3d vettoreMax(numeric_limits<double>::min(), numeric_limits<double>::min(), numeric_limits<double>::min());
     Vector3d vettoreMin(numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max());
@@ -476,7 +573,7 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int 
 
 //****************************************************************
 
-bool IntersezioneBoundingBox(const FractureStruct& fract, unsigned int n1,unsigned int n2)
+bool IntersezioneBoundingBox(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2) // METTERE LA TOLLERANZA
 {
     Matrix<double,2,3> BBox1 = ComputeBoundingBox(fract,n1);
     Matrix<double,2,3> BBox2 = ComputeBoundingBox(fract,n2);
@@ -605,7 +702,7 @@ bool OutputTraces(const TracesStruct& trac)
 bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
 {
     unsigned int num_fratture = frac.NumeroFratture;
-    string sep = "; ";
+    string sep = ";\t";
     ofstream file;
     string outputFileName = "./OutputFractures.txt";
     file.open(outputFileName);
@@ -616,6 +713,37 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
         return false;
     }
 
+    for (unsigned int i=0; i < num_fratture; i++)
+    {
+        // Tracce passanti
+        if (!frac.NumeroTracceP[i].empty() || !frac.NumeroTracceN[i].empty())
+        {
+            file << "# FractureId; NumTraces" << endl;
+            file << i << sep << frac.NumeroTracceP[i].size() + frac.NumeroTracceN[i].size() << endl;
+
+            file <<  "# TraceId; Tips; Length" << endl;
+            for (auto itor = frac.NumeroTracceP[i].begin() ; itor != frac.NumeroTracceP[i].end(); itor++)
+            {
+                unsigned int id_traccia = (*itor);
+                file << id_traccia << sep << false << sep << fixed << setprecision(16) << trac.LunghezzaTracce[id_traccia] << endl;
+            }
+
+            for (auto itor = frac.NumeroTracceN[i].begin() ; itor != frac.NumeroTracceN[i].end(); itor++)
+            {
+                unsigned int id_traccia = (*itor);
+                file << id_traccia << sep << true << sep << fixed << setprecision(16) << trac.LunghezzaTracce[id_traccia] << endl;
+            }
+            file << endl;
+        }
+
+    }
+    file.close();
+
+    return true;
+}
+
+
+/*
     for (unsigned int i=0; i < num_fratture; i++)
     {
         if (!frac.NumeroTracce[i].empty())
@@ -654,13 +782,7 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
                 unsigned int id_traccia = ordinato_non_passanti[j];
                 file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
             }
-*/
-        }
-    }
-    file.close();
-
-    return true;
-}
+            */
 
 //****************************************************************
 
@@ -694,6 +816,15 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 }
 
 //****************************************************************
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 
 } //namespace
