@@ -480,7 +480,7 @@ void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsi
 }
 
 //****************************************************************
- //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
+//SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
 bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 {
 
@@ -598,66 +598,6 @@ bool IntersezioneBoundingBox(const FractureStruct& fract, const unsigned int& n1
 }
 
 //****************************************************************
-/*
-bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double ts2,
-                  const MatrixXd& rettaIntersezione, unsigned int n1, unsigned int n2,
-                  bool pass1,bool pass2)
-{
-    unsigned int num = trac.ct;
-    trac.IdTracce.push_back(num);
-    Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts1;
-    Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts2;
-    Matrix<double,2,3> M;
-    M.row(0)=p1;
-    M.row(1)=p2;
-    trac.EstremiTracce.push_back(M);
-    double len = (p2-p1).norm();
-    trac.LunghezzaTracce.push_back(len);
-    Matrix<unsigned int,2,2> Traccia;
-    unsigned int passante1 = 0;
-    unsigned int passante2 = 0;
-    if (pass1 == false)
-    {
-        passante1 = 1;
-    }
-    if (pass2 == false)
-    {
-        passante2 = 1;
-    }
-    Vector<unsigned int,2> riga1(n1,passante1);
-    Vector<unsigned int,2> riga2(n2,passante2);
-    Traccia.row(0) = riga1;
-    Traccia.row(1) = riga2;
-    trac.PNP.push_back(Traccia);
-
-
-    vector<unsigned int> infoN1 = {num,passante1};
-    vector<unsigned int> infoN2 = {num,passante2};
-
-    (fract.NumeroTracce[n1]).push_back(infoN1);
-    fract.NumeroTracce.resize(fract.NumeroFratture);
-    //list<vector<unsigned int>> lista;
-    //fract.NumeroTracce[n1] = lista;
-    //lista.push_back(infoN1);
-    //fract.NumeroTracce[n1] = lista;
-
-    (fract.NumeroTracce[n2]).push_back(infoN2);
-    //list<vector<unsigned int>> lista;
-    //fract.NumeroTracce[n2] = lista;
-    //lista.push_back(infoN2);
-    //fract.NumeroTracce[n2] = lista;
-
-
-
-
-    trac.ct ++;
-
-    return true ;//se è andato a buon fine il salvataggio
-
-}
-*/
-
-//****************************************************************
 
 bool OutputTraces(const TracesStruct& trac)
 {
@@ -742,48 +682,6 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
     return true;
 }
 
-
-/*
-    for (unsigned int i=0; i < num_fratture; i++)
-    {
-        if (!frac.NumeroTracce[i].empty())
-        {
-            unsigned int lungh_lista = (frac.NumeroTracce[i]).size();
-            vector<unsigned int> passanti;
-            vector<unsigned int> non_passanti;
-            passanti.resize(lungh_lista);
-            non_passanti.resize(lungh_lista);
-
-            for (vector<unsigned int> colonna : frac.NumeroTracce[i])
-            {
-                if (colonna[1] == 1)
-                {
-                    non_passanti.push_back(colonna[0]);
-                }
-                else
-                {
-                    passanti.push_back(colonna[0]);
-                }
-            }
-            file << "# FractureId; NumTraces" << endl;
-            file << i << sep << lungh_lista << endl;
-            file <<  "# TraceId; Tips; Length" << endl;
-            /*
-            vector<unsigned int> ordinato_passanti = ordina(passanti);
-            vector<unsigned int> ordinato_non_passanti = ordina(non_passanti);
-
-            for (unsigned int j = 0; j < ordinato_passanti.size(); j++)
-            {
-                unsigned int id_traccia = ordinato_passanti[j];
-                file << id_traccia << sep << fixed << setprecision(16) << false << trac.LunghezzaTracce[id_traccia] << endl;
-            }
-            for (unsigned int j = 0; j < ordinato_non_passanti.size(); j++)
-            {
-                unsigned int id_traccia = ordinato_non_passanti[j];
-                file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
-            }
-            */
-
 //****************************************************************
 
 bool Output(const TracesStruct& trac, const FractureStruct& frac)
@@ -817,9 +715,11 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 
 //****************************************************************
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////  PARTE 2 /////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//****************************************************************
 
 
 
