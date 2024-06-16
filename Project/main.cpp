@@ -13,7 +13,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR10_data.txt";
+    string NomeFile = "FR200_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
     if(!ImportaDati(NomeFile, fract))

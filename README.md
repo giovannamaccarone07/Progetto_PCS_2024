@@ -29,16 +29,9 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 
 
 - rivedere le strutture in fratture.hpp perché abbiamo creato delle matrici di double ma abbiamo intenzione di inserirci dei booleani. Potrebbe andare 0/1? Tuple
-- rivedere l'indice del ciclo for e scriverlo in modulo 6 //fatto
-- rivedere valore k 
-- rivedere le 24 condizioni FILOSOFIA DI GIOVANNA
--   Vector3d vettoreMax1(-1e100, -1e100, -1e100); Nella boundingBox come inizializzo dei vettori vuoti in modo che possa fare dei paragoni con le x,y,z che trovo? 
-- output tips va bene mettere direttamente false 
-- perché non prende frac nei test
-
 
 - MEMORIZZARE IN MODO EFFICIENTE I DATI NELLA STRUCT TRAC
 - le matrici possono contenere tipi misti ? 
 - è più costoso aggiungere su un vector con .push_back opp vector[i] = oggetto
 
-
+- TRACCE DI LUNGHEZZA 0 ?? passanti e non passanti 
