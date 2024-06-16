@@ -40,6 +40,8 @@ struct FractureStruct
     vector<list<unsigned int>> NumeroTracceN = {};
     vector<list<unsigned int>> NumeroTracceP= {};
 
+    vector<PolygonalMesh> mesh = {};                    /// dim: 1 x NumeroFratture
+    // in ogni posizione ho un oggetto di tipo mesh associato alla frattura i-esima
 };
 
 
@@ -66,6 +68,45 @@ struct TracesStruct
     vector<Matrix<unsigned int,2,2>> PNP = {};                          /// dim: 1 x ct
 };
 
+
+struct PolygonalMesh
+{
+    ///celle 0D
+    // memorizzo il numero di celle
+    // creo un vector di interi dove memorizzo gli Id delle celle
+    // creo un vector di vettori a due componenti in cui salvo le coordinate (X,Y) delle celle
+    // creo un dizionario per salvare i marker, ad ogni marker associo una lista con gli Id delle celle che hanno quel marker
+    //
+    unsigned int NumberCell0D = 0; ///< number of Cell0D
+    vector<unsigned int> Cell0DId = {}; ///< Cell0D id, size 1 x NumberCell0D
+    vector<Vector3d> Cell0DCoordinates = {}; ///< Cell0D coordinates, size 2 x NumberCell0D (x,y)
+
+    ///celle 1D
+    // memorizzo il numero di celle
+    // creo un vector di interi dove memorizzo gli Id delle celle
+    // creo un vector di vettori a due componenti in cui salvo l'id di origine e fine delle celle0D che formano la cella1D
+    // creo un dizionario per salvare i marker, ad ogni marker associo una lista con gli Id delle celle che hanno quel marker
+    //
+    unsigned int NumberCell1D = 0; ///< number of Cell1D
+    vector<unsigned int> Cell1DId = {}; ///< Cell1D id, size 1 x NumberCell1D
+    vector<Vector2i> Cell1DVertices = {}; ///< Cell1D vertices indices, size 2 x NumberCell1D (fromId,toId)
+
+
+    ///celle 2D
+    // memorizzo il numero di celle
+    // creo un vector di interi dove memorizzo gli Id delle celle
+    // creo un vector di Vector per memorizzare la sequenza dei vertici della cella (i vertici sono gli id delle celle 0D)
+    // creo un vector di Vector per memorizzare la sequenza degli archi della cella (gli archi sono gli id delle celle 1D)
+    //
+    unsigned int NumberCell2D = 0; ///< number of Cell2D
+    vector<unsigned int> NumeroDiVertici = {};
+    vector<unsigned int> NumeroDiLati = {};
+    vector<VectorXi> Cell2DVertices = {}; ///< Cell2D Vertices indices
+    vector<VectorXi> Cell2DEdges = {}; ///< Cell2D Cell1D indices
+
+
+
+};
 
 
 }
