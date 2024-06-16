@@ -297,8 +297,8 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
     }
     else
     {
-        if(max(ts[0],ts[1]) <= min(ts[2],ts[3]) + tol ||
-           max(ts[2],ts[3]) <= min(ts[0],ts[1]) + tol) // caso disgiunti o vertici intermedi coincidenti
+        if(max(ts[0],ts[1])  <= min(ts[2],ts[3]) + tol  ||
+           max(ts[2],ts[3])  <= min(ts[0],ts[1]) + tol ) // caso disgiunti o vertici intermedi coincidenti
         {
             return intersezione;
         }
@@ -478,8 +478,6 @@ void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsi
     }
 
 }
-
-
 
 //****************************************************************
  //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
@@ -785,7 +783,6 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
                 file << id_traccia << sep << false << trac.LunghezzaTracce[id_traccia] << endl;
             }
             */
-
 
 //****************************************************************
 

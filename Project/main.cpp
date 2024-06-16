@@ -71,7 +71,7 @@ int main()
 
     for (unsigned int i =0; i<fract.NumeroFratture; i++)
     {
-        for (unsigned int j =i; j<fract.NumeroFratture; j++)
+        for (unsigned int j =i+1; j<fract.NumeroFratture; j++)
         {
             bool result = checkIntersezione(fract,trac,i,j,tol);
             if(result == false)
