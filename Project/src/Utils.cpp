@@ -398,20 +398,20 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             if (pass1 == false)
             {
                 passante1 = 1;
-                ordineDecrescente(fract, trac, fract.NumeroTracceN[n1], num);
+                ordineDecrescente(trac, fract.NumeroTracceN[n1], num);
             }
             else
             {
-                ordineDecrescente(fract, trac, fract.NumeroTracceP[n1], num);
+                ordineDecrescente(trac, fract.NumeroTracceP[n1], num);
             }
             if (pass2 == false)
             {
                 passante2 = 1;
-                ordineDecrescente(fract, trac, fract.NumeroTracceN[n2], num);
+                ordineDecrescente(trac, fract.NumeroTracceN[n2], num);
             }
             else
             {
-                ordineDecrescente(fract, trac, fract.NumeroTracceP[n2], num);
+                ordineDecrescente(trac, fract.NumeroTracceP[n2], num);
             }
             Vector<unsigned int,2> riga1(n1,passante1);
             Vector<unsigned int,2> riga2(n2,passante2);
@@ -447,6 +447,34 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
 
     return intersezione;
 }
+
+//***************************************************************
+
+void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num)
+{
+
+    double length = trac.LunghezzaTracce[num];
+   /* auto posizione =lista.begin();
+    double valoreAssociato =trac.LunghezzaTracce[nuovoElemento.valore];
+    while (posizione != lista.end() && posizione -> valoreAssociato > nuovoElemento.valoreAssociato)
+    {
+        ++posizione;
+    }
+    lista.insert(posizione, nuovoElemento);
+*/
+    for(auto itor = lista.begin(); itor != lista.end(); itor ++)
+    {
+
+        if (length > trac.LunghezzaTracce[*itor])
+        {
+            lista.insert(itor,num);
+
+        }
+
+    }
+}
+
+
 
 //****************************************************************
  //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA

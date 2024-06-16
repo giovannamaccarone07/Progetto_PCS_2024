@@ -67,10 +67,5 @@ struct TracesStruct
 };
 
 
-struct Elemento
-{
-    unsigned int valore;
-    double valoreAssociato;
-};
 
 }

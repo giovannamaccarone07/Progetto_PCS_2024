@@ -130,8 +130,12 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac);
 ///
 bool OutputTraces(const TracesStruct& trac);
 
-
-
-
+///
+/// \brief ordineDecrescente
+/// \param trac
+/// \param lista
+/// \param num
+///
+void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num);
 
 }
