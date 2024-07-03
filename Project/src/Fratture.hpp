@@ -31,6 +31,9 @@ struct FractureStruct
     // Ogni componente del vettore contiene una matrice che indica tutte le tracce che intersecano la frattura i-esima.
     // Ogni colonna della matrice contiene l'id della traccia (prima riga) e il booleano che indica se la traccia stessa è passante o meno per la frattura.
 
+
+    /////////////////////////// PER L'AMOR DI DIO TOGLIERE LE VARIABILI CHE NON SI USANO ANCHE NELLA DOCUMENTAZIONE
+
     unsigned int NumeroFratture = 0;
     vector<unsigned int> IdFratture = {};               /// dim: 1 x NumeroFratture
     vector<unsigned int> NumeroVertici = {};            /// dim: 1 x NumeroFratture
@@ -42,6 +45,7 @@ struct FractureStruct
 
     vector<PolygonalMesh> mesh = {};                    /// dim: 1 x NumeroFratture
     // in ogni posizione ho un oggetto di tipo mesh associato alla frattura i-esima
+    // da aggiungere alla uml ?
 };
 
 
@@ -90,6 +94,12 @@ struct PolygonalMesh
     unsigned int NumberCell1D = 0; ///< number of Cell1D
     vector<unsigned int> Cell1DId = {}; ///< Cell1D id, size 1 x NumberCell1D
     vector<Vector2i> Cell1DVertices = {}; ///< Cell1D vertices indices, size 2 x NumberCell1D (fromId,toId)
+
+
+
+
+    ////// MA SONO INT OPP UNSIGNED INT ? ho un vector di unsigned int opp
+
 
 
     ///celle 2D
