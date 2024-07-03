@@ -330,57 +330,8 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             //ordino il vettore
             sort(ts.begin(),ts.end()); // costo computazionale o(nlogn)
             intersezione = true;
-            //passo i valori centrali che rappresentano gli estremi della tracciA
+            //passo i valori centrali che rappresentano gli estremi della traccia
 
-            /*
-            //COMPUTE TRACE
-
-            unsigned int num = trac.ct;
-            trac.IdTracce.push_back(num);
-            Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[1];
-            Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[2];
-            Matrix<double,2,3> M;
-            M.row(0)=p1;
-            M.row(1)=p2;
-            trac.EstremiTracce.push_back(M);
-            double len = (p2-p1).norm();
-            trac.LunghezzaTracce.push_back(len);
-            Matrix<unsigned int,2,2> Traccia;
-            unsigned int passante1 = 0;
-            unsigned int passante2 = 0;
-            if (pass1 == false)
-            {
-                passante1 = 1;
-            }
-            if (pass2 == false)
-            {
-                passante2 = 1;
-            }
-            Vector<unsigned int,2> riga1(n1,passante1);
-            Vector<unsigned int,2> riga2(n2,passante2);
-            Traccia.row(0) = riga1;
-            Traccia.row(1) = riga2;
-            trac.PNP.push_back(Traccia);
-
-
-            vector<unsigned int> infoN1 = {num,passante1};
-            vector<unsigned int> infoN2 = {num,passante2};
-
-            (fract.NumeroTracce[n1]).push_back(infoN1);
-            fract.NumeroTracce.resize(fract.NumeroFratture);
-            //list<vector<unsigned int>> lista;
-            //fract.NumeroTracce[n1] = lista;
-            //lista.push_back(infoN1);
-            //fract.NumeroTracce[n1] = lista;
-
-            (fract.NumeroTracce[n2]).push_back(infoN2);
-            //list<vector<unsigned int>> lista;
-            //fract.NumeroTracce[n2] = lista;
-            //lista.push_back(infoN2);
-            //fract.NumeroTracce[n2] = lista;
-            */
-
-            //COMPUTE TRACE
 
             unsigned int num = trac.ct;
             trac.IdTracce.push_back(num);
@@ -419,27 +370,6 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
             Traccia.row(1) = riga2;
             trac.PNP.push_back(Traccia);
 
-            /*
-            vector<unsigned int> infoN1 = {num,passante1};
-            vector<unsigned int> infoN2 = {num,passante2};
-
-            (fract.NumeroTracce[n1]).push_back(infoN1);
-            fract.NumeroTracce.resize(fract.NumeroFratture);
-            //list<vector<unsigned int>> lista;
-            //fract.NumeroTracce[n1] = lista;
-            //lista.push_back(infoN1);
-            //fract.NumeroTracce[n1] = lista;
-
-            (fract.NumeroTracce[n2]).push_back(infoN2);
-            //list<vector<unsigned int>> lista;
-            //fract.NumeroTracce[n2] = lista;
-            //lista.push_back(infoN2);
-            //fract.NumeroTracce[n2] = lista;
-            */
-
-
-
-
             trac.ct ++;
         }
     }
@@ -454,14 +384,6 @@ void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsi
 {
 
     double length = trac.LunghezzaTracce[num];
-   /* auto posizione =lista.begin();
-    double valoreAssociato =trac.LunghezzaTracce[nuovoElemento.valore];
-    while (posizione != lista.end() && posizione -> valoreAssociato > nuovoElemento.valoreAssociato)
-    {
-        ++posizione;
-    }
-    lista.insert(posizione, nuovoElemento);
-*/
 
     auto itor = lista.begin();
     while( length < trac.LunghezzaTracce[*itor] && itor != lista.end())
@@ -623,7 +545,7 @@ bool OutputTraces(const TracesStruct& trac)
              << sep << trac.PNP[i].row(1)[0]
              << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(0)[0]
              << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(0)[1]
-             << sep <<fixed << setprecision(16) << trac.EstremiTracce[i].row(0)[2]
+             << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(0)[2]
              << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(1)[0]
              << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(1)[1]
              << sep << fixed << setprecision(16) << trac.EstremiTracce[i].row(1)[2]
