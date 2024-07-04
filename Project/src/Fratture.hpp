@@ -98,7 +98,7 @@ struct PolygonalMesh
 
 
 
-    ////// MA SONO INT OPP UNSIGNED INT ? ho un vector di unsigned int opp
+    ////// MA SONO INT OPP UNSIGNED INT ? ho un vector di unsigned int opp Vector2i di interi?
 
 
 
