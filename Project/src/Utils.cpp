@@ -159,7 +159,7 @@ Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [cod
     b[2] = 0;
     Vector3d puntoApplicazione = A.fullPivLu().solve(b); //x punto di applicazione
     Matrix<double,2,3> rettaIntersezione;
-    rettaIntersezione.row(0) = puntoApplicazione;
+    rettaIntersezione.row(0) = - puntoApplicazione; ///questo è il meno che aggiusta i segni deve essere SOLO qui
     rettaIntersezione.row(1) = tangente;
 
     return rettaIntersezione;
@@ -178,7 +178,7 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
 
     //RIVEDERE DIREZIONE
     Vector3d direzioneRetta = rettaIntersezione.row(1);
-    Vector3d app = -rettaIntersezione.row(0);
+    Vector3d app = rettaIntersezione.row(0);
     vector<double> ts; // ts sono i parametri di intersezione tra la retta e le fratture
 
 
@@ -678,8 +678,8 @@ bool subPolygons(const FractureStruct& frac, const TracesStruct& trac, unsigned 
         Vector3d v1 = (traccia1 - verticeA);
         if(((u.cross(v1)).array().abs() <= tol).all())
         {
-            sinistra.push_back(traccia0);
-            destra.push_back(traccia0);
+            sinistra.push_back(traccia1);
+            destra.push_back(traccia1);
         }
 
 
