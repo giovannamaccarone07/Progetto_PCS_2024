@@ -33,7 +33,14 @@ struct FractureStruct
 
 
     /////////////////////////// PER L'AMOR DI DIO TOGLIERE LE VARIABILI CHE NON SI USANO ANCHE NELLA DOCUMENTAZIONE
-
+    /// indici vertici ha senso di esistere?
+    ///
+    /// per ogni frattura ha senso memorizzare il piano che la contiene così poi nella parte2 quando devo calcolare la normale del piano ce l'ho già?
+    /// oppure ingombra solo memoria e conviene piuttosto ricalcolarsi la normale quando serve in subPolygons??
+    ///
+    vector<Vector3d> NormaleFrattura = {};
+    ///
+    ///
     unsigned int NumeroFratture = 0;
     vector<unsigned int> IdFratture = {};               /// dim: 1 x NumeroFratture
     vector<unsigned int> NumeroVertici = {};            /// dim: 1 x NumeroFratture
@@ -43,7 +50,7 @@ struct FractureStruct
     vector<list<unsigned int>> NumeroTracceN = {};
     vector<list<unsigned int>> NumeroTracceP= {};
 
-    vector<PolygonalMesh> mesh = {};                    /// dim: 1 x NumeroFratture
+    // vector<PolygonalMesh> mesh = {};                    /// dim: 1 x NumeroFratture
     // in ogni posizione ho un oggetto di tipo mesh associato alla frattura i-esima
     // da aggiungere alla uml ?
 };

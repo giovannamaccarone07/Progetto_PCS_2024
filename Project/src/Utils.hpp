@@ -33,7 +33,7 @@ Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2);
 /// \param n
 /// \return
 ///
-Vector4d PianoPassantePerFrattura(const FractureStruct& fract, const unsigned int& n);
+Vector4d PianoPassantePerFrattura(FractureStruct& fract, const unsigned int& n);
 
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
@@ -137,5 +137,17 @@ bool OutputTraces(const TracesStruct& trac);
 /// \param num
 ///
 void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num);
+
+///
+/// \brief subPolygons
+/// \param frac
+/// \param trac
+/// \param n1
+/// \param idTraccia
+/// \param tol
+/// \return
+///
+bool subPolygons(const FractureStruct& frac, const TracesStruct& trac, unsigned int n1, unsigned int idTraccia, const double& tol);
+
 
 }

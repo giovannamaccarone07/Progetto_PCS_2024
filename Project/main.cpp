@@ -13,7 +13,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR200_data.txt";
+    string NomeFile = "FR3_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
     if(!ImportaDati(NomeFile, fract))
@@ -91,6 +91,10 @@ int main()
     {
         cout << "Dati stampati correttamente" << endl;
     }
+
+
+    bool taglio = subPolygons(fract, trac, 0, 0, tol);
+    cout<< taglio <<endl;
 
 
     return 0;

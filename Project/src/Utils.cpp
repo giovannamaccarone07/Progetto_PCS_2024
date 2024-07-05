@@ -34,6 +34,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
     fract.IndiciVertici.resize(fract.NumeroFratture);
     fract.NumeroTracceN.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
     fract.NumeroTracceP.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
+    fract.NormaleFrattura.resize(fract.NumeroFratture); // aggiunto il 05/07/2024 per ottimizzare parte2
 
 
     unsigned int indice = 0; // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
@@ -110,7 +111,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& fract)
 
 //****************************************************************
 
-Vector4d PianoPassantePerFrattura(const FractureStruct& fract, const unsigned int& n) // test n < numero fratture
+Vector4d PianoPassantePerFrattura(FractureStruct& fract, const unsigned int& n) // test n < numero fratture
 {
     //Prendo i primi tre vertici della frattura n-esima per trovare il piano su cui giace il poligono
 
@@ -130,6 +131,8 @@ Vector4d PianoPassantePerFrattura(const FractureStruct& fract, const unsigned in
     piano[1] = t[1];
     piano[2] = t[2];
     piano[3] = d;
+
+    fract.NormaleFrattura[n] = t;
 
     return piano;
 }
@@ -643,7 +646,72 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 
 //****************************************************************
 
+bool subPolygons(const FractureStruct& frac, const TracesStruct& trac, unsigned int n1, unsigned int idTraccia, const double& tol)
+{
+    list<Vector3d> destra = {}; //modificare unsigned int oppure solo int
+    list<Vector3d> sinistra = {};
+    Vector3d traccia0 = trac.EstremiTracce[idTraccia].row(0);
+    Vector3d traccia1 = trac.EstremiTracce[idTraccia].row(1);
+    Vector3d dirTraccia = traccia1 - traccia0;
+    unsigned int e = 0; // per ciclare sugli archi
+    unsigned int v1,v2;
 
+    while (e < frac.NumeroVertici[n1])
+    {
+        v1 = e%(frac.NumeroVertici[n1]);
+        v2 = (e+1)%(frac.NumeroVertici[n1]);
+
+        //estrapolo le coordinate dei rispettivi vertici
+        Vector3d verticeA = frac.CoordinateVertici[n1].col(v1);
+        Vector3d verticeB = frac.CoordinateVertici[n1].col(v2);
+
+        // se uno dei due estremi della traccia appartiene al lato e lo salvo direttamente in entrambe le liste
+        // bisogna verificare se uno dei due estremi appartiene al segmento che sto considerando, in quel caso lo salvo nella lista
+        Vector3d u = verticeB - verticeA;
+        Vector3d v0 = (traccia0 - verticeA);
+        if(((u.cross(v0)).array().abs() <= tol).all())
+        {
+            sinistra.push_back(traccia0);
+            destra.push_back(traccia0);
+        }
+
+        Vector3d v1 = (traccia1 - verticeA);
+        if(((u.cross(v1)).array().abs() <= tol).all())
+        {
+            sinistra.push_back(traccia0);
+            destra.push_back(traccia0);
+        }
+
+
+        // se il prodotto scalare è positivo sta nella lista di destra altrimenti nella sinistra
+        // dobbiamo distinguere i tre casi se è  > tol , < -tol, o compreso fra le due tol (allora è zero)
+        Vector3d crossProduct = dirTraccia.cross((verticeB - traccia0));
+        double segno = crossProduct.dot(frac.NormaleFrattura[n1]);
+        if(segno > tol)
+        {
+            destra.push_back(verticeB);
+        }
+        else if(segno < -tol)
+        {
+            sinistra.push_back(verticeB);
+        }
+        else if (abs(segno)< tol)
+        {
+            cerr<< "problema nel prodotto misto";
+            return false;
+        }
+        else
+        {
+            cerr<< "problema casistica non conteplata prodotto misto";
+            return false;
+        }
+
+        e++;
+    }
+
+
+    return true; // se tutto è andato bene
+}
 
 
 
