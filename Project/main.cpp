@@ -94,7 +94,11 @@ int main()
 
 
     bool taglio = subPolygons(fract, trac, 0, 0, tol);
-    cout<< taglio <<endl;
+    if (taglio == true)
+        cout<< "taglio a buon fine"<<endl;
+
+
+
 
 
     return 0;
