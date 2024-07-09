@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     FractureStruct fract;
     TracesStruct trac;
 
-    string NomeFile = "FR362_data.txt";
+    string NomeFile = "FR200_data.txt";
 
     bool import = ImportaDati(NomeFile, fract);
     if(import == false)

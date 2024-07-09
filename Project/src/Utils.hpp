@@ -140,14 +140,13 @@ void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsi
 
 ///
 /// \brief subPolygons
-/// \param frac
-/// \param trac
-/// \param n1
-/// \param idTraccia
+/// \param listaTracce
+/// \param verticiPolygons
+/// \param coordEstremiTracce
 /// \param tol
 /// \return
 ///
-bool subPolygons(const FractureStruct& frac, const TracesStruct& trac, unsigned int n1, unsigned int idTraccia, const double& tol);
+bool subPolygons(const MatrixXd& verticiPolygons, const vector<Matrix<double, 2,3>>& coordEstremiTracce, const Vector3d& normale,  const double& tol);
 
 
 }

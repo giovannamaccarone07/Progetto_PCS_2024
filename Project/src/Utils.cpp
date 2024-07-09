@@ -646,25 +646,30 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 
 //****************************************************************
 
-bool subPolygons(const FractureStruct& frac, const TracesStruct& trac, unsigned int n1, unsigned int idTraccia, const double& tol)
+bool subPolygons(const MatrixXd& verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, const Vector3d& normale, const double& tol)
 {
+
     list<Vector3d> destra = {}; //modificare unsigned int oppure solo int
     list<Vector3d> sinistra = {};
-    Vector3d traccia0 = trac.EstremiTracce[idTraccia].row(0);
-    Vector3d traccia1 = trac.EstremiTracce[idTraccia].row(1);
+    Vector3d traccia0 = coordEstremiTracce[0].row(0);  //seleziono la matrice PRIMA S nel vettore coordEstremiTracce (che le ha tutte) e poi estraggo le cordinate da wuella matrice
+    Vector3d traccia1 = coordEstremiTracce[0].row(1);
     Vector3d dirTraccia = traccia1 - traccia0;
     unsigned int e = 0; // per ciclare sugli archi
     unsigned int v1,v2;
 
-    while (e < frac.NumeroVertici[n1])
+
+    // algoritmo taglio frattura in due subpolygons
+    //
+    while (e < verticiPolygons.cols())
     {
-        v1 = e%(frac.NumeroVertici[n1]);
-        v2 = (e+1)%(frac.NumeroVertici[n1]);
+        v1 = e%(verticiPolygons.cols());
+        v2 = (e+1)%(verticiPolygons.cols());
 
         //estrapolo le coordinate dei rispettivi vertici
-        Vector3d verticeA = frac.CoordinateVertici[n1].col(v1);
-        Vector3d verticeB = frac.CoordinateVertici[n1].col(v2);
+        Vector3d verticeA = verticiPolygons.col(v1);
+        Vector3d verticeB = verticiPolygons.col(v2);
 
+        ///CASO ESTREMI TRACCIA
         // se uno dei due estremi della traccia appartiene al lato e lo salvo direttamente in entrambe le liste
         // bisogna verificare se uno dei due estremi appartiene al segmento che sto considerando, in quel caso lo salvo nella lista
         Vector3d u = verticeB - verticeA;
@@ -682,11 +687,11 @@ bool subPolygons(const FractureStruct& frac, const TracesStruct& trac, unsigned 
             destra.push_back(traccia1);
         }
 
-
+        ///VERTICI POLIGONO
         // se il prodotto scalare è positivo sta nella lista di destra altrimenti nella sinistra
         // dobbiamo distinguere i tre casi se è  > tol , < -tol, o compreso fra le due tol (allora è zero)
         Vector3d crossProduct = dirTraccia.cross((verticeB - traccia0));
-        double segno = crossProduct.dot(frac.NormaleFrattura[n1]);
+        double segno = crossProduct.dot(normale);
         if(segno > tol)
         {
             destra.push_back(verticeB);
@@ -708,6 +713,14 @@ bool subPolygons(const FractureStruct& frac, const TracesStruct& trac, unsigned 
 
         e++;
     }
+
+
+
+    // bisogna distingue le tracce a dx o sx o secanti (da ritagliare) rispetto alla principale
+    //
+
+
+    //
 
 
     return true; // se tutto è andato bene

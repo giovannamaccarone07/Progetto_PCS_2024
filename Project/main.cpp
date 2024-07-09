@@ -67,7 +67,7 @@ int main()
         cout << "Dati stampati correttamente" << endl;
     }
     */
-    ///**************************************************************************************
+   ///**************************************************************************************
 
     for (unsigned int i =0; i<fract.NumeroFratture; i++)
     {
@@ -93,7 +93,24 @@ int main()
     }
 
 
-    bool taglio = subPolygons(fract, trac, 0, 0, tol);
+    ///*****************************************************************************
+    /// Metabolizziamo alcune informazioni prima di passarle a subpolygons in modo da renderla ricorsiva
+    unsigned int n = 0;
+
+    list<unsigned int> listaTracce = fract.NumeroTracceP[n];
+    MatrixXd verticiPolygons = fract.CoordinateVertici[n];
+    Vector3d normale = fract.NormaleFrattura[n];
+
+
+    vector<Matrix<double,2,3>> coordEstremiTracce;
+    while(!listaTracce.empty())
+    {
+        coordEstremiTracce.push_back(trac.EstremiTracce[listaTracce.front()]);
+        listaTracce.pop_front();
+    }
+
+
+    bool taglio = subPolygons(verticiPolygons, coordEstremiTracce, normale, tol);
     if (taglio == true)
         cout<< "taglio a buon fine"<<endl;
 
