@@ -648,7 +648,6 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 
 bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, const Vector3d& normale, const double& tol)
 {
-
     list<Vector3d> destra = {}; //modificare unsigned int oppure solo int
     list<Vector3d> sinistra = {};
     Vector3d traccia0 = coordEstremiTracce[0].row(0);  //seleziono la matrice PRIMA S nel vettore coordEstremiTracce (che le ha tutte) e poi estraggo le cordinate da wuella matrice
@@ -663,7 +662,7 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
     while (e < num )
     {
-        //estrapolo le coordinate dei rispettivi vertici
+        // vertici da analizzare
         Vector3d verticeA = verticiPolygons.front();
         verticiPolygons.push_back(verticeA);
         verticiPolygons.pop_front();
@@ -716,10 +715,100 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         e++;
     }
 
-
     /// Distinguo le tracce della lista rispetto a quella di riferimento
     // bisogna distingue le tracce a dx o sx o secanti (da ritagliare) rispetto alla principale
     // ho un vettore vector<Matrix<double, 2, 3>> da dividere in due vettori dx e sx
+    // (redmi **)
+
+    vector<Matrix<double,2,3>> tdestra = {};
+    vector<Matrix<double,2,3>> tsinistra = {};
+    for (unsigned int i = 1; i < coordEstremiTracce.size(); i++)
+    {
+        //prendo i due estremi della traccia da analizzare
+        Vector3d A = coordEstremiTracce[i].row(0);
+        Vector3d B = coordEstremiTracce[i].row(1);
+
+        Vector3d crossProductB = dirTraccia.cross((B - traccia0));
+        double segnoB = crossProductB.dot(normale);
+
+        Vector3d crossProductA = dirTraccia.cross((A - traccia0));
+        double segnoA = crossProductA.dot(normale);
+
+
+        if(segnoA && segnoB > tol) // entrambi i vertici stanno a destra della retta di riferimento
+        {
+            tdestra.push_back(coordEstremiTracce[i]);
+        }
+        else if(segnoA && segnoB < -tol)
+        {
+            tsinistra.push_back(coordEstremiTracce[i]);
+        }
+        else if (segnoA < -tol && segnoB > tol)
+        {
+            Matrix3d Matrice;
+            Vector3d zeri(0,0,0);
+            Matrice.col(0) = dirTraccia;
+            Matrice.row(1) = (B-A);
+            Matrice.row(2) = zeri;
+            Vector3d b = (B-traccia0);
+            Vector3d coeff = Matrice.fullPivLu().solve(b);
+            Vector3d punto = traccia0 + coeff[0]*dirTraccia;
+            Vector3d checkPunto = A + coeff[1]*(B-A);
+
+            //condizione su punto e checkpunto
+
+            Matrix<double,2,3> Tdx = {};
+            Tdx.row(0) = B;
+            Tdx.row(1) = punto;
+
+            Matrix<double,2,3> Tsx = {};
+            Tsx.row(0) = A;
+            Tsx.row(1) = punto;
+
+            tsinistra.push_back(Tsx);
+            tdestra.push_back(Tdx);
+        }
+        else if (segnoA > tol && segnoB < -tol)
+        {
+            Matrix3d Matrice;
+            Vector3d zeri(0,0,0);
+            Matrice.col(0) = dirTraccia;
+            Matrice.row(1) = (B-A);
+            Matrice.row(2) = zeri;
+            Vector3d b = (B-traccia0);
+            Vector3d coeff = Matrice.fullPivLu().solve(b);
+            Vector3d punto = traccia0 + coeff[0]*dirTraccia;
+            Vector3d checkPunto = A + coeff[1]*(B-A);
+
+            //condizione su punto e checkpunto
+
+            Matrix<double,2,3> Tdx = {};
+            Tdx.row(0) = A;
+            Tdx.row(1) = punto;
+
+            Matrix<double,2,3> Tsx = {};
+            Tsx.row(0) = B;
+            Tsx.row(1) = punto;
+
+            tsinistra.push_back(Tsx);
+            tdestra.push_back(Tdx);
+        }
+        else if (abs(segnoA) || abs(segnoB) < tol)
+        {
+            cerr<< "problema nel prodotto misto";
+            return false;
+        }
+        else
+        {
+            cerr<< "problema casistica non conteplata prodotto misto";
+            return false;
+        }
+
+
+    }
+
+
+
 
 
 

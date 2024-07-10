@@ -13,7 +13,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR3_data.txt";
+    string NomeFile = "FR200_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
     if(!ImportaDati(NomeFile, fract))
@@ -95,7 +95,7 @@ int main()
 
     ///*****************************************************************************
     /// Metabolizziamo alcune informazioni prima di passarle a subpolygons in modo da renderla ricorsiva
-    unsigned int n = 0;
+    unsigned int n = 7;
 
 
 
@@ -103,24 +103,32 @@ int main()
 
     list<unsigned int> listaTracce = fract.NumeroTracceP[n];
     vector<Matrix<double,2,3>> coordEstremiTracce;
-    while(!listaTracce.empty())
+
+    if(listaTracce.empty())
     {
-        coordEstremiTracce.push_back(trac.EstremiTracce[listaTracce.front()]);
-        listaTracce.pop_front();
+        cerr << "nessuna traccia P per frattura: " << n<< endl;
     }
-
-    list<Vector3d> verticiPolygons;
-    for(unsigned int c = 0; c < fract.CoordinateVertici[n].cols(); c++)
+    else
     {
-        verticiPolygons.push_back(fract.CoordinateVertici[n].col(c));
+        while(!listaTracce.empty())
+        {
+            coordEstremiTracce.push_back(trac.EstremiTracce[listaTracce.front()]);
+            listaTracce.pop_front();
+        }
+
+        list<Vector3d> verticiPolygons;
+        for(unsigned int c = 0; c < fract.CoordinateVertici[n].cols(); c++)
+        {
+            verticiPolygons.push_back(fract.CoordinateVertici[n].col(c));
+        }
+
+
+        bool taglio = subPolygons(verticiPolygons, coordEstremiTracce, normale, tol);
+
+        if (taglio == true)
+            cout<< "taglio a buon fine"<<endl;
+
     }
-
-
-
-    bool taglio = subPolygons(verticiPolygons, coordEstremiTracce, normale, tol);
-    if (taglio == true)
-        cout<< "taglio a buon fine"<<endl;
-
 
 
 
