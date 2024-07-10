@@ -97,17 +97,24 @@ int main()
     /// Metabolizziamo alcune informazioni prima di passarle a subpolygons in modo da renderla ricorsiva
     unsigned int n = 0;
 
-    list<unsigned int> listaTracce = fract.NumeroTracceP[n];
-    MatrixXd verticiPolygons = fract.CoordinateVertici[n];
+
+
     Vector3d normale = fract.NormaleFrattura[n];
 
-
+    list<unsigned int> listaTracce = fract.NumeroTracceP[n];
     vector<Matrix<double,2,3>> coordEstremiTracce;
     while(!listaTracce.empty())
     {
         coordEstremiTracce.push_back(trac.EstremiTracce[listaTracce.front()]);
         listaTracce.pop_front();
     }
+
+    list<Vector3d> verticiPolygons;
+    for(unsigned int c = 0; c < fract.CoordinateVertici[n].cols(); c++)
+    {
+        verticiPolygons.push_back(fract.CoordinateVertici[n].col(c));
+    }
+
 
 
     bool taglio = subPolygons(verticiPolygons, coordEstremiTracce, normale, tol);

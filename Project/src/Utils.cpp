@@ -646,7 +646,7 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 
 //****************************************************************
 
-bool subPolygons(const MatrixXd& verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, const Vector3d& normale, const double& tol)
+bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, const Vector3d& normale, const double& tol)
 {
 
     list<Vector3d> destra = {}; //modificare unsigned int oppure solo int
@@ -654,12 +654,96 @@ bool subPolygons(const MatrixXd& verticiPolygons, const vector<Matrix<double,2,3
     Vector3d traccia0 = coordEstremiTracce[0].row(0);  //seleziono la matrice PRIMA S nel vettore coordEstremiTracce (che le ha tutte) e poi estraggo le cordinate da wuella matrice
     Vector3d traccia1 = coordEstremiTracce[0].row(1);
     Vector3d dirTraccia = traccia1 - traccia0;
+
+    /// Taglio la frattura separando i vertici rispetto alla prima traccia
+    // algoritmo taglio frattura in due subpolygons e ottengo le due liste destra e sinistra
+    // per poter richiamare subpolygons bisogna trasformare le liste in due matrixXd (redmi*)
     unsigned int e = 0; // per ciclare sugli archi
-    unsigned int v1,v2;
+    const unsigned int num = verticiPolygons.size();
+
+    while (e < num )
+    {
 
 
-    // algoritmo taglio frattura in due subpolygons
+        //estrapolo le coordinate dei rispettivi vertici
+
+        Vector3d verticeA = verticiPolygons.front();
+
+        verticiPolygons.push_back(verticeA);
+        verticiPolygons.pop_front();
+
+
+        Vector3d verticeB = verticiPolygons.front();
+
+
+        ///CASO ESTREMI TRACCIA
+        // se uno dei due estremi della traccia appartiene al lato e lo salvo direttamente in entrambe le liste
+        // bisogna verificare se uno dei due estremi appartiene al segmento che sto considerando, in quel caso lo salvo nella lista
+        Vector3d u = verticeB - verticeA;
+        Vector3d v0 = (traccia0 - verticeA);
+        if(((u.cross(v0)).array().abs() <= tol).all())
+        {
+            sinistra.push_back(traccia0);
+            destra.push_back(traccia0);
+        }
+
+        Vector3d v1 = (traccia1 - verticeA);
+        if(((u.cross(v1)).array().abs() <= tol).all())
+        {
+            sinistra.push_back(traccia1);
+            destra.push_back(traccia1);
+        }
+
+        ///VERTICI POLIGONO
+        // se il prodotto scalare è positivo sta nella lista di destra altrimenti nella sinistra
+        // dobbiamo distinguere i tre casi se è  > tol , < -tol, o compreso fra le due tol (allora è zero)
+        Vector3d crossProduct = dirTraccia.cross((verticeB - traccia0));
+        double segno = crossProduct.dot(normale);
+        if(segno > tol)
+        {
+            destra.push_back(verticeB);
+        }
+        else if(segno < -tol)
+        {
+            sinistra.push_back(verticeB);
+        }
+        else if (abs(segno)< tol)
+        {
+            cerr<< "problema nel prodotto misto";
+            return false;
+        }
+        else
+        {
+            cerr<< "problema casistica non conteplata prodotto misto";
+            return false;
+        }
+
+
+        e++;
+    }
+
+
+
+    // bisogna distingue le tracce a dx o sx o secanti (da ritagliare) rispetto alla principale
     //
+
+
+    //
+
+
+    return true; // se tutto è andato bene
+}
+
+
+
+
+
+} //namespace
+
+
+
+
+/*
     while (e < verticiPolygons.cols())
     {
         v1 = e%(verticiPolygons.cols());
@@ -714,20 +798,4 @@ bool subPolygons(const MatrixXd& verticiPolygons, const vector<Matrix<double,2,3
         e++;
     }
 
-
-
-    // bisogna distingue le tracce a dx o sx o secanti (da ritagliare) rispetto alla principale
-    //
-
-
-    //
-
-
-    return true; // se tutto è andato bene
-}
-
-
-
-
-
-} //namespace
+*/

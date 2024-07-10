@@ -35,3 +35,10 @@ Quindi in lettura devo per prima cosa creo una list<MatrixXd> poi a fine lettura
 - è più costoso aggiungere su un vector con .push_back opp vector[i] = oggetto
 
 - TRACCE DI LUNGHEZZA 0 ?? passanti e non passanti 
+
+
+### Commenti
+- * una volta applicata la prima volta subpolygons vengnono generate due liste di vertici che devono essere riconvertite in due matrixXd per poter riapplicare ricorsivamente subpolygons... l'alternativa forse meno costosa? bisogna valutare il costo ... Dicevo l'alternativa sarebbe convertire inizialmente la MatrixXd in una lista e addestrare subpolygons a leggere i punti direttamente come nodi della lista e non come colonne della matrice ... oppure ancora alternativamente si potrebbero salvare i vertici man mano che vengono processati da subpolygons anzichè sulla lista direttamente sulle due matrixXd ... ma secondo me quest'ultima alternativa non è gran che perchè migior gestione della memoria con la lista.
+Potremmo dire a subpolygons: 
+finchè la lista non è vuota:
+prendi il primo elemento della lista e il successivo, fai quello che devi fare, poi salva solo il primo (anzichè salvare il secondo) e toglilo dalla lista...
