@@ -663,16 +663,10 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
     while (e < num )
     {
-
-
         //estrapolo le coordinate dei rispettivi vertici
-
         Vector3d verticeA = verticiPolygons.front();
-
         verticiPolygons.push_back(verticeA);
         verticiPolygons.pop_front();
-
-
         Vector3d verticeB = verticiPolygons.front();
 
 
@@ -723,12 +717,10 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     }
 
 
-
+    /// Distinguo le tracce della lista rispetto a quella di riferimento
     // bisogna distingue le tracce a dx o sx o secanti (da ritagliare) rispetto alla principale
-    //
+    // ho un vettore vector<Matrix<double, 2, 3>> da dividere in due vettori dx e sx
 
-
-    //
 
 
     return true; // se tutto è andato bene
