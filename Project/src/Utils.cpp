@@ -174,17 +174,17 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
 
-bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
-                  const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol)
+bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
 
 {
+    //Estraggo e salvo la direzione e il punto di applicazione della retta di intersezione.
+    Vector3d lineDir = intersectionLine.row(1);
+    Vector3d point = intersectionLine.row(0);
 
-    //RIVEDERE DIREZIONE
-    Vector3d direzioneRetta = rettaIntersezione.row(1);
-    Vector3d app = rettaIntersezione.row(0);
-    vector<double> ts; // ts sono i parametri di intersezione tra la retta e le fratture
+    //ts è il vettore di double che contiene i parametri di intersezione tra retta e fratture
+    vector<double> ts;
 
-
+    //Inizializzo gli indici per lavorare in modulo 6.
     unsigned int j1 = 0;
     unsigned int i1;
     unsigned int p1;
@@ -196,27 +196,27 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
 
         //calcolo gli estremi di ogni lato per tutti i lati tranne l'ultimo
         //lato i-esimo:
-        Vector3d vertice0 = fract.CoordinateVertici[n1].col(i1);
-        Vector3d vertice1 = fract.CoordinateVertici[n1].col(p1);
-        Vector3d direzioneLato = vertice1 - vertice0;
+        Vector3d vertex0 = fract.CoordinateVertici[n1].col(i1);
+        Vector3d vertex1 = fract.CoordinateVertici[n1].col(p1);
+        Vector3d edgeDir = vertex1 - vertex0;
 
         //parametro lato
-        if((direzioneLato.cross(direzioneRetta)).norm() < tol && ((vertice0-app).cross(direzioneRetta)).norm() < tol) //  caso paralleli e coincidenti
+        if((edgeDir.cross(lineDir)).norm() < tol && ((vertex0-point).cross(lineDir)).norm() < tol) //  caso paralleli e coincidenti
         {
             // sono coincidenti
-            ts.push_back((vertice0-app).norm());
-            ts.push_back((vertice1-app).norm());
+            ts.push_back((vertex0-point).norm());
+            ts.push_back((vertex1-point).norm());
             cout << "CheckTraccia: Sono paralleli. lato: "<<i1<< "frattura: "<<n1<< endl;
 
         }
-        else if((direzioneLato.cross(direzioneRetta)).norm() > tol)
+        else if((edgeDir.cross(lineDir)).norm() > tol)
         {
-            double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+            double k = ((point.cross(lineDir)-vertex0.cross(lineDir)).dot((edgeDir.cross(lineDir))))/(((edgeDir.cross(lineDir)).norm())*(edgeDir.cross(lineDir)).norm());
 
             if(k >tol && k<=1+tol)
             {
                 //parametro retta
-                double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+                double t = ((vertex0.cross(edgeDir)-point.cross(edgeDir)).dot((lineDir.cross(edgeDir))))/(((lineDir.cross(edgeDir)).norm())*(lineDir.cross(edgeDir)).norm());
                 ts.push_back(t);
 
                 cout << "CheckTraccia: intersezione: " << i1 <<" frattura: " << n1 << endl;
@@ -255,15 +255,15 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
         Vector3d vertice1 = fract.CoordinateVertici[n2].col(p2);
         Vector3d direzioneLato = vertice1 - vertice0;
         //parametro lato
-        if((direzioneLato.cross(direzioneRetta)).norm() < tol && ((vertice0-app).cross(direzioneRetta)).norm() < tol) //  caso paralleli e coincidenti
+        if((direzioneLato.cross(lineDir)).norm() < tol && ((vertice0-point).cross(lineDir)).norm() < tol) //  caso paralleli e coincidenti
         {
             // sono coincidenti
-            ts.push_back((vertice0-app).norm());
-            ts.push_back((vertice1-app).norm());
+            ts.push_back((vertice0-point).norm());
+            ts.push_back((vertice1-point).norm());
             cout << "CheckTraccia: Sono paralleli. lato: "<<i1<< "frattura: "<<n1<< endl;
 
         }
-        else if((direzioneLato.cross(direzioneRetta)).norm() > tol)
+        else if((direzioneLato.cross(lineDir)).norm() > tol)
         { //no abs perchè la norma è positiva //da ottimizzare
             /*    double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
             Vector3d punto = (app+t*direzioneRetta);
@@ -279,12 +279,12 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
                 ts.push_back(t);
             }
 */
-            double k = ((app.cross(direzioneRetta)-vertice0.cross(direzioneRetta)).dot((direzioneLato.cross(direzioneRetta))))/(((direzioneLato.cross(direzioneRetta)).norm())*(direzioneLato.cross(direzioneRetta)).norm());
+            double k = ((point.cross(lineDir)-vertice0.cross(lineDir)).dot((direzioneLato.cross(lineDir))))/(((direzioneLato.cross(lineDir)).norm())*(direzioneLato.cross(lineDir)).norm());
 
             if(k >tol && k<=1+tol)
             {
                 //parametro retta
-                double t = ((vertice0.cross(direzioneLato)-app.cross(direzioneLato)).dot((direzioneRetta.cross(direzioneLato))))/(((direzioneRetta.cross(direzioneLato)).norm())*(direzioneRetta.cross(direzioneLato)).norm());
+                double t = ((vertice0.cross(direzioneLato)-point.cross(direzioneLato)).dot((lineDir.cross(direzioneLato))))/(((lineDir.cross(direzioneLato)).norm())*(lineDir.cross(direzioneLato)).norm());
                 ts.push_back(t);
 
                 cout << "CheckTraccia: intersezione: " << i1 <<" frattura: " << n1 << endl;
@@ -341,8 +341,8 @@ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac,
 
             unsigned int num = trac.ct;
             trac.IdTracce.push_back(num);
-            Vector3d p1 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[1];
-            Vector3d p2 = rettaIntersezione.row(0) + rettaIntersezione.row(1)*ts[2];
+            Vector3d p1 = intersectionLine.row(0) + intersectionLine.row(1)*ts[1];
+            Vector3d p2 = intersectionLine.row(0) + intersectionLine.row(1)*ts[2];
             Matrix<double,2,3> M;
             M.row(0)=p1;
             M.row(1)=p2;
