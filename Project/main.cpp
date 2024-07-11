@@ -95,7 +95,7 @@ int main()
 
     ///*****************************************************************************
     /// Metabolizziamo alcune informazioni prima di passarle a subpolygons in modo da renderla ricorsiva
-    unsigned int n = 7;
+    unsigned int n = 1;
 
 
 
