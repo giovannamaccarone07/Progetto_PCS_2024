@@ -97,7 +97,7 @@ double tol = 10e-10; //CAMBIARE LA TOLLERANZA
 TEST(ImportaDatiTest, NumeroVertici)
 {
     FractureStruct fract;
-    ImportaDati("FR3_data.txt",fract);
+    ImportData("FR3_data.txt",fract);
     unsigned int vertici = fract.NumeroVertici[0];
     ASSERT_EQ(4,vertici);
 
@@ -112,7 +112,7 @@ TEST(RettaIntersezioneTest, PianiSecanti)
     Vector4d piano1(1,-1,1,1);
     Vector4d piano2(1,1,1,2);
 
-    Matrix<double,2,3> line = RettaIntersezione(piano1, piano2);
+    Matrix<double,2,3> line = IntersectionLine(piano1, piano2);
     Matrix<double,2,3> expectedLine;
     //Vector3d appCorretta(1.5,0.5,0);
     Vector3d lineDirection(-2,0,2);
@@ -133,7 +133,7 @@ TEST(RettaIntersezioneTest, PuntiAppartenentiPiani)
 {
     Vector4d piano1(1,1,1,-1); //CONTROLLARE IL SEGNO DI d
     Vector4d piano2(1,1,0,-2);
-    Matrix<double,2,3> retta = RettaIntersezione(piano1, piano2);
+    Matrix<double,2,3> retta = IntersectionLine(piano1, piano2);
 
     //Calcolo le distanze punto-piano
 
@@ -153,9 +153,9 @@ TEST(RettaIntersezioneTest, PuntiAppartenentiPiani)
 TEST(PianoPassantePerFratturaTest, PianoPassante)
 {
     FractureStruct fract;
-    ImportaDati("FR3_data.txt",fract);
+    ImportData("FR3_data.txt",fract);
 
-    Vector4d pianoCalcolato1 = PianoPassantePerFrattura(fract,0);
+    Vector4d pianoCalcolato1 = FracturePlane(fract,0);
     Vector4d pianoCorretto1(0,0,1,0);
 
     for(unsigned int i=0;i<pianoCorretto1.size();i++)
@@ -163,7 +163,7 @@ TEST(PianoPassantePerFratturaTest, PianoPassante)
         EXPECT_NEAR(pianoCalcolato1[i],pianoCorretto1[i],tol);
     }
 
-    Vector4d pianoCalcolato2 = PianoPassantePerFrattura(fract,1);
+    Vector4d pianoCalcolato2 = FracturePlane(fract,1);
     Vector4d pianoCorretto2(-0.4,0,0,0.32);
 
     for(unsigned int i=0;i<pianoCorretto2.size();i++)
@@ -180,7 +180,7 @@ TEST(PianoPassantePerFratturaTest, PianoPassante)
 TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
 {
     FractureStruct fract;
-    ImportaDati("FR3_data.txt",fract);
+    ImportData("FR3_data.txt",fract);
     Matrix<double,2,3> BBox = ComputeBoundingBox(fract,0);
     Vector3d expectedMin(0,0,0);
     Vector3d expectedMax(1,1,0);
@@ -205,9 +205,9 @@ TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
 TEST(IntersezioneBoundingBoxTest, IntersezioneBoundingBox)
 {
     FractureStruct fract;
-    ImportaDati("FR3_data.txt",fract);
-    ASSERT_TRUE(IntersezioneBoundingBox(fract,0,1));
-    ASSERT_FALSE(IntersezioneBoundingBox(fract,1,2));
+    ImportData("FR3_data.txt",fract);
+    ASSERT_TRUE(BBoxIntersection(fract,0,1));
+    ASSERT_FALSE(BBoxIntersection(fract,1,2));
 
 }
 
@@ -222,12 +222,12 @@ TEST(pianiParalleliTest, PianiParalleli){
     //Test con piani paralleli
     Vector4d piano1(2,3,4,5);
     Vector4d piano2(2,3,4,10);
-    ASSERT_TRUE(pianiParalleli(piano1,piano2,tol));
+    ASSERT_TRUE(parallelPlanes(piano1,piano2,tol));
 
     //Test con piani secanti
     Vector4d piano3(1,2,3,-4);
     Vector4d piano4(2,-1,1,1);
-    ASSERT_FALSE(pianiParalleli(piano3,piano4,tol));
+    ASSERT_FALSE(parallelPlanes(piano3,piano4,tol));
 
 
 }

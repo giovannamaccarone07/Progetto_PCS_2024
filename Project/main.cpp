@@ -68,7 +68,7 @@ int main()
     }
     */
    ///**************************************************************************************
-
+    /*
     for (unsigned int i =0; i<fract.NumeroFratture; i++)
     {
         for (unsigned int j =i+1; j<fract.NumeroFratture; j++)
@@ -91,6 +91,7 @@ int main()
     {
         cout << "Dati stampati correttamente" << endl;
     }
+*/
 
 
     ///*****************************************************************************

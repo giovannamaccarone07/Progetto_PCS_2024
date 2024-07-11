@@ -355,20 +355,20 @@ bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& int
             if (pass1 == false)
             {
                 passante1 = 1;
-                ordineDecrescente(trac, fract.NumeroTracceN[n1], num);
+                descendingOrder(trac, fract.NumeroTracceN[n1], num);
             }
             else
             {
-                ordineDecrescente(trac, fract.NumeroTracceP[n1], num);
+                descendingOrder(trac, fract.NumeroTracceP[n1], num);
             }
             if (pass2 == false)
             {
                 passante2 = 1;
-                ordineDecrescente(trac, fract.NumeroTracceN[n2], num);
+                descendingOrder(trac, fract.NumeroTracceN[n2], num);
             }
             else
             {
-                ordineDecrescente(trac, fract.NumeroTracceP[n2], num);
+                descendingOrder(trac, fract.NumeroTracceP[n2], num);
             }
             Vector<unsigned int,2> riga1(n1,passante1);
             Vector<unsigned int,2> riga2(n2,passante2);
@@ -386,7 +386,7 @@ bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& int
 
 //***************************************************************
 
-void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num)
+void descendingOrder(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num)
 {
 
     double length = trac.LunghezzaTracce[num];
@@ -409,7 +409,7 @@ void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsi
 
 //****************************************************************
 //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
-bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
+bool parallelPlanes(Vector4d& piano1, Vector4d& piano2, const double& tol)
 {
     Vector3d p1 = piano1.head(3);
     Vector3d p2 = piano2.head(3);
@@ -425,51 +425,9 @@ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 
 //****************************************************************
 
-bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const unsigned int& n2, const double& tol)
-{
-
-
-    Vector4d piano1 = PianoPassantePerFrattura(fract, n1);
-    Vector4d piano2 = PianoPassantePerFrattura(fract, n2);
-/*
-    if(pianiParalleli(piano1,piano2,tol) == true)
-    {
-        cout << "CheckIntersezione: I piani sono paralleli" << endl;
-        return false; //non c'è intersezione
-    }
-
-    else
-    {
-
-*/
-        if(IntersezioneBoundingBox(fract,n1,n2) == false)
-        {
-            cout << "Boundingbox: i poligono non si toccano" << endl;
-            return false;
-        }
-        else
-        {
-            Matrix<double,2,3> rettaIntersezione = RettaIntersezione(piano1,piano2);
-            if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2,tol)==false) //modificare una volta che si è modificata checktraccia
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-
-        }
-    //}
-
-    //chiamare funzione che salva le info sulle tracce
-
-
-}
-
-//****************************************************************
 Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int n)
 {
+    //Inizializzo i vettori Max e Min rispettivamente con i valori minimi e massimi possibili in modo da modificarli.
     Vector3d vettoreMax(numeric_limits<double>::min(), numeric_limits<double>::min(), numeric_limits<double>::min());
     Vector3d vettoreMin(numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max());
 
@@ -494,7 +452,7 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int
         if(vettoreMin[2]>z)
             vettoreMin[2] = z;
     }
-
+    //Salvo la BoundingBox in una matrice.
     Matrix<double,2,3> BBox;
     BBox.row(0) = vettoreMax;
     BBox.row(1) = vettoreMin;
@@ -504,18 +462,17 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int
 
 //****************************************************************
 
-bool IntersezioneBoundingBox(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2) // METTERE LA TOLLERANZA
+bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2) // METTERE LA TOLLERANZA
 {
     Matrix<double,2,3> BBox1 = ComputeBoundingBox(fract,n1);
     Matrix<double,2,3> BBox2 = ComputeBoundingBox(fract,n2);
-
 
     Vector3d vettoreMax1 = BBox1.row(0);
     Vector3d vettoreMin1 = BBox1.row(1);
     Vector3d vettoreMax2 = BBox2.row(0);
     Vector3d vettoreMin2 = BBox2.row(1);
 
-    //check intersezione bbox
+    //Verifico se le due bounding box si intersecano.
     if(vettoreMin1[0]<= vettoreMax2[0] && vettoreMax1[0]>= vettoreMin2[0] &&
         vettoreMin1[1]<= vettoreMax2[1] && vettoreMax1[1]>= vettoreMin2[1] &&
         vettoreMin1[2]<= vettoreMax2[2] && vettoreMax1[2]>= vettoreMin2[2])

@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     string NomeFile = "FR200_data.txt";
 
-    bool import = ImportaDati(NomeFile, fract);
+    bool import = ImportData(NomeFile, fract);
     if(import == false)
     {
 
