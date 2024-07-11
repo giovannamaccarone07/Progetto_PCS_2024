@@ -11,158 +11,161 @@ using namespace std;
 //#define TEST
 namespace FractureLibrary{
 
-bool ImportaDati(const string& NomeFile, FractureStruct& fract)
+bool ImportData(const string& fileName, FractureStruct& fract)
 {
     ifstream file;
-    file.open(NomeFile);
+    file.open(fileName);
     if(file.fail()){
-        cerr << "ImportaDati: impossibile aprire il file"<<endl;
+        cerr << "ImportData: Errore durante l'apertura del file."<<endl;
         return false;
     }
-    string riga;
+    string line;
 
-    getline(file, riga);   //leggo la prima riga e la scarto
-    getline(file,riga);    //leggo la seconda da cui prendo il numero delle fratture
-    istringstream convertElemento(riga);
-    unsigned int n_fratture;
-    convertElemento >> n_fratture;
+    //Leggo la PRIMA riga: la scarto.
+    getline(file, line);
 
-    fract.NumeroFratture = n_fratture;
+    //Leggo la SECONDA riga: estraggo il numero delle fratture.
+    getline(file,line);
+    istringstream elementConverter(line);
+    unsigned int n_fractures;
+    elementConverter >> n_fractures;
+
+    fract.NumeroFratture = n_fractures;
     fract.IdFratture.resize(fract.NumeroFratture);
     fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
     fract.IndiciVertici.resize(fract.NumeroFratture);
-    fract.NumeroTracceN.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
-    fract.NumeroTracceP.resize(fract.NumeroFratture); //aggiunto il 06/06/2024
-    fract.NormaleFrattura.resize(fract.NumeroFratture); // aggiunto il 05/07/2024 per ottimizzare parte2
+    fract.NumeroTracceN.resize(fract.NumeroFratture);
+    fract.NumeroTracceP.resize(fract.NumeroFratture);
+    fract.NormaleFrattura.resize(fract.NumeroFratture);
 
+    // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
+    unsigned int index = 0;
 
-    unsigned int indice = 0; // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
-
-    // Leggo le righe in gruppi di 6 poichè a ogni frattura sono dedidicate 6 righe
-    /// ogni frattura ha 6 righe quindi all'interno del for devono esserci 6 getline.
-    /// per ogni frattura ripeto le 6 getline
-    for(unsigned int i = 0; i< n_fratture; i++)
+    // Leggo le righe in gruppi di 6 poichè a ogni frattura sono dedidicate 6 righe (avrò bisogno di 6 getline):
+    for(unsigned int i = 0; i< n_fractures; i++)
     {
-        getline(file, riga);  //NUMERO 1 Salto la prima riga di istruzioni
+        //Leggo la PRIMA riga: la scarto.
+        getline(file, line);
 
-        // Leggo l'id della frattura e il numero dei vertici
-        getline(file, riga); //NUMERO 2
-        istringstream converter1(riga);
-        char separatore;
-        unsigned int id_fratture, n_vertici;
-        converter1 >> id_fratture >> separatore >> n_vertici;
-        getline(file, riga); //NUMERO 3 Salto la riga
+        // Leggo la SECONDA riga: estraggo l'id della frattura e il numero di vertici.
+        getline(file, line);
+        istringstream converter1(line);
+        char delimiter;
+        unsigned int id_fractures, n_vertices;
+        converter1 >> id_fractures >> delimiter >> n_vertices;
 
-        /// Ora riempio l'oggetto IndiciVertici della struct fract
-        // IndiciVertici è un vector<vector<unsigned int>> quindi per
-        // ogni frattura devo costruire i rispettivi vector<unsigend int> più interni.
-        // Creo il vector di lunghezza indefinita per salvare gli indici dei vertici della frattura
-        // Gli cambio la dimensione in base al numero dei vertici ha la frattura.
+        //Leggo la TERZA riga: la scarto.
+        getline(file, line);
 
-        vector<unsigned int> indici;
-        indici.resize(n_vertici);
-        //Ciclo per incrementare il contatore 'indice' tante volte quante sono i vertici della frattura
-        for (unsigned int in = 0; in < n_vertici; in++)
+        /// Riempio l'oggetto IndiciVertici della struct fract
+        // IndiciVertici è un vector<vector<unsigned int>> quindi per ogni frattura devo costruire i rispettivi vector<unsigend int> più interni.
+        // Creo il vector di lunghezza indefinita per salvare gli indici dei vertici della frattura e successivamente effettuo un resize in base al numero di vertici della frattura
+
+        vector<unsigned int> indices;
+        indices.resize(n_vertices);
+        //Effettuo un ciclo per incrementare il contatore 'index' tante volte quante sono i vertici della frattura.
+        for (unsigned int in = 0; in < n_vertices; in++)
         {
-            indici[in] = indice;  // Metto indice nel vector indici che contine i vertici della frattura
-            indice ++;
+            indices[in] = index;
+            index ++;
         }
 
-        fract.IndiciVertici[i] = indici;
-        fract.IdFratture[i] = id_fratture;
-        fract.NumeroVertici[i] = n_vertici;
+        fract.IndiciVertici[i] = indices;
+        fract.IdFratture[i] = id_fractures;
+        fract.NumeroVertici[i] = n_vertices;
 
-        /// Ora riempio l'oggetto CoordinateVertici è un vector<MatrixXd>
-        // initializzo e riempio la mia MatrixXd e poi l'inserisco in coda al vector
-        MatrixXd matrice(3,n_vertici);
+        /// Riempio l'oggetto CoordinateVertici  della struct fract
+        // CoordinateVertici è un vector<MatrixXd>. Riempio ogni MatrixXd più interna e poi la inserisco in coda al vector.
+        MatrixXd matrix(3,n_vertices);
 
-        getline(file, riga); //NUMERO 4
-        istringstream riga_x(riga);
+        //Leggo la QUARTA riga: contiene le coordinate x dei vertici.
+        getline(file, line);
+        istringstream line_x(line);
+        //Leggo la QUINTA riga: contiene le coordinate y dei vertici.
+        getline(file, line);
+        istringstream line_y(line);
+        //Leggo la SESTA riga: contiene le coordinate z dei vertici.
+        getline(file, line);
+        istringstream line_z(line);
 
-        getline(file, riga);//NUMERO 5
-        istringstream riga_y(riga);
-
-        getline(file, riga); //NUMERO 6
-        istringstream riga_z(riga);
-
-        double coordinatex, coordinatey, coordinatez;
+        double coordX, coordY, coordZ;
         char c;
 
-        // travaso il contenuto delle tre righe che ho letto, prima le metto in veriabili coordinatex ,y, z
-        // poi inserisco le variabili nei vettori che ho costruito
-        for (unsigned int k = 0; k < n_vertici; k++)
+        //Inserisco il contenuto delle tre righe che ho appena letto: in un primo momento le assegno alle variabili coordX/Y/Z,
+        //successimanete le inserisco nei vettori che ho precedentemente costruito.
+        for (unsigned int k = 0; k < n_vertices; k++)
         {
-            riga_x >> coordinatex >> c;
-            riga_y >> coordinatey >> c;
-            riga_z >> coordinatez >> c;
+            line_x >> coordX >> c;
+            line_y >> coordY >> c;
+            line_z >> coordZ >> c;
 
-            matrice(0,k) = coordinatex;
-            matrice(1,k) = coordinatey;
-            matrice(2,k) = coordinatez;
+            matrix(0,k) = coordX;
+            matrix(1,k) = coordY;
+            matrix(2,k) = coordZ;
         }
 
-        // aggiungo la MatrixXd al vector CoordinateVertici
-        fract.CoordinateVertici[i] = matrice;
+        // Inserisco la MatrixXd al vector CoordinateVertici
+        fract.CoordinateVertici[i] = matrix;
     }
+
     file.close();
     return true;
 }
 
 //****************************************************************
 
-Vector4d PianoPassantePerFrattura(FractureStruct& fract, const unsigned int& n) // test n < numero fratture
+Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n)
 {
-    //Prendo i primi tre vertici della frattura n-esima per trovare il piano su cui giace il poligono
+    //Considero i primi tre vertici della frattura n-esima per trovare il piano su cui giace la stessa.
+    Vector3d vertex1 = fract.CoordinateVertici[n].col(0);
+    Vector3d vertex2 = fract.CoordinateVertici[n].col(1);
+    Vector3d vertex3 = fract.CoordinateVertici[n].col(2);
 
-    Vector3d vertice1 = fract.CoordinateVertici[n].col(0);
-    Vector3d vertice2 = fract.CoordinateVertici[n].col(1);
-    Vector3d vertice3 = fract.CoordinateVertici[n].col(2);
+    //Calcolo i vettori direzionali fissando il vertice1.
+    Vector3d n1 = vertex2 - vertex1;
+    Vector3d n2 = vertex3 - vertex1;
 
-    //trovo i vettori direzionali: fisso il vertice1 e faccio n1 = (vertice2 - vertice1) e n2 = (vertice3) - (vertice1)
-    Vector3d n1 = vertice2 - vertice1;
-    Vector3d n2 = vertice3 - vertice1;
-
-    //prodotto vettoriale t = n1 x n2
+    //Calcolo la giacitura del piano tramite il prodotto vettoriale t = n1 x n2.
     Vector3d t = n1.cross(n2);
-    double d = -(t[0]*vertice1[0] + t[1]*vertice1[1] + t[2]*vertice1[2]); //d = -(ax+by+cz)
-    Vector4d piano;
-    piano[0] = t[0];
-    piano[1] = t[1];
-    piano[2] = t[2];
-    piano[3] = d;
+    //Calcolo il termine noto come d = -(ax+by+cz).
+    double d = -(t[0]*vertex1[0] + t[1]*vertex1[1] + t[2]*vertex1[2]);
+    Vector4d plane;
+    plane[0] = t[0];
+    plane[1] = t[1];
+    plane[2] = t[2];
+    plane[3] = d;
 
     fract.NormaleFrattura[n] = t;
 
-    return piano;
+    return plane;
 }
 
 //****************************************************************
 
-// REtta intersezione chiama PianoPassantePErFRattura due volte
-// Calcolo la retta di intersezione tra piani dopo aver controllato che non sono paralleli
-Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2) // [coda; testa]
+Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda; testa]
 {
-    //vettore normale al primo piano
-    Vector3d p1 = piano1.head(3);    // prende le prime 3 componenti
-    //vettore normale al secondo piano
-    Vector3d p2 = piano2.head(3);
-    Vector3d tangente = p1.cross(p2);
-    //documento vicini
+    //Individuo lle giaciture dei piani considerando i coefficienti a,b,c delle equazioni.
+    Vector3d p1 = plane1.head(3);
+    Vector3d p2 = plane2.head(3);
+    //Calcolo la direzione tangente tramite il prodotto vettoriale delle giaciture
+    Vector3d tang = p1.cross(p2);
+    //Costruisco il sistema Ax=b.
     Matrix3d A;
     A.row(0) = p1;
     A.row(1) = p2;
-    A.row(2) = tangente;
+    A.row(2) = tang;
     Vector3d b;
-    b[0] = piano1[3];
-    b[1] = piano2[3];
+    b[0] = plane1[3];
+    b[1] = plane2[3];
     b[2] = 0;
-    Vector3d puntoApplicazione = A.fullPivLu().solve(b); //x punto di applicazione
-    Matrix<double,2,3> rettaIntersezione;
-    rettaIntersezione.row(0) = - puntoApplicazione; ///questo è il meno che aggiusta i segni deve essere SOLO qui
-    rettaIntersezione.row(1) = tangente;
+    //Risolvo il sistema calcolando il punto di applicazione della retta di intersezione x.
+    Vector3d point = A.fullPivLu().solve(b);
+    Matrix<double,2,3> intersectionLine;
+    intersectionLine.row(0) = -point;
+    intersectionLine.row(1) = tang;
 
-    return rettaIntersezione;
+    return intersectionLine;
 }
 
 //****************************************************************
@@ -408,10 +411,12 @@ void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsi
 //SCRIVERE LA FUNZIONE DOVE VIENE CHIAMATA PER EVITARE DI CHIAMARLA
 bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
 {
+    Vector3d p1 = piano1.head(3);
+    Vector3d p2 = piano2.head(3);
+    //double dotProduct = piano1[0]*piano2[0]+piano1[1]*piano2[1]+piano1[2]*piano2[2];
 
-    double dotProduct = piano1[0]*piano2[0]+piano1[1]*piano2[1]+piano1[2]*piano2[2];
-
-    if(abs(dotProduct)>tol){   ///???DISUGUAGLIAnza giusta???
+    if(p1.cross(p2).norm()<tol)
+    {
         return true; //sono paralleli
     }
     return false;
@@ -467,6 +472,7 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int
 {
     Vector3d vettoreMax(numeric_limits<double>::min(), numeric_limits<double>::min(), numeric_limits<double>::min());
     Vector3d vettoreMin(numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max());
+
     for(unsigned int i=0;i<fract.NumeroVertici[n];i++)
     {
         Vector3d vertice = fract.CoordinateVertici[n].col(i);

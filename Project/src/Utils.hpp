@@ -16,7 +16,7 @@ namespace FractureLibrary
 /// \param Fract
 /// \return
 ///
-bool ImportaDati(const string& NomeFile, FractureStruct& Fract);
+bool ImportData(const string& fileName, FractureStruct& fract);
 
 
 ///
@@ -25,7 +25,7 @@ bool ImportaDati(const string& NomeFile, FractureStruct& Fract);
 /// \param piano2
 /// \return
 ///
-Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2);
+Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2);
 
 ///
 /// \brief PianoPassantePerFrattura
@@ -33,7 +33,7 @@ Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2);
 /// \param n
 /// \return
 ///
-Vector4d PianoPassantePerFrattura(FractureStruct& fract, const unsigned int& n);
+Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n);
 
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano

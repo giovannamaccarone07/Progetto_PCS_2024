@@ -16,7 +16,7 @@ int main()
     string NomeFile = "FR3_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
-    if(!ImportaDati(NomeFile, fract))
+    if(!ImportData(NomeFile, fract))
     {
         cerr << "Impossibile importare i dati" << endl;
 
