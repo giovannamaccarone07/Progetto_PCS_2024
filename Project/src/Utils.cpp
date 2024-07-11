@@ -159,11 +159,13 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda
     b[0] = plane1[3];
     b[1] = plane2[3];
     b[2] = 0;
+
     //Risolvo il sistema calcolando il punto di applicazione della retta di intersezione x.
     Vector3d point = A.fullPivLu().solve(b);
     Matrix<double,2,3> intersectionLine;
     intersectionLine.row(0) = -point;
     intersectionLine.row(1) = tang;
+
 
     return intersectionLine;
 }
@@ -213,7 +215,7 @@ bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& int
         {
             double k = ((point.cross(lineDir)-vertex0.cross(lineDir)).dot((edgeDir.cross(lineDir))))/(((edgeDir.cross(lineDir)).norm())*(edgeDir.cross(lineDir)).norm());
 
-            if(k >tol && k<=1+tol)
+            if(k >tol && k<1+tol)
             {
                 //parametro retta
                 double t = ((vertex0.cross(edgeDir)-point.cross(edgeDir)).dot((lineDir.cross(edgeDir))))/(((lineDir.cross(edgeDir)).norm())*(lineDir.cross(edgeDir)).norm());
@@ -281,7 +283,7 @@ bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& int
 */
             double k = ((point.cross(lineDir)-vertice0.cross(lineDir)).dot((direzioneLato.cross(lineDir))))/(((direzioneLato.cross(lineDir)).norm())*(direzioneLato.cross(lineDir)).norm());
 
-            if(k >tol && k<=1+tol)
+            if(k >tol && k<1+tol)
             {
                 //parametro retta
                 double t = ((vertice0.cross(direzioneLato)-point.cross(direzioneLato)).dot((lineDir.cross(direzioneLato))))/(((lineDir.cross(direzioneLato)).norm())*(lineDir.cross(direzioneLato)).norm());
@@ -316,13 +318,13 @@ bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& int
                 pass1 = true;
                 pass2 = true;
             }
-            else if((min(ts[2],ts[3]) >= min(ts[1],ts[0]) + tol && max(ts[2],ts[3]) <= max(ts[0],ts[1]))+ tol) // passante per la seconda frattura
+            else if(min(ts[2],ts[3]) > min(ts[1],ts[0]) + tol && max(ts[2],ts[3]) < max(ts[0],ts[1])+ tol) // passante per la seconda frattura
             {
-                pass1 = false;
+                pass1 = false; //li ho scambiati
                 pass2 = true;
 
             }
-            else if((min(ts[0],ts[1]) >= min(ts[2],ts[3]) + tol && max(ts[0],ts[1]) <= max(ts[2],ts[3]))+ tol) // passante per la prima frattura
+            else if(min(ts[0],ts[1]) > min(ts[2],ts[3]) + tol && max(ts[0],ts[1]) < max(ts[2],ts[3])+ tol) // passante per la prima frattura
             {
                 pass1 = true;
                 pass2 = false;
@@ -611,6 +613,13 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 
 bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, const Vector3d& normale, const double& tol)
 {
+    bool fermaEsplorazione = false;
+
+    if (verticiPolygons.size() <= 3  || coordEstremiTracce.empty())
+    {
+        return true;
+    }
+
 
     list<Vector3d> destra = {}; //modificare unsigned int oppure solo int
     list<Vector3d> sinistra = {};
@@ -626,7 +635,7 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
     while (e < num )
     {
-        //estrapolo le coordinate dei rispettivi vertici
+        // vertici da analizzare
         Vector3d verticeA = verticiPolygons.front();
         verticiPolygons.push_back(verticeA);
         verticiPolygons.pop_front();
@@ -679,10 +688,140 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         e++;
     }
 
-
     /// Distinguo le tracce della lista rispetto a quella di riferimento
     // bisogna distingue le tracce a dx o sx o secanti (da ritagliare) rispetto alla principale
     // ho un vettore vector<Matrix<double, 2, 3>> da dividere in due vettori dx e sx
+    // (redmi **)
+    vector<Matrix<double,2,3>> tdestra = {};
+    vector<Matrix<double,2,3>> tsinistra = {};
+    for (unsigned int i = 1; i < coordEstremiTracce.size(); i++)
+    {
+        //prendo i due estremi della traccia da analizzare
+        Vector3d A = coordEstremiTracce[i].row(0);
+        Vector3d B = coordEstremiTracce[i].row(1);
+
+
+        Vector3d crossProductB = dirTraccia.cross((B - traccia0));
+        double segnoB = crossProductB.dot(normale);
+
+        Vector3d crossProductA = dirTraccia.cross((A - traccia0));
+        double segnoA = crossProductA.dot(normale);
+
+
+        if(segnoA && segnoB > tol) // entrambi i vertici stanno a destra della retta di riferimento
+        {
+            tdestra.push_back(coordEstremiTracce[i]);
+        }
+        else if(segnoA && segnoB < -tol)
+        {
+            tsinistra.push_back(coordEstremiTracce[i]);
+        }
+        else if (segnoA < -tol && segnoB > tol)
+        {
+            Matrix3d Matrice;
+            Vector3d zeri(0,0,0);
+            Matrice.col(0) = dirTraccia;
+            Matrice.row(1) = (B-A);
+            Matrice.row(2) = zeri;
+            Vector3d b = (B-traccia0);
+            Vector3d coeff = Matrice.fullPivLu().solve(b);
+            Vector3d punto = traccia0 + coeff[0]*dirTraccia;
+            Vector3d checkPunto = A + coeff[1]*(B-A);
+
+            //condizione su punto e checkpunto
+
+            Matrix<double,2,3> Tdx = {};
+            Tdx.row(0) = B;
+            Tdx.row(1) = punto;
+
+            Matrix<double,2,3> Tsx = {};
+            Tsx.row(0) = A;
+            Tsx.row(1) = punto;
+
+            tsinistra.push_back(Tsx);
+            tdestra.push_back(Tdx);
+
+
+        }
+        else if (segnoA > tol && segnoB < -tol)
+        {
+            Matrix3d Matrice;
+            Vector3d zeri(0,0,0);
+            Matrice.col(0) = dirTraccia;
+            Matrice.row(1) = (B-A);
+            Matrice.row(2) = zeri;
+            Vector3d b = (B-traccia0);
+            Vector3d coeff = Matrice.fullPivLu().solve(b);
+            Vector3d punto = traccia0 + coeff[0]*dirTraccia;
+            Vector3d checkPunto = A + coeff[1]*(B-A);
+
+            //condizione su punto e checkpunto
+
+            Matrix<double,2,3> Tdx = {};
+            Tdx.row(0) = A;
+            Tdx.row(1) = punto;
+
+            Matrix<double,2,3> Tsx = {};
+            Tsx.row(0) = B;
+            Tsx.row(1) = punto;
+
+            tsinistra.push_back(Tsx);
+            tdestra.push_back(Tdx);
+        }
+        else if (abs(segnoA) || abs(segnoB) < tol)
+        {
+            cerr<< "problema nel prodotto misto";
+            return false;
+        }
+        else
+        {
+            cerr<< "problema casistica non conteplata prodotto misto";
+            return false;
+        }
+
+
+    }
+
+
+
+    /// Condizione di Salvataggio
+    ///
+    if (destra.size() >= 3)
+    {    /// salvataggioDati
+        cout << "punti di destra: "<< endl;
+        auto itor = destra.begin();
+        while(itor != destra.end())
+        {
+            itor ++;
+            cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
+
+        }
+    }
+
+    if(sinistra.size() >= 3)
+    {
+        cout << "punti di sinistra: "<< endl;
+        auto itor2 = sinistra.begin();
+        while(itor2 != sinistra.end())
+        {
+            itor2 ++;
+            cout << (*itor2)[0] << " "<< (*itor2)[1] << " "<< (*itor2)[2] << endl;
+
+        }
+    }
+
+
+
+    /// Chiamo subpolygons ricorsivamente sulle due liste
+    // esplorazione in profondità????? CONTROLLARE
+    while (fermaEsplorazione != true)
+    {
+        bool fermaEsplorazioneDx = subPolygons(destra, tdestra, normale, tol);
+        bool fermaEsplorazioneSx = subPolygons(sinistra, tsinistra, normale, tol);
+
+        fermaEsplorazione = fermaEsplorazioneDx && fermaEsplorazioneSx;
+    }
+
 
 
 
@@ -751,6 +890,32 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         }
 
         e++;
+    }
+
+
+
+
+
+
+
+****
+****
+
+
+        cout << "tracce di destra: " << endl;
+        for (unsigned int j = 0; j< tdestra.size(); j++)
+        {
+            cout << tdestra[j](0,0) << " "<< tdestra[j](0,1) << " " << tdestra[j](0,2) << endl;
+            cout << tdestra[j](1,0) << " "<< tdestra[j](1,1) << " " << tdestra[j](1,2) << endl;
+
+        }
+
+        cout << "tracce di sinistra: " << endl;
+        for (unsigned int j = 0; j< tsinistra.size(); j++)
+        {
+            cout << tsinistra[j](0,0) << " "<< tsinistra[j](0,1) << " " << tsinistra[j](0,2) << endl;
+            cout << tsinistra[j](1,0) << " "<< tsinistra[j](1,1) << " " << tsinistra[j](1,2) << endl;
+        }
     }
 
 */
