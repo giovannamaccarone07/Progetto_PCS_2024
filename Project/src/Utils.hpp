@@ -49,18 +49,6 @@ Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n);
 ///
 bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol);
 
-///CheckIntersezione
-// controlla se c'è intersezione
-/// \brief checkIntersezione
-/// \param fract
-/// \param trac
-/// \param n1
-/// \param n2
-/// \param tol
-/// \return
-///
-bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const  unsigned int& n2, const double& tol);
-
 ///
 /// \brief IntersezioneBoundingBox
 /// \param fract
@@ -68,7 +56,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigne
 /// \param n2
 /// \return
 ///
-bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2);
+bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2,const double& tol);
 
 ///
 /// \brief ComputeTrace
@@ -104,7 +92,7 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int 
 /// \param frac
 /// \return
 ///
-bool Output(const TracesStruct& trac, const FractureStruct& frac);
+bool GeneralOutput(const TracesStruct& trac, const FractureStruct& frac);
 
 ///
 /// \brief pianiParalleli
@@ -113,7 +101,7 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac);
 /// \param tol
 /// \return
 ///
-bool parallelPlanes(Vector4d& piano1, Vector4d& piano2, const double& tol);
+bool parallelPlanes(Vector4d& plane1, Vector4d& plane2, const double& tol);
 
 ///
 /// \brief OutputFractures
@@ -136,7 +124,7 @@ bool OutputTraces(const TracesStruct& trac);
 /// \param lista
 /// \param num
 ///
-void descendingOrder(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num);
+void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigned int& num);
 
 ///
 /// \brief subPolygons
