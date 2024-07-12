@@ -172,7 +172,7 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda
 
 //****************************************************************
 
-bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
+bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
 
 {
     //Estraggo e salvo la direzione e il punto di applicazione della retta di intersezione.

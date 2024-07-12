@@ -250,7 +250,7 @@ TEST(ComputeTracesTest, IntersezioneSingoloPunto){
     Matrix<double,2,3> intersectionLine;
     intersectionLine << 0.5, 0, 0,
                         0, 1, 0;
-    bool result = ComputeTrace(fract, trac, intersectionLine, n1, n2, tol);
+    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
     ASSERT_FALSE(result);
 
 }

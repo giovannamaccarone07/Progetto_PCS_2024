@@ -47,7 +47,7 @@ Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n);
 /// \param tol
 /// \return
 ///
-bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol);
+bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol);
 
 ///
 /// \brief IntersezioneBoundingBox
