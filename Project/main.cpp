@@ -133,8 +133,8 @@ int main()
     {
         MatrixXd matrice= (*itor);
         unsigned int mc =matrice.cols();
-        mesh.NumberCell0D = mc;
-        mesh.NumberCell1D = mc;
+        mesh.NumberCell0D = mesh.NumberCell0D + mc;
+        mesh.NumberCell1D = mesh.NumberCell1D +mc;
         mesh.NumberCell2D ++;
         mesh.NumeroDiLati.push_back(mc);
         mesh.NumeroDiVertici.push_back(mc);
