@@ -125,6 +125,7 @@ TEST(RettaIntersezioneTest, PianiSecanti)
     //VERIFICO CHE SONO UNO IL MULTIPLO DELL'ALTRO, FACCIO IL TEST SOLO SULLE DIREZIONI
     }
 }
+
 //****************************************************************
 
 //TEST 3: testiamo la funzione RettaIntersezione verificando che, dati due piani che si intersecano,
@@ -234,11 +235,12 @@ TEST(pianiParalleliTest, PianiParalleli){
 //****************************************************************
 
 //TEST 8: testiamo la funzione ComputeTrace. Caso poligoni disgiunti.
-TEST(ComputeTracesTest, IntersezioneSingoloPunto){
+TEST(FindTracesTest, CasoTraccia1){
 
     FractureStruct fract;
     TracesStruct trac;
     unsigned int n1 = 0, n2 = 1;
+
     fract.NumeroVertici = {4,4};
     fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
     fract.CoordinateVertici[0] << 0, 1, 1, 0,
@@ -247,11 +249,120 @@ TEST(ComputeTracesTest, IntersezioneSingoloPunto){
     fract.CoordinateVertici[1] << 2, 3, 3, 2,
                                   2, 2, 3, 3,
                                   0, 0, 0, 0;
+
     Matrix<double,2,3> intersectionLine;
     intersectionLine << 0.5, 0, 0,
                         0, 1, 0;
+
     bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
     ASSERT_FALSE(result);
+
+}
+//****************************************************************
+
+//TEST 9: testiamo la funzione ComputeTrace. Caso traccia passante per la prima frattura ma non per la seconda.
+TEST(FindTracesTest, CasoTraccia2){
+
+    FractureStruct fract;
+    TracesStruct trac;
+    unsigned int n1 = 0, n2 = 1;
+    fract.NumeroVertici = {4,4};
+
+    fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
+    fract.CoordinateVertici[0] << 0, 1, 1, 0,
+                                  0, 0, 2, 2,
+                                  0, 0, 0, 0;
+
+    fract.CoordinateVertici[1] <<0.5, 0.5, 0.5, 0.5,
+                                 0.5, 0.5, 1.5, 1.5,
+                                 -1, 1, 1, -1;
+
+    Matrix<double,2,3> intersectionLine;
+    intersectionLine << 0.5, 1.5, 0,
+                        0.5, 0.5, 0;
+
+    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    ASSERT_TRUE(result);
+
+}
+//****************************************************************
+
+//TEST 10: testiamo la funzione ComputeTrace. Caso traccia passante per la seconda frattura ma non per la prima.
+TEST(FindTracesTest, CasoTraccia3){
+
+    FractureStruct fract;
+    TracesStruct trac;
+    unsigned int n1 = 0, n2 = 1;
+    fract.NumeroVertici = {4,4};
+
+    fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
+    fract.CoordinateVertici[0] << 0, 1, 1, 0,
+                                  0, 0, 2, 2,
+                                  0, 0, 0, 0;
+
+    fract.CoordinateVertici[1] <<0.5, 0.5, 0.5, 0.5,
+                                 -0.5, -0.5, 2.5, 2.5,
+                                 -1, 1, 1, -1;
+
+    Matrix<double,2,3> intersectionLine;
+    intersectionLine << 0.5, 1.5, 0,
+                        0.5, 0.5, 0;
+
+    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    ASSERT_TRUE(result);
+
+}
+//****************************************************************
+
+//TEST 11: testiamo la funzione ComputeTrace. Caso traccia non passante per entrambe.
+TEST(FindTracesTest, CasoTraccia4){
+
+    FractureStruct fract;
+    TracesStruct trac;
+    unsigned int n1 = 0, n2 = 1;
+    fract.NumeroVertici = {4,4};
+
+    fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
+    fract.CoordinateVertici[0] << 0, 1, 1, 0,
+                                  0, 0, 2, 2,
+                                  0, 0, 0, 0;
+    fract.CoordinateVertici[1] <<0.5, 0.5, 0.5, 0.5,
+                                -0.5, -0.5, 1, 1,
+                                -1, 1, 1, -1;
+
+    Matrix<double,2,3> intersectionLine;
+    intersectionLine << 0.5, 1.5, 0,
+                        0.5, 0.5, 0;
+
+    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    ASSERT_TRUE(result);
+
+}
+
+//****************************************************************
+
+//TEST 12: testiamo la funzione ComputeTrace. Caso traccia passante per entrambe.
+TEST(FindTracesTest, CasoTraccia5){
+
+    FractureStruct fract;
+    TracesStruct trac;
+    unsigned int n1 = 0, n2 = 1;
+    fract.NumeroVertici = {4,4};
+
+    fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
+    fract.CoordinateVertici[0] << 0, 1, 1, 0,
+                                  0, 0, 2, 2,
+                                  0, 0, 0, 0;
+    fract.CoordinateVertici[1] <<0.5, 0.5, 0.5, 0.5,
+                                -0.5, -0.5, 1, 1,
+                                -1, 1, 1, -1;
+
+    Matrix<double,2,3> intersectionLine;
+    intersectionLine << 0.5, 1.5, 0,
+                        0.5, 0.5, 0;
+
+    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    ASSERT_TRUE(result);
 
 }
 

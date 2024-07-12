@@ -794,8 +794,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
     }
 
-
-
     /// Condizione di Salvataggio
     ///
     if (destra.size() >= 3)
@@ -823,7 +821,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     }
 
 
-
     /// Chiamo subpolygons ricorsivamente sulle due liste
     // esplorazione in profondità????? CONTROLLARE
     while (fermaEsplorazione != true)
@@ -834,19 +831,10 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         fermaEsplorazione = fermaEsplorazioneDx && fermaEsplorazioneSx;
     }
 
-
-
-
     return true; // se tutto è andato bene
 }
 
-
-
-
-
 } //namespace
-
-
 
 
 /*
@@ -903,12 +891,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
         e++;
     }
-
-
-
-
-
-
 
 ****
 ****
