@@ -16,7 +16,7 @@ int main()
     string NomeFile = "FR200_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
-    if(!ImportaDati(NomeFile, fract))
+    if(!ImportData(NomeFile, fract))
     {
         cerr << "Impossibile importare i dati" << endl;
 
@@ -68,7 +68,7 @@ int main()
     }
     */
    ///**************************************************************************************
-
+    /*
     for (unsigned int i =0; i<fract.NumeroFratture; i++)
     {
         for (unsigned int j =i+1; j<fract.NumeroFratture; j++)
@@ -91,6 +91,7 @@ int main()
     {
         cout << "Dati stampati correttamente" << endl;
     }
+*/
 
 
     ///*****************************************************************************
