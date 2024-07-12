@@ -47,7 +47,7 @@ Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n);
 /// \param tol
 /// \return
 ///
-bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol);
+bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol);
 
 ///CheckIntersezione
 // controlla se c'è intersezione
@@ -70,25 +70,6 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigne
 ///
 bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2);
 
-///
-/// \brief ComputeTrace
-/// \param trac
-/// \param fract
-/// \param ts1
-/// \param ts2
-/// \param rettaIntersezione
-/// \param n1
-/// \param n2
-/// \param pass1
-/// \param pass2
-/// \return
-///
-bool ComputeTrace(TracesStruct& trac,
-                  FractureStruct& fract,
-                  double ts1, double ts2,
-                  const MatrixXd& rettaIntersezione,
-                  const unsigned int& n1, const unsigned int& n2,
-                  bool pass1,bool pass2);
 
 ///
 /// \brief ComputeBoundingBox
@@ -145,7 +126,7 @@ void descendingOrder(TracesStruct& trac, list<unsigned int>& lista, const unsign
 /// \param tol
 /// \return
 ///
-bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double, 2,3>>& coordEstremiTracce, const Vector3d& normale,  const double& tol);
+bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double, 2,3>>& coordEstremiTracce, list<MatrixXd>& sp, const Vector3d& normale,  const double& tol);
 
 
 }

@@ -10,6 +10,9 @@ using namespace FractureLibrary;
 
 int main()
 {
+    PolygonalMesh mesh;
+
+
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
@@ -48,27 +51,7 @@ int main()
     }
     */
     ///**************************************************************************************
-    /*
-    bool result = checkIntersezione(fract,trac,0,1,tol);
-    if(result == false)
-        cout << "Main: non c'è intersezione" << endl;
-    else
-        cout << "Main: c'é intersezione" << endl;
 
-
-    if(Output(trac, fract) == false)
-    {
-        cerr << "Impossibile stampare i dati" << endl;
-
-        return 2;
-    }
-    else
-    {
-        cout << "Dati stampati correttamente" << endl;
-    }
-    */
-   ///**************************************************************************************
-    /*
     for (unsigned int i =0; i<fract.NumeroFratture; i++)
     {
         for (unsigned int j =i+1; j<fract.NumeroFratture; j++)
@@ -91,14 +74,14 @@ int main()
     {
         cout << "Dati stampati correttamente" << endl;
     }
-*/
+
 
 
     ///*****************************************************************************
     /// Metabolizziamo alcune informazioni prima di passarle a subpolygons in modo da renderla ricorsiva
     unsigned int n = 3; // era 3
 
-
+    list<MatrixXd> sp = {};
 
     Vector3d normale = fract.NormaleFrattura[n];
 
@@ -124,11 +107,56 @@ int main()
         }
 
 
-        bool taglio = subPolygons(verticiPolygons, coordEstremiTracce, normale, tol);
+        bool taglio = subPolygons(verticiPolygons, coordEstremiTracce,sp, normale, tol);
 
         if (taglio == true)
             cout<< "taglio a buon fine"<<endl;
+    }
 
+
+
+
+    unsigned int id = 0;
+    mesh.NumberCell2D = sp.size();
+    mesh.Cell0DId.reserve(sp.size());
+    mesh.Cell1DId.reserve(sp.size());
+    mesh.Cell0DCoordinates.reserve(sp.size());
+    mesh.Cell1DVertices.reserve(sp.size());
+    mesh.Cell2DVertices.reserve(sp.size());
+    mesh.Cell2DEdges.reserve(sp.size());
+    mesh.NumeroDiLati.reserve(sp.size());
+    mesh.NumeroDiVertici.reserve(sp.size());
+
+
+    auto itor = sp.begin();
+    while(itor != sp.end())
+    {
+        MatrixXd matrice= (*itor);
+        unsigned int mc =matrice.cols();
+        mesh.NumberCell0D = mc;
+        mesh.NumberCell1D = mc;
+        mesh.NumberCell2D ++;
+        mesh.NumeroDiLati.push_back(mc);
+        mesh.NumeroDiVertici.push_back(mc);
+
+        VectorXi lati = {};
+        VectorXi vertici = {};
+        for (unsigned int c= 0; c<mc; c++)
+        {
+            mesh.Cell0DId.push_back(id);
+            mesh.Cell0DCoordinates.push_back(matrice.col(c));
+            Vector2i edge(id%(mc), (id+1)%(mc));
+            mesh.Cell1DVertices.push_back(edge);
+            mesh.Cell1DId.push_back(id);
+            vertici[c] = id;
+            lati[c]= id;
+            id ++;
+        }
+
+        mesh.Cell2DEdges.push_back(lati);
+        mesh.Cell2DVertices.push_back(vertici);
+
+        itor++;
     }
 
 

@@ -115,6 +115,50 @@ bool ImportData(const string& fileName, FractureStruct& fract)
 
 //****************************************************************
 
+bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const unsigned int& n2, const double& tol)
+{
+
+
+    Vector4d piano1 = FracturePlane(fract, n1);
+    Vector4d piano2 = FracturePlane(fract, n2);
+    /*
+    if(pianiParalleli(piano1,piano2,tol) == true)
+    {
+        cout << "CheckIntersezione: I piani sono paralleli" << endl;
+        return false; //non c'è intersezione
+    }
+
+    else
+    {
+
+*/
+    if(BBoxIntersection(fract,n1,n2) == false)
+    {
+        cout << "Boundingbox: i poligono non si toccano" << endl;
+        return false;
+    }
+    else
+    {
+        Matrix<double,2,3> rettaIntersezione = IntersectionLine(piano1,piano2);
+        if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2,tol)==false) //modificare una volta che si è modificata checktraccia
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+
+    }
+    //}
+
+    //chiamare funzione che salva le info sulle tracce
+
+
+}
+
+//****************************************************************
+
 Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n)
 {
     //Considero i primi tre vertici della frattura n-esima per trovare il piano su cui giace la stessa.
@@ -176,7 +220,7 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda
 /// CheckTraccia
 // controlla se la retta passa per la frattura che giace nel piano
 
-bool ComputeTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
+bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
 
 {
     //Estraggo e salvo la direzione e il punto di applicazione della retta di intersezione.
@@ -611,7 +655,7 @@ bool Output(const TracesStruct& trac, const FractureStruct& frac)
 
 //****************************************************************
 
-bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, const Vector3d& normale, const double& tol)
+bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, list<MatrixXd>& sp ,const Vector3d& normale, const double& tol)
 {
     bool fermaEsplorazione = true;
 
@@ -784,28 +828,54 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     /// Condizione di Salvataggio
     ///
     if (tdestra.empty())
-    {    /// salvataggioDati
+    {   /// salvataggioDati
+        //UTILITà DI AVER FATTO PRIMA UNA LISTA DI VECTOR PER
+        //POI TRAVASARE LA STESSA LISTA IN UN VETTORE DI VECTOR ////////////////////////////////// ///// //// ////// //// ///  // / //////
+        vector<Vector3d> colonne = {};
         cout << "punti di destra: "<< endl;
         auto itor = destra.begin();
         while(itor != destra.end())
         {
-
+            Vector3d comp = (*itor);
+            colonne.push_back(comp);
             cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
             itor++;
         }
+        unsigned int c = colonne.size();
+        MatrixXd vertici(3,c);
+
+        for (unsigned int i= 0; i < c; i++)
+        {
+            vertici.col(i) = colonne[i];
+        }
+
+        sp.push_back(vertici);
+
     }
 
-    if(tsinistra.empty())
-    {
-        cout << "punti di sinistra: "<< endl;
+
+    if (tsinistra.empty())
+    {    /// salvataggioDati
+        vector<Vector3d> colonne = {};
+        cout << "punti di destra: "<< endl;
         auto itor = sinistra.begin();
         while(itor != sinistra.end())
         {
+            Vector3d comp = (*itor);
+            colonne.push_back(comp);
             cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
             itor++;
         }
-    }
+        unsigned int c = colonne.size();
+        MatrixXd vertici(3,c);
 
+        for (unsigned int i= 0; i < c; i++)
+        {
+            vertici.col(i) = colonne[i];
+        }
+
+        sp.push_back(vertici);
+    }
 
 
 
@@ -814,8 +884,8 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     // esplorazione in profondità????? CONTROLLARE
     while (fermaEsplorazione == true)
     {
-        bool fermaEsplorazioneDx = subPolygons(destra, tdestra, normale, tol);
-        bool fermaEsplorazioneSx = subPolygons(sinistra, tsinistra, normale, tol);
+        bool fermaEsplorazioneDx = subPolygons(destra, tdestra, sp, normale, tol);
+        bool fermaEsplorazioneSx = subPolygons(sinistra, tsinistra, sp, normale, tol);
 
         fermaEsplorazione = fermaEsplorazioneDx || fermaEsplorazioneSx;
     }
