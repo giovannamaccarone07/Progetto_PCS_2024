@@ -206,8 +206,8 @@ TEST(IntersezioneBoundingBoxTest, IntersezioneBoundingBox)
 {
     FractureStruct fract;
     ImportData("FR3_data.txt",fract);
-    ASSERT_TRUE(BBoxIntersection(fract,0,1));
-    ASSERT_FALSE(BBoxIntersection(fract,1,2));
+    ASSERT_TRUE(BBoxIntersection(fract,0,1,tol));
+    ASSERT_FALSE(BBoxIntersection(fract,1,2,tol));
 
 }
 
@@ -231,6 +231,30 @@ TEST(pianiParalleliTest, PianiParalleli){
 
 
 }
+//****************************************************************
+
+//TEST 8: testiamo la funzione ComputeTrace. Caso poligoni disgiunti.
+TEST(ComputeTracesTest, IntersezioneSingoloPunto){
+
+    FractureStruct fract;
+    TracesStruct trac;
+    unsigned int n1 = 0, n2 = 1;
+    fract.NumeroVertici = {4,4};
+    fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
+    fract.CoordinateVertici[0] << 0, 1, 1, 0,
+                                  0, 0, 1, 1,
+                                  0, 0, 0, 0;
+    fract.CoordinateVertici[1] << 2, 3, 3, 2,
+                                  2, 2, 3, 3,
+                                  0, 0, 0, 0;
+    Matrix<double,2,3> intersectionLine;
+    intersectionLine << 0.5, 0, 0,
+                        0, 1, 0;
+    bool result = ComputeTrace(fract, trac, intersectionLine, n1, n2, tol);
+    ASSERT_FALSE(result);
+
+}
+
 
 
 
