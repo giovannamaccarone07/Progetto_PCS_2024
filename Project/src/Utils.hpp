@@ -124,7 +124,7 @@ bool OutputTraces(const TracesStruct& trac);
 /// \param lista
 /// \param num
 ///
-void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigned int& num);
+void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigned int& num,const double& tol);
 
 ///
 /// \brief subPolygons

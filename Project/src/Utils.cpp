@@ -371,20 +371,20 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
             if (pass1 == false)
             {
                 passante1 = 1;
-                descendingOrder(trac, fract.NumeroTracceN[n1], num);
+                descendingOrder(trac, fract.NumeroTracceN[n1], num,tol);
             }
             else
             {
-                descendingOrder(trac, fract.NumeroTracceP[n1], num);
+                descendingOrder(trac, fract.NumeroTracceP[n1], num,tol);
             }
             if (pass2 == false)
             {
                 passante2 = 1;
-                descendingOrder(trac, fract.NumeroTracceN[n2], num);
+                descendingOrder(trac, fract.NumeroTracceN[n2], num,tol);
             }
             else
             {
-                descendingOrder(trac, fract.NumeroTracceP[n2], num);
+                descendingOrder(trac, fract.NumeroTracceP[n2], num,tol);
             }
             Vector<unsigned int,2> riga1(n1,passante1);
             Vector<unsigned int,2> riga2(n2,passante2);
@@ -402,13 +402,14 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
 
 //***************************************************************
 
-void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigned int& num)
+void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigned int& num, const double& tol)
 {
 
     double length = trac.LunghezzaTracce[num];
 
     auto itor = list.begin();
-    while( length < trac.LunghezzaTracce[*itor] && itor != list.end())
+
+    while( length < trac.LunghezzaTracce[*itor]+tol && itor != list.end())
     { 
         itor ++;
 
@@ -794,8 +795,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
     }
 
-
-
     /// Condizione di Salvataggio
     ///
     if (destra.size() >= 3)
@@ -823,7 +822,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     }
 
 
-
     /// Chiamo subpolygons ricorsivamente sulle due liste
     // esplorazione in profondità????? CONTROLLARE
     while (fermaEsplorazione != true)
@@ -834,19 +832,10 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         fermaEsplorazione = fermaEsplorazioneDx && fermaEsplorazioneSx;
     }
 
-
-
-
     return true; // se tutto è andato bene
 }
 
-
-
-
-
 } //namespace
-
-
 
 
 /*
@@ -903,12 +892,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
         e++;
     }
-
-
-
-
-
-
 
 ****
 ****
