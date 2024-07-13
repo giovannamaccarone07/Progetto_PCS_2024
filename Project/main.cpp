@@ -2,6 +2,9 @@
 #include <Eigen/Eigen>
 #include "Fratture.hpp"
 #include "Utils.hpp"
+#include "UCD_test.hpp"
+#include "UCDUtilities.hpp"
+
 
 
 using namespace std;
@@ -16,7 +19,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR200_data.txt";
+    string NomeFile = "FR50_data.txt";
 
     // Verifica che l'importo della mesh e tutti i test siano andati a buon fine
     if(!ImportData(NomeFile, fract))
@@ -30,7 +33,7 @@ int main()
         cout << "Dati importati correttamente" << endl;
     }
 
-    ///**************************************************************************************
+///**************************************************************************************
     /*
     // Provo a stampare le coordinate delle fratture
     cout << "Ci sono " << fract.NumeroFratture << " fratture" << endl;
@@ -50,7 +53,7 @@ int main()
         cout << endl;
     }
     */
-    ///**************************************************************************************
+///**************************************************************************************
 
     for (unsigned int i =0; i<fract.NumeroFratture; i++)
     {
@@ -77,8 +80,9 @@ int main()
 
 
 
-    ///*****************************************************************************
-    /// Metabolizziamo alcune informazioni prima di passarle a subpolygons in modo da renderla ricorsiva
+///*****************************************************************************
+/// Metabolizziamo alcune informazioni prima di passarle a subpolygons in modo da renderla ricorsiva
+///
     unsigned int n = 3; // era 3
 
     list<MatrixXd> sp = {};
@@ -114,7 +118,8 @@ int main()
     }
 
 
-
+    /// Memorizzo le informazioni nella mesh
+    /// ATTENZIONE CHE ALCUNE SONO RIDONDANTI
 
     unsigned int id = 0;
     mesh.NumberCell2D = sp.size();
@@ -141,6 +146,8 @@ int main()
 
         VectorXi lati = {};
         VectorXi vertici = {};
+        lati.resize(mc);
+        vertici.resize(mc);
         for (unsigned int c= 0; c<mc; c++)
         {
             mesh.Cell0DId.push_back(id);
@@ -158,6 +165,62 @@ int main()
 
         itor++;
     }
+
+///*******************************************************************
+
+    ///*******************************************************************
+    ///  // voglio stampare la mesh
+    /// ///*********************************************************************************
+    /// MESH OUTPUT
+    ///
+
+
+    unsigned int c = 0;
+    MatrixXd points(3, mesh.Cell0DCoordinates.size());
+    for (unsigned int i = 0; i< mesh.Cell0DCoordinates.size(); i++)
+    {
+        points.col(c) = mesh.Cell0DCoordinates[i];
+        c++;
+    }
+
+    unsigned int p = 0;
+    MatrixXi edges(2, mesh.Cell1DVertices.size());
+    for (unsigned int i = 0; i< mesh.Cell1DVertices.size(); i++)
+    {
+        edges.col(p) = mesh.Cell1DVertices[i];
+        p++;
+    }
+
+
+    vector<vector<unsigned int>> indici = {};
+    indici.resize(mesh.NumberCell2D);
+    for(unsigned int i= 0; i<mesh.NumberCell2D; i++)
+    {
+        vector<unsigned int> v = {};
+        unsigned int count = 0;
+        for(unsigned int j =0; j<mesh.NumeroDiVertici.size(); j++)
+        {
+            v.push_back(count);
+            count ++;
+        }
+
+        indici.push_back(v);
+    }
+
+
+    //***********************************************
+
+    std::string exportFolder = "./";
+    Gedim::UCDUtilities exporter;
+    exporter.ExportPoints(exportFolder + "/Mesh0Ds.inp",points);
+
+    exporter.ExportSegments(exportFolder + "/Mesh1Ds.inp",points,edges);
+
+    exporter.ExportPolygons(exportFolder + "/Mesh2Ds.inp",points,indici);
+
+    // ***************************************************************************
+
+
 
 
 
