@@ -113,17 +113,10 @@ TEST(RettaIntersezioneTest, PianiSecanti)
     Vector4d piano2(1,1,1,2);
 
     Matrix<double,2,3> line = IntersectionLine(piano1, piano2);
-    Matrix<double,2,3> expectedLine;
-    //Vector3d appCorretta(1.5,0.5,0);
-    Vector3d lineDirection(-2,0,2);
-    //rettaCorretta.row(0) = appCorretta;
-    expectedLine.row(1) = lineDirection;
+    Vector3d expectedLineDirection(-2,0,2);
+    Vector3d lineDirection = line.row(1);
 
-    for (int i = 0; i < 3; i++)
-    {
-        EXPECT_NEAR(line(1, i)/expectedLine(1, i), 1.0, tol);
-    //VERIFICO CHE SONO UNO IL MULTIPLO DELL'ALTRO, FACCIO IL TEST SOLO SULLE DIREZIONI
-    }
+    EXPECT_NEAR((lineDirection.cross(expectedLineDirection)).norm(),0,tol);
 }
 
 //****************************************************************
@@ -132,7 +125,7 @@ TEST(RettaIntersezioneTest, PianiSecanti)
 //il punto di applicazione della retta calcolata dalla funzione appartenga ad entrambi i piani.
 TEST(RettaIntersezioneTest, PuntiAppartenentiPiani)
 {
-    Vector4d piano1(1,1,1,-1); //CONTROLLARE IL SEGNO DI d
+    Vector4d piano1(1,1,1,-1);
     Vector4d piano2(1,1,0,-2);
     Matrix<double,2,3> retta = IntersectionLine(piano1, piano2);
 
@@ -240,6 +233,11 @@ TEST(FindTracesTest, CasoTraccia1){
     FractureStruct fract;
     TracesStruct trac;
     unsigned int n1 = 0, n2 = 1;
+    fract.NumeroTracceN = {};
+    fract.NumeroTracceP = {};
+    fract.NumeroTracceN.resize(2);
+    fract.NumeroTracceP.resize(2);
+    fract.NumeroFratture = 2;
 
     fract.NumeroVertici = {4,4};
     fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
@@ -266,6 +264,11 @@ TEST(FindTracesTest, CasoTraccia2){
     FractureStruct fract;
     TracesStruct trac;
     unsigned int n1 = 0, n2 = 1;
+    fract.NumeroTracceN = {};
+    fract.NumeroTracceP = {};
+    fract.NumeroTracceN.resize(2);
+    fract.NumeroTracceP.resize(2);
+    fract.NumeroFratture = 2;
     fract.NumeroVertici = {4,4};
 
     fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
@@ -285,6 +288,7 @@ TEST(FindTracesTest, CasoTraccia2){
     ASSERT_TRUE(result);
 
 }
+
 //****************************************************************
 
 //TEST 10: testiamo la funzione ComputeTrace. Caso traccia passante per la seconda frattura ma non per la prima.
@@ -293,6 +297,11 @@ TEST(FindTracesTest, CasoTraccia3){
     FractureStruct fract;
     TracesStruct trac;
     unsigned int n1 = 0, n2 = 1;
+    fract.NumeroTracceN = {};
+    fract.NumeroTracceP = {};
+    fract.NumeroTracceN.resize(2);
+    fract.NumeroTracceP.resize(2);
+    fract.NumeroFratture = 2;
     fract.NumeroVertici = {4,4};
 
     fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
@@ -320,6 +329,11 @@ TEST(FindTracesTest, CasoTraccia4){
     FractureStruct fract;
     TracesStruct trac;
     unsigned int n1 = 0, n2 = 1;
+    fract.NumeroTracceN = {};
+    fract.NumeroTracceP = {};
+    fract.NumeroTracceN.resize(2);
+    fract.NumeroTracceP.resize(2);
+    fract.NumeroFratture = 2;
     fract.NumeroVertici = {4,4};
 
     fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
@@ -347,6 +361,11 @@ TEST(FindTracesTest, CasoTraccia5){
     FractureStruct fract;
     TracesStruct trac;
     unsigned int n1 = 0, n2 = 1;
+    fract.NumeroTracceN = {};
+    fract.NumeroTracceP = {};
+    fract.NumeroTracceN.resize(2);
+    fract.NumeroTracceP.resize(2);
+    fract.NumeroFratture = 2;
     fract.NumeroVertici = {4,4};
 
     fract.CoordinateVertici = {MatrixXd(3, 4), MatrixXd(3, 4)};
@@ -354,8 +373,8 @@ TEST(FindTracesTest, CasoTraccia5){
                                   0, 0, 2, 2,
                                   0, 0, 0, 0;
     fract.CoordinateVertici[1] <<0.5, 0.5, 0.5, 0.5,
-                                -0.5, -0.5, 1, 1,
-                                -1, 1, 1, -1;
+                                 -0.5, -0.5, 1, 1,
+                                 -1, 1, 1, -1;
 
     Matrix<double,2,3> intersectionLine;
     intersectionLine << 0.5, 1.5, 0,
