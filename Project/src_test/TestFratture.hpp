@@ -17,8 +17,6 @@ namespace FractureLibrary {
 
 double tol = 10e-10; //CAMBIARE LA TOLLERANZA
 
-
-
 //TEST 1: testiamo la funzione ImportaDati verificando che la prima frattura abbiamo quattro vertici.
 TEST(ImportaDatiTest, NumeroVertici)
 {
@@ -101,7 +99,7 @@ TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
 {
     FractureStruct fract;
     ImportData("FR3_data.txt",fract);
-    Matrix<double,2,3> BBox = ComputeBoundingBox(fract,0);
+    Matrix<double,2,3> BBox = ComputeBoundingBox(fract,0,tol);
     Vector3d expectedMin(0,0,0);
     Vector3d expectedMax(1,1,0);
 
@@ -310,11 +308,6 @@ TEST(CheckTracciaTest, CasoTraccia5){
     ASSERT_TRUE(result);
 
 }
-
-
-
-
-
 
 }
 

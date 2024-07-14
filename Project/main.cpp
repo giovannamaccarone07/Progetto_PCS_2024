@@ -19,7 +19,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR200_data.txt";
+    string NomeFile = "FR50_data.txt";
 
 
     /// Input dei dati
