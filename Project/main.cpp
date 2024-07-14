@@ -116,8 +116,6 @@ int main()
         {
             unsigned int id = 0;
             unsigned int IdLato = 0;
-<<<<<<< HEAD
-
             mesh.NumberCell2D = sp.size();
             mesh.NumeroDiLati.reserve(sp.size());
             mesh.NumeroDiVertici.reserve(sp.size());
@@ -227,143 +225,6 @@ int main()
                     vertici[i] = v1;
                     lati[i]= IdLato;
 
-                }
-
-
-                mesh.Cell2DEdges.push_back(lati);
-                mesh.Cell2DVertices.push_back(vertici);
-
-
-
-
-
-                itor++;
-            }
-        }
-        else
-        {
-            mesh.Cell0DCoordinates = {};
-            mesh.Cell0DId = {};
-            mesh.Cell1DId = {};
-            mesh.Cell1DVertices = {};
-            mesh.Cell2DEdges = {};
-            mesh.Cell2DVertices = {};
-            mesh.NumberCell0D = {};
-            mesh.NumberCell1D = {};
-            mesh.NumberCell2D = {};
-            mesh.NumeroDiLati = {};
-            mesh.NumeroDiVertici = {};
-=======
-
-            mesh.NumberCell2D = sp.size();
-            mesh.NumeroDiLati.reserve(sp.size());
-            mesh.NumeroDiVertici.reserve(sp.size());
-
-            // troviamo le dimensioni per impostare la mesh
-            auto itor2 = sp.begin();
-            unsigned int TotCol = 0;
-            while(itor2 != sp.end())
-            {
-                TotCol = TotCol + (*itor2).cols();
-                itor2 ++;
-            }
-
-            mesh.Cell0DId.reserve(TotCol);
-            mesh.Cell1DId.reserve(TotCol);
-            mesh.Cell0DCoordinates.reserve(TotCol);
-            mesh.Cell1DVertices.reserve(TotCol);
-            mesh.Cell2DVertices.reserve(TotCol);
-            mesh.Cell2DEdges.reserve(TotCol);
-
-
-
-            auto itor3 = sp.begin();
-            while(itor3 != sp.end()) // ciclo su ogni sottopoligono
-            {
-                MatrixXd matrice = (*itor3);
-                unsigned int mc = matrice.cols();
-
-
-                // riempio mesh.Cell0DCoordinates
-                // confronto ogni punto con quelli già memorizzati nella struct
-                // se non è presente lo inserisco
-                for (unsigned int c= 0; c<mc; c++)
-                {
-                    bool same = false;
-
-                    for(unsigned int col = 0; col < mesh.Cell0DCoordinates.size(); col++)
-                    {
-                        if (abs(matrice.col(c)[0] - mesh.Cell0DCoordinates[col][0]) < tol &&
-                            abs(matrice.col(c)[1] - mesh.Cell0DCoordinates[col][1]) < tol &&
-                            abs(matrice.col(c)[2] - mesh.Cell0DCoordinates[col][2]) < tol)
-                        {
-                            same = true;
-                        }
-                    }
-
-                    if (same == false)
-                    {
-                        mesh.Cell0DId.push_back(id);
-                        mesh.Cell0DCoordinates.push_back(matrice.col(c));
-                        id ++;
-                    }
-                }
-
-                itor3++;
-            }
-
-
-            auto itor = sp.begin();
-            while(itor != sp.end())
-        {
-            MatrixXd matrice = (*itor);
-            unsigned int mc = matrice.cols();
-            mesh.NumberCell0D = mesh.NumberCell0D + mc;
-            mesh.NumberCell1D = mesh.NumberCell1D +mc;
-            mesh.NumeroDiLati.push_back(mc);
-            mesh.NumeroDiVertici.push_back(mc);
-
-            VectorXi lati = {};
-            VectorXi vertici = {};
-            lati.resize(mc);
-            vertici.resize(mc);
-
-            unsigned int v1, v2;
-            for(unsigned int i = 0; i < matrice.cols(); i++) // ciclo sul numero di lati
-            {
-                v1 = i % matrice.cols();
-                v2 = (i+1) % matrice.cols();
-                unsigned int id1, id2;
-
-                // cerco l'id del punto corrispondente alla colonna matrice.col(v1)
-                for(unsigned int col = 0; col < mesh.Cell0DCoordinates.size(); col++)
-                {
-                    if (abs(matrice.col(v1)[0] - mesh.Cell0DCoordinates[col][0]) < tol &&
-                        abs(matrice.col(v1)[1] - mesh.Cell0DCoordinates[col][1]) < tol &&
-                        abs(matrice.col(v1)[2] - mesh.Cell0DCoordinates[col][2]) < tol)
-                    {
-                        id1 = col;
-                    }
-                }
-                // cerco l'id del punto corrispondente alla colonna matrice.col(v2)
-                for(unsigned int col = 0; col < mesh.Cell0DCoordinates.size(); col++)
-                {
-                    if (abs(matrice.col(v2)[0] - mesh.Cell0DCoordinates[col][0]) < tol &&
-                        abs(matrice.col(v2)[1] - mesh.Cell0DCoordinates[col][1]) < tol &&
-                        abs(matrice.col(v2)[2] - mesh.Cell0DCoordinates[col][2]) < tol)
-                    {
-                        id2 = col;
-                    }
-                }
-
-                Vector2i edge(id1, id2);
-                mesh.Cell1DVertices.push_back(edge);
-                mesh.Cell1DId.push_back(IdLato);
-                IdLato ++;
-
-                vertici[i] = v1;
-                lati[i]= IdLato;
-
             }
 
 
@@ -375,7 +236,6 @@ int main()
 
 
             itor++;
->>>>>>> 871b8a1ab4531192ae757f7a4d526580d4582ffe
         }
         }
         else
@@ -397,15 +257,11 @@ int main()
 
 
 
-<<<<<<< HEAD
+
     ///*******************************************************************
     ///                     voglio stampare la mesh
     ///*******************************************************************
-=======
-///*******************************************************************
-///                     voglio stampare la mesh
-///*******************************************************************
->>>>>>> 871b8a1ab4531192ae757f7a4d526580d4582ffe
+
 
 
     unsigned int c = 0;
