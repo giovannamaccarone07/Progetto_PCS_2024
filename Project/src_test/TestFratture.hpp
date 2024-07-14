@@ -175,7 +175,7 @@ TEST(ComputeBoundingBoxTest, CorrettezzaBBox)
 {
     FractureStruct fract;
     ImportData("FR3_data.txt",fract);
-    Matrix<double,2,3> BBox = ComputeBoundingBox(fract,0);
+    Matrix<double,2,3> BBox = ComputeBoundingBox(fract,0,tol);
     Vector3d expectedMin(0,0,0);
     Vector3d expectedMax(1,1,0);
 

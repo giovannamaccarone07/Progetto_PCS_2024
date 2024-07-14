@@ -145,7 +145,7 @@ Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n)
 
 Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda; testa]
 {
-    //Individuo lle giaciture dei piani considerando i coefficienti a,b,c delle equazioni.
+    //Individuo le giaciture dei piani considerando i coefficienti a,b,c delle equazioni.
     Vector3d p1 = plane1.head(3);
     Vector3d p2 = plane2.head(3);
     //Calcolo la direzione tangente tramite il prodotto vettoriale delle giaciture
@@ -201,14 +201,14 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
         Vector3d edgeDir = vertex1 - vertex0;
 
         //CASO 1: la retta di intersezione e la direzione del lato sono parallele e coincidenti.
-        if((edgeDir.cross(lineDir)).norm() < tol && ((vertex0-point).cross(lineDir)).norm() < tol)
+        if((edgeDir.cross(lineDir)).norm() < tol*max(edgeDir.norm(),lineDir.norm()) && ((vertex0-point).cross(lineDir)).norm() < tol*max((vertex0-point).norm(),lineDir.norm()))
         {
             //Salvo in ts gli estremi del lato.
             ts.push_back((vertex0-point).norm());
             ts.push_back((vertex1-point).norm());
         }
         //CASO 2: c'è intersezione tra la retta di intersezione e la direzione del lato.
-        else if((edgeDir.cross(lineDir)).norm() > tol)
+        else if((edgeDir.cross(lineDir)).norm() > tol*max(edgeDir.norm(),lineDir.norm()))
         {
             //Calcolo il parametro k.
             double k = ((point.cross(lineDir)-vertex0.cross(lineDir)).dot((edgeDir.cross(lineDir))))/(((edgeDir.cross(lineDir)).norm())*(edgeDir.cross(lineDir)).norm());
@@ -229,9 +229,9 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
             Vector3d maxVec = BBox.row(0);
             Vector3d minVec = BBox.row(1);
 
-            if(minVec[0]-tol< punto[0] && punto[0] < maxVec[0]+tol &&
-                minVec[1]-tol< punto[1] && punto[1] < maxVec[1]+tol &&
-                minVec[2]-tol< punto[2] && punto[2] < maxVec[2]+tol)
+            if(minVec[0]-punto[0]<tol*max(minVec[0],punto[0]) && punto[0]-maxVec[0]<tol*max(punto[0],maxVec[0]) &&
+                minVec[1]-punto[1]<tol*max(minVec[1],punto[1]) && punto[1]-maxVec[1]<tol*max(punto[1],maxVec[1]) &&
+                minVec[2]-punto[2]<tol*max(minVec[2],punto[2]) && punto[2]-maxVec[2]<tol*max(punto[2],maxVec[2]))
             {
                 ts.push_back(t);
             }
@@ -260,7 +260,7 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
         Vector3d edgeDir = vertex1 - vertex0;
 
         //CASO 1: la retta di intersezione e la direzione del lato sono parallele e coincidenti.
-        if((edgeDir.cross(lineDir)).norm() < tol && ((vertex0-point).cross(lineDir)).norm() < tol)
+        if((edgeDir.cross(lineDir)).norm() < tol*max(edgeDir.norm(),lineDir.norm()) && ((vertex0-point).cross(lineDir)).norm() < tol*max((vertex0-point).norm(),lineDir.norm()))
         {
             //Salvo in ts gli estremi del lato.
             ts.push_back((vertex0-point).norm());
@@ -268,7 +268,7 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
 
         }
         //CASO 2: c'è intersezione tra la retta di intersezione e la direzione del lato.
-        else if((edgeDir.cross(lineDir)).norm() > tol)
+        else if((edgeDir.cross(lineDir)).norm() > tol*max(edgeDir.norm(),lineDir.norm()))
         {
             //Calcolo il parametro k.
             double k = ((point.cross(lineDir)-vertex0.cross(lineDir)).dot((edgeDir.cross(lineDir))))/(((edgeDir.cross(lineDir)).norm())*(edgeDir.cross(lineDir)).norm());
@@ -289,9 +289,9 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
             Vector3d maxVec = BBox.row(0);
             Vector3d minVec = BBox.row(1);
 
-            if(vettoreMin[0]-tol< punto[0] && punto[0] < maxVec[0]+tol &&
-                vettoreMin[1]-tol< punto[1] && punto[1] < maxVec[1]+tol &&
-                vettoreMin[2]-tol< punto[2] && punto[2] < maxVec[2]+tol)
+            if(minVec[0]-punto[0]<tol*max(minVec[0],punto[0]) && punto[0]-maxVec[0]<tol*max(punto[0],maxVec[0]) &&
+                minVec[1]-punto[1]<tol*max(minVec[1],punto[1]) && punto[1]-maxVec[1]<tol*max(punto[1],maxVec[1]) &&
+                minVec[2]-punto[2]<tol*max(minVec[2],punto[2]) && punto[2]-maxVec[2]<tol*max(punto[2],maxVec[2]))
             {
                 ts.push_back(t);
             }
@@ -317,29 +317,29 @@ bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& inters
     else
     {
         //CASO1: non si ha intersezione tra i poligoni di conseguenza non esiste la traccia.
-        if(max(ts[0],ts[1])  <= min(ts[2],ts[3]) + tol  ||
-           max(ts[2],ts[3])  <= min(ts[0],ts[1]) + tol )
+        if(max(ts[0],ts[1])  < min(ts[2],ts[3]) + tol*max(max(ts[0],ts[1]),min(ts[2],ts[3]))  ||
+            max(ts[2],ts[3])  < min(ts[0],ts[1]) + tol*max(max(ts[2],ts[3]),min(ts[0],ts[1])) )
         {
             return intersection;
         }
         else
         {
             //CASO2: la traccia è passante per entrambe le fratture.
-            if((abs(ts[0]-ts[2])<tol && abs(ts[1]-ts[3])<tol) ||
-                (abs(ts[0]-ts[3])<tol && abs(ts[1]-ts[2])<tol))
+            if((abs(ts[0]-ts[2])<tol*max(ts[0],ts[2]) && abs(ts[1]-ts[3])<tol*max(ts[1],ts[3])) ||
+                (abs(ts[0]-ts[3])<tol*max(ts[0],ts[3]) && abs(ts[1]-ts[2])<tol*max(ts[1],ts[2])))
             {
                 pass1 = true;
                 pass2 = true;
             }
             //CASO3: la traccia è passante per la frattura n2 ma non per la frattura n1.
-            else if(min(ts[2],ts[3]) > min(ts[1],ts[0]) + tol && max(ts[2],ts[3]) < max(ts[0],ts[1])+ tol) // passante per la seconda frattura
+            else if(min(ts[2],ts[3]) > min(ts[1],ts[0]) + tol*max(min(ts[2],ts[3]),min(ts[1],ts[0])) && max(ts[2],ts[3]) < max(ts[0],ts[1])+ tol*max(max(ts[2],ts[3]),max(ts[0],ts[1])))
             {
-                pass1 = false; //li ho scambiati
+                pass1 = false;
                 pass2 = true;
 
             }
             //CASO4: la traccia è passante per la frattura n1 ma non per la frattura n2.
-            else if(min(ts[0],ts[1]) > min(ts[2],ts[3]) + tol && max(ts[0],ts[1]) < max(ts[2],ts[3])+ tol) // passante per la prima frattura
+            else if(min(ts[0],ts[1]) > min(ts[2],ts[3]) + tol*max(min(ts[0],ts[1]),min(ts[2],ts[3])) && max(ts[0],ts[1]) < max(ts[2],ts[3])+ tol*max(max(ts[0],ts[1]),max(ts[2],ts[3])))
             {
                 pass1 = true;
                 pass2 = false;
@@ -409,7 +409,7 @@ void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigne
 
     auto itor = list.begin();
 
-    while( length < trac.LunghezzaTracce[*itor]+tol && itor != list.end())
+    while( length < trac.LunghezzaTracce[*itor]+tol*max(length,trac.LunghezzaTracce[*itor]) && itor != list.end())
     { 
         itor ++;
 
@@ -430,9 +430,8 @@ bool parallelPlanes(Vector4d& plane1, Vector4d& plane2, const double& tol)
 {
     Vector3d p1 = plane1.head(3);
     Vector3d p2 = plane2.head(3);
-    //double dotProduct = piano1[0]*piano2[0]+piano1[1]*piano2[1]+piano1[2]*piano2[2];
 
-    if(p1.cross(p2).norm()<tol)
+    if(p1.cross(p2).norm()<tol*max(p1.norm(),p2.norm()))
     {
         return true; //sono paralleli
     }
@@ -442,7 +441,7 @@ bool parallelPlanes(Vector4d& plane1, Vector4d& plane2, const double& tol)
 
 //****************************************************************
 
-Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int n)
+Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int n, const double& tol)
 {
     //Inizializzo i vettori Max e Min rispettivamente con i valori minimi e massimi possibili in modo da modificarli.
     Vector3d vettoreMax(numeric_limits<double>::min(), numeric_limits<double>::min(), numeric_limits<double>::min());
@@ -455,18 +454,18 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int
         double y = vertice[1];
         double z = vertice[2];
         //check massimi
-        if(vettoreMax[0]<x)
+        if(vettoreMax[0]<x+tol*max(vettoreMax[0],x))
             vettoreMax[0] = x;
-        if(vettoreMax[1]<y)
+        if(vettoreMax[1]<y+tol*max(vettoreMax[1],y))
             vettoreMax[1] = y;
-        if(vettoreMax[2]<z)
+        if(vettoreMax[2]<z+tol*max(vettoreMax[2],z))
             vettoreMax[2] = z;
         //check minimi
-        if(vettoreMin[0]>x)
+        if(vettoreMin[0]>x+tol*max(vettoreMin[0],x))
             vettoreMin[0] = x;
-        if(vettoreMin[1]>y)
+        if(vettoreMin[1]>y+tol*max(vettoreMin[1],y))
             vettoreMin[1] = y;
-        if(vettoreMin[2]>z)
+        if(vettoreMin[2]>z+tol*max(vettoreMax[2],z))
             vettoreMin[2] = z;
     }
     //Salvo la BoundingBox in una matrice.
@@ -481,8 +480,8 @@ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract,  unsigned int
 
 bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2,const double& tol)
 {
-    Matrix<double,2,3> BBox1 = ComputeBoundingBox(fract,n1);
-    Matrix<double,2,3> BBox2 = ComputeBoundingBox(fract,n2);
+    Matrix<double,2,3> BBox1 = ComputeBoundingBox(fract,n1,tol);
+    Matrix<double,2,3> BBox2 = ComputeBoundingBox(fract,n2,tol);
 
     Vector3d vettoreMax1 = BBox1.row(0);
     Vector3d vettoreMin1 = BBox1.row(1);
@@ -490,9 +489,12 @@ bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const
     Vector3d vettoreMin2 = BBox2.row(1);
 
     //Verifico se le due bounding box si intersecano.
-    if(vettoreMin1[0]< vettoreMax2[0]+tol && vettoreMax1[0]> vettoreMin2[0]+tol &&
-        vettoreMin1[1]< vettoreMax2[1]+tol && vettoreMax1[1]> vettoreMin2[1]+tol &&
-        vettoreMin1[2]< vettoreMax2[2]+tol && vettoreMax1[2]> vettoreMin2[2]+tol)
+    if(vettoreMin1[0]< vettoreMax2[0]+tol*max(vettoreMin1[0],vettoreMax2[0]) &&
+        vettoreMax1[0]> vettoreMin2[0]+tol*max(vettoreMax1[0],vettoreMin2[0]) &&
+        vettoreMin1[1]< vettoreMax2[1]+tol*max(vettoreMin1[1],vettoreMax2[1]) &&
+        vettoreMax1[1]> vettoreMin2[1]+tol*max(vettoreMax1[1],vettoreMin2[1]) &&
+        vettoreMin1[2]< vettoreMax2[2]+tol*max(vettoreMin1[2],vettoreMax2[2]) &&
+        vettoreMax1[2]> vettoreMin2[2]+tol*max(vettoreMax1[2],vettoreMin2[2]))
     {
         return true;
     }

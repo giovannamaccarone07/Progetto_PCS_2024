@@ -8,9 +8,6 @@ namespace FractureLibrary
 {
 
 /// ImportaDati
-// NomeFile: prende come riferimento costante il path del file
-// Fract: prende la struct di tipo FractureStruct come riferimento e può modificarla
-// Funzione che importa i dati da file, restituisce TRUE se la lettura è andata a buon fine
 /// \brief ImportaDati
 /// \param NomeFile
 /// \param Fract
@@ -18,11 +15,10 @@ namespace FractureLibrary
 ///
 bool ImportData(const string& fileName, FractureStruct& fract);
 
-
 ///
-/// \brief RettaIntersezione
-/// \param piano1
-/// \param piano2
+/// \brief IntersectionLine
+/// \param plane1
+/// \param plane2
 /// \return
 ///
 Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2);
@@ -36,7 +32,6 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2);
 Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n);
 
 /// CheckTraccia
-// controlla se la retta passa per la frattura che giace nel piano
 ///
 /// \brief CheckTraccia
 /// \param fract
@@ -71,12 +66,7 @@ bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const
 /// \param pass2
 /// \return
 ///
-bool ComputeTrace(TracesStruct& trac,
-                  FractureStruct& fract,
-                  double ts1, double ts2,
-                  const MatrixXd& rettaIntersezione,
-                  const unsigned int& n1, const unsigned int& n2,
-                  bool pass1,bool pass2);
+bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double ts2, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, bool pass1,bool pass2);
 
 ///
 /// \brief ComputeBoundingBox
@@ -84,7 +74,7 @@ bool ComputeTrace(TracesStruct& trac,
 /// \param n
 /// \return
 ///
-Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n);
+Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n,const double& tol);
 
 ///
 /// \brief Output
