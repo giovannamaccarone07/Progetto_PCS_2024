@@ -115,6 +115,50 @@ bool ImportData(const string& fileName, FractureStruct& fract)
 
 //****************************************************************
 
+bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const unsigned int& n2, const double& tol)
+{
+
+
+    Vector4d piano1 = FracturePlane(fract, n1);
+    Vector4d piano2 = FracturePlane(fract, n2);
+    /*
+    if(pianiParalleli(piano1,piano2,tol) == true)
+    {
+        cout << "CheckIntersezione: I piani sono paralleli" << endl;
+        return false; //non c'è intersezione
+    }
+
+    else
+    {
+
+*/
+    if(BBoxIntersection(fract,n1,n2) == false)
+    {
+        cout << "Boundingbox: i poligono non si toccano" << endl;
+        return false;
+    }
+    else
+    {
+        Matrix<double,2,3> rettaIntersezione = IntersectionLine(piano1,piano2);
+        if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2,tol)==false) //modificare una volta che si è modificata checktraccia
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+
+    }
+    //}
+
+    //chiamare funzione che salva le info sulle tracce
+
+
+}
+
+//****************************************************************
+
 Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n)
 {
     //Considero i primi tre vertici della frattura n-esima per trovare il piano su cui giace la stessa.
@@ -172,7 +216,13 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda
 
 //****************************************************************
 
-bool FindTrace(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
+
+//VERIFICARE GLI INPUT IN REFERENZA
+/// CheckTraccia
+// controlla se la retta passa per la frattura che giace nel piano
+
+bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
+
 
 {
     //Estraggo e salvo la direzione e il punto di applicazione della retta di intersezione.
@@ -624,13 +674,13 @@ bool GeneralOutput(const TracesStruct& trac, const FractureStruct& frac)
 
 //****************************************************************
 
-bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, const Vector3d& normale, const double& tol)
+bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, list<MatrixXd>& sp ,const Vector3d& normale, const double& tol)
 {
-    bool fermaEsplorazione = false;
+    bool fermaEsplorazione = true;
 
-    if (verticiPolygons.size() <= 3  || coordEstremiTracce.empty())
+    if (coordEstremiTracce.empty())
     {
-        return true;
+        return false;
     }
 
 
@@ -721,11 +771,11 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         double segnoA = crossProductA.dot(normale);
 
 
-        if(segnoA && segnoB > tol) // entrambi i vertici stanno a destra della retta di riferimento
+        if(segnoA > tol && segnoB > tol) // entrambi i vertici stanno a destra della retta di riferimento
         {
             tdestra.push_back(coordEstremiTracce[i]);
         }
-        else if(segnoA && segnoB < -tol)
+        else if(segnoA < -tol && segnoB < -tol)
         {
             tsinistra.push_back(coordEstremiTracce[i]);
         }
@@ -734,8 +784,8 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
             Matrix3d Matrice;
             Vector3d zeri(0,0,0);
             Matrice.col(0) = dirTraccia;
-            Matrice.row(1) = (B-A);
-            Matrice.row(2) = zeri;
+            Matrice.col(1) = (B-A);
+            Matrice.col(2) = zeri;
             Vector3d b = (B-traccia0);
             Vector3d coeff = Matrice.fullPivLu().solve(b);
             Vector3d punto = traccia0 + coeff[0]*dirTraccia;
@@ -753,16 +803,14 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
             tsinistra.push_back(Tsx);
             tdestra.push_back(Tdx);
-
-
         }
         else if (segnoA > tol && segnoB < -tol)
         {
             Matrix3d Matrice;
             Vector3d zeri(0,0,0);
             Matrice.col(0) = dirTraccia;
-            Matrice.row(1) = (B-A);
-            Matrice.row(2) = zeri;
+            Matrice.col(1) = (B-A);
+            Matrice.col(2) = zeri;
             Vector3d b = (B-traccia0);
             Vector3d coeff = Matrice.fullPivLu().solve(b);
             Vector3d punto = traccia0 + coeff[0]*dirTraccia;
@@ -795,122 +843,85 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
     }
 
+
+
+
     /// Condizione di Salvataggio
     ///
-    if (destra.size() >= 3)
-    {    /// salvataggioDati
+    if (tdestra.empty())
+    {   /// salvataggioDati
+        //UTILITà DI AVER FATTO PRIMA UNA LISTA DI VECTOR PER
+        //POI TRAVASARE LA STESSA LISTA IN UN VETTORE DI VECTOR ////////////////////////////////// ///// //// ////// //// ///  // / //////
+        vector<Vector3d> colonne = {};
         cout << "punti di destra: "<< endl;
         auto itor = destra.begin();
         while(itor != destra.end())
         {
-            itor ++;
+            Vector3d comp = (*itor);
+            colonne.push_back(comp);
             cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
-
+            itor++;
         }
-    }
+        unsigned int c = colonne.size();
+        MatrixXd vertici(3,c);
 
-    if(sinistra.size() >= 3)
-    {
-        cout << "punti di sinistra: "<< endl;
-        auto itor2 = sinistra.begin();
-        while(itor2 != sinistra.end())
+        for (unsigned int i= 0; i < c; i++)
         {
-            itor2 ++;
-            cout << (*itor2)[0] << " "<< (*itor2)[1] << " "<< (*itor2)[2] << endl;
-
+            vertici.col(i) = colonne[i];
         }
+
+        sp.push_back(vertici);
+
     }
+
+
+    if (tsinistra.empty())
+    {    /// salvataggioDati
+        vector<Vector3d> colonne = {};
+        cout << "punti di sinistra: "<< endl;
+        auto itor = sinistra.begin();
+        while(itor != sinistra.end())
+        {
+            Vector3d comp = (*itor);
+            colonne.push_back(comp);
+            cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
+            itor++;
+        }
+        unsigned int c = colonne.size();
+        MatrixXd vertici(3,c);
+
+        for (unsigned int i= 0; i < c; i++)
+        {
+            vertici.col(i) = colonne[i];
+        }
+
+        sp.push_back(vertici);
+    }
+
 
 
     /// Chiamo subpolygons ricorsivamente sulle due liste
     // esplorazione in profondità????? CONTROLLARE
-    while (fermaEsplorazione != true)
+    while (fermaEsplorazione == true)
     {
-        bool fermaEsplorazioneDx = subPolygons(destra, tdestra, normale, tol);
-        bool fermaEsplorazioneSx = subPolygons(sinistra, tsinistra, normale, tol);
+        bool fermaEsplorazioneDx = subPolygons(destra, tdestra, sp, normale, tol);
+        bool fermaEsplorazioneSx = subPolygons(sinistra, tsinistra, sp, normale, tol);
 
-        fermaEsplorazione = fermaEsplorazioneDx && fermaEsplorazioneSx;
+        fermaEsplorazione = fermaEsplorazioneDx || fermaEsplorazioneSx;
     }
 
-    return true; // se tutto è andato bene
+
+
+
+
+    return false; // se tutto è andato bene
+
 }
 
 } //namespace
 
 
-/*
-    while (e < verticiPolygons.cols())
-    {
-        v1 = e%(verticiPolygons.cols());
-        v2 = (e+1)%(verticiPolygons.cols());
-
-        //estrapolo le coordinate dei rispettivi vertici
-        Vector3d verticeA = verticiPolygons.col(v1);
-        Vector3d verticeB = verticiPolygons.col(v2);
-
-        ///CASO ESTREMI TRACCIA
-        // se uno dei due estremi della traccia appartiene al lato e lo salvo direttamente in entrambe le liste
-        // bisogna verificare se uno dei due estremi appartiene al segmento che sto considerando, in quel caso lo salvo nella lista
-        Vector3d u = verticeB - verticeA;
-        Vector3d v0 = (traccia0 - verticeA);
-        if(((u.cross(v0)).array().abs() <= tol).all())
-        {
-            sinistra.push_back(traccia0);
-            destra.push_back(traccia0);
-        }
-
-        Vector3d v1 = (traccia1 - verticeA);
-        if(((u.cross(v1)).array().abs() <= tol).all())
-        {
-            sinistra.push_back(traccia1);
-            destra.push_back(traccia1);
-        }
-
-        ///VERTICI POLIGONO
-        // se il prodotto scalare è positivo sta nella lista di destra altrimenti nella sinistra
-        // dobbiamo distinguere i tre casi se è  > tol , < -tol, o compreso fra le due tol (allora è zero)
-        Vector3d crossProduct = dirTraccia.cross((verticeB - traccia0));
-        double segno = crossProduct.dot(normale);
-        if(segno > tol)
-        {
-            destra.push_back(verticeB);
-        }
-        else if(segno < -tol)
-        {
-            sinistra.push_back(verticeB);
-        }
-        else if (abs(segno)< tol)
-        {
-            cerr<< "problema nel prodotto misto";
-            return false;
-        }
-        else
-        {
-            cerr<< "problema casistica non conteplata prodotto misto";
-            return false;
-        }
-
-        e++;
-    }
-
-****
-****
 
 
-        cout << "tracce di destra: " << endl;
-        for (unsigned int j = 0; j< tdestra.size(); j++)
-        {
-            cout << tdestra[j](0,0) << " "<< tdestra[j](0,1) << " " << tdestra[j](0,2) << endl;
-            cout << tdestra[j](1,0) << " "<< tdestra[j](1,1) << " " << tdestra[j](1,2) << endl;
 
-        }
 
-        cout << "tracce di sinistra: " << endl;
-        for (unsigned int j = 0; j< tsinistra.size(); j++)
-        {
-            cout << tsinistra[j](0,0) << " "<< tsinistra[j](0,1) << " " << tsinistra[j](0,2) << endl;
-            cout << tsinistra[j](1,0) << " "<< tsinistra[j](1,1) << " " << tsinistra[j](1,2) << endl;
-        }
-    }
-
-*/
