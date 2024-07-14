@@ -1,10 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <Eigen/Eigen>
 #include "Fratture.hpp"
 #include "Utils.hpp"
 #include "UCD_test.hpp"
 #include "UCDUtilities.hpp"
-
 
 
 using namespace std;
@@ -19,7 +19,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR200_data.txt";
+    string NomeFile = "FR10_data.txt";
 
 
     /// Input dei dati
@@ -110,30 +110,78 @@ int main()
                 cout << "taglio a buon fine per frattura: "<< n <<endl;
         }
 
-
         /// Memorizzo le informazioni nella mesh
-        /// ATTENZIONE CHE ALCUNE SONO RIDONDANTI
 
-        unsigned int id = 0;
-        mesh.NumberCell2D = sp.size();
-        mesh.Cell0DId.reserve(sp.size());
-        mesh.Cell1DId.reserve(sp.size());
-        mesh.Cell0DCoordinates.reserve(sp.size());
-        mesh.Cell1DVertices.reserve(sp.size());
-        mesh.Cell2DVertices.reserve(sp.size());
-        mesh.Cell2DEdges.reserve(sp.size());
-        mesh.NumeroDiLati.reserve(sp.size());
-        mesh.NumeroDiVertici.reserve(sp.size());
-
-
-        auto itor = sp.begin();
-        while(itor != sp.end())
+        if (!sp.empty())
         {
-            MatrixXd matrice= (*itor);
-            unsigned int mc =matrice.cols();
+            unsigned int id = 0;
+            unsigned int IdLato = 0;
+
+            mesh.NumberCell2D = sp.size();
+            mesh.NumeroDiLati.reserve(sp.size());
+            mesh.NumeroDiVertici.reserve(sp.size());
+
+            // troviamo le dimensioni per impostare la mesh
+            auto itor2 = sp.begin();
+            unsigned int TotCol = 0;
+            while(itor2 != sp.end())
+            {
+                TotCol = TotCol + (*itor2).cols();
+                itor2 ++;
+            }
+
+            mesh.Cell0DId.reserve(TotCol);
+            mesh.Cell1DId.reserve(TotCol);
+            mesh.Cell0DCoordinates.reserve(TotCol);
+            mesh.Cell1DVertices.reserve(TotCol);
+            mesh.Cell2DVertices.reserve(TotCol);
+            mesh.Cell2DEdges.reserve(TotCol);
+
+
+
+            auto itor3 = sp.begin();
+            while(itor3 != sp.end()) // ciclo su ogni sottopoligono
+            {
+                MatrixXd matrice = (*itor3);
+                unsigned int mc = matrice.cols();
+
+
+                // riempio mesh.Cell0DCoordinates
+                // confronto ogni punto con quelli già memorizzati nella struct
+                // se non è presente lo inserisco
+                for (unsigned int c= 0; c<mc; c++)
+                {
+                    bool same = false;
+
+                    for(unsigned int col = 0; col < mesh.Cell0DCoordinates.size(); col++)
+                    {
+                        if (abs(matrice.col(c)[0] - mesh.Cell0DCoordinates[col][0]) < tol &&
+                            abs(matrice.col(c)[1] - mesh.Cell0DCoordinates[col][1]) < tol &&
+                            abs(matrice.col(c)[2] - mesh.Cell0DCoordinates[col][2]) < tol)
+                        {
+                            same = true;
+                        }
+                    }
+
+                    if (same == false)
+                    {
+                        mesh.Cell0DId.push_back(id);
+                        mesh.Cell0DCoordinates.push_back(matrice.col(c));
+                        id ++;
+                    }
+                }
+
+                itor3++;
+            }
+
+
+            auto itor = sp.begin();
+            while(itor != sp.end())
+        {
+            MatrixXd matrice = (*itor);
+            unsigned int mc = matrice.cols();
             mesh.NumberCell0D = mesh.NumberCell0D + mc;
             mesh.NumberCell1D = mesh.NumberCell1D +mc;
-            mesh.NumberCell2D ++;
             mesh.NumeroDiLati.push_back(mc);
             mesh.NumeroDiVertici.push_back(mc);
 
@@ -141,24 +189,73 @@ int main()
             VectorXi vertici = {};
             lati.resize(mc);
             vertici.resize(mc);
-            for (unsigned int c= 0; c<mc; c++)
+
+            unsigned int v1, v2;
+            for(unsigned int i = 0; i < matrice.cols(); i++) // ciclo sul numero di lati
             {
-                mesh.Cell0DId.push_back(id);
-                mesh.Cell0DCoordinates.push_back(matrice.col(c));
-                Vector2i edge(id%(mc), (id+1)%(mc));
+                v1 = i % matrice.cols();
+                v2 = (i+1) % matrice.cols();
+                unsigned int id1, id2;
+
+                // cerco l'id del punto corrispondente alla colonna matrice.col(v1)
+                for(unsigned int col = 0; col < mesh.Cell0DCoordinates.size(); col++)
+                {
+                    if (abs(matrice.col(v1)[0] - mesh.Cell0DCoordinates[col][0]) < tol &&
+                        abs(matrice.col(v1)[1] - mesh.Cell0DCoordinates[col][1]) < tol &&
+                        abs(matrice.col(v1)[2] - mesh.Cell0DCoordinates[col][2]) < tol)
+                    {
+                        id1 = col;
+                    }
+                }
+                // cerco l'id del punto corrispondente alla colonna matrice.col(v2)
+                for(unsigned int col = 0; col < mesh.Cell0DCoordinates.size(); col++)
+                {
+                    if (abs(matrice.col(v2)[0] - mesh.Cell0DCoordinates[col][0]) < tol &&
+                        abs(matrice.col(v2)[1] - mesh.Cell0DCoordinates[col][1]) < tol &&
+                        abs(matrice.col(v2)[2] - mesh.Cell0DCoordinates[col][2]) < tol)
+                    {
+                        id2 = col;
+                    }
+                }
+
+                Vector2i edge(id1, id2);
                 mesh.Cell1DVertices.push_back(edge);
-                mesh.Cell1DId.push_back(id);
-                vertici[c] = id;
-                lati[c]= id;
-                id ++;
+                mesh.Cell1DId.push_back(IdLato);
+                IdLato ++;
+
+                vertici[i] = v1;
+                lati[i]= IdLato;
+
             }
+
 
             mesh.Cell2DEdges.push_back(lati);
             mesh.Cell2DVertices.push_back(vertici);
 
+
+
+
+
             itor++;
         }
+        }
+        else
+        {
+            mesh.Cell0DCoordinates = {};
+            mesh.Cell0DId = {};
+            mesh.Cell1DId = {};
+            mesh.Cell1DVertices = {};
+            mesh.Cell2DEdges = {};
+            mesh.Cell2DVertices = {};
+            mesh.NumberCell0D = {};
+            mesh.NumberCell1D = {};
+            mesh.NumberCell2D = {};
+            mesh.NumeroDiLati = {};
+            mesh.NumeroDiVertici = {};
+        }
     }
+
+
 
 
 ///*******************************************************************
@@ -173,6 +270,7 @@ int main()
         points.col(c) = mesh.Cell0DCoordinates[i];
         c++;
     }
+
 
     unsigned int p = 0;
     MatrixXi edges(2, mesh.Cell1DVertices.size());
@@ -209,9 +307,11 @@ int main()
 
 
 
+
+
     return 0;
 
-} //main
+} // main
 
 
 /*
