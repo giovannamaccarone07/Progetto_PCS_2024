@@ -34,7 +34,6 @@ bool ImportData(const string& fileName, FractureStruct& fract)
     fract.IdFratture.resize(fract.NumeroFratture);
     fract.CoordinateVertici.resize(fract.NumeroFratture);
     fract.NumeroVertici.resize(fract.NumeroFratture);
-    fract.IndiciVertici.resize(fract.NumeroFratture);
     fract.NumeroTracceN.resize(fract.NumeroFratture);
     fract.NumeroTracceP.resize(fract.NumeroFratture);
     fract.NormaleFrattura.resize(fract.NumeroFratture);
@@ -212,8 +211,6 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda
 // controlla se la retta passa per la frattura che giace nel piano
 
 bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
-
-
 {
     //Estraggo e salvo la direzione e il punto di applicazione della retta di intersezione.
     Vector3d lineDir = intersectionLine.row(1);
@@ -467,7 +464,6 @@ bool parallelPlanes(Vector4d& plane1, Vector4d& plane2, const double& tol)
 {
     Vector3d p1 = plane1.head(3);
     Vector3d p2 = plane2.head(3);
-    //double dotProduct = piano1[0]*piano2[0]+piano1[1]*piano2[1]+piano1[2]*piano2[2];
 
     if(p1.cross(p2).norm()<tol*max(p1.norm(),p2.norm()))
     {

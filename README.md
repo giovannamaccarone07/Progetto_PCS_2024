@@ -47,3 +47,8 @@ prendi il primo elemento della lista e il successivo, fai quello che devi fare, 
 - ** per vedere se una traccia sta a destra o a sinistra di un altra, guardo la posizione dei due estremi della traccia relativa alla traccia di riferimento, faccio il prodotto scalare, se entrambi stanno a destra li metto a destra se i vettori sono concordi e negativi stanno a sinistra, se sono discori prendo l'intersezione fra le due tracce... 
 IMPORTANTE: sto analizzando solo le tracce passanti quindi non verifico il caso in cui uno dei due estremi della traccia sia sulla tracci di riferimento
 OTTIMIZZAZIONE: QUESTI Prodotti scalari in realtà li ho già calcolati, si potrebbe fare in modo che li recuperi
+
+
+
+### OTTIMIZZAZIONE
+- un ottimizzazione potrebbe essere sul ciclo iniziale che chiama checkintersezione, per ogni frattura la interseco con tutte le successive
