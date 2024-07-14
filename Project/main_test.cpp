@@ -18,13 +18,10 @@ using namespace FractureLibrary;
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-
-    PolygonalMesh mesh;
     FractureStruct fract;
-    TracesStruct trac;
 
 
-    string NomeFile = "FR50_data.txt";
+    string NomeFile = "FR200_data.txt";
 
     bool import = ImportData(NomeFile, fract);
     if(import == false)

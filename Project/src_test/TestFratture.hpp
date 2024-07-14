@@ -13,85 +13,11 @@ using namespace Eigen;
 using namespace std;
 
 namespace FractureLibrary {
-//********************************
-/*TEST(TRIANGLETEST, TestComputeArea){
-
-    Matrix3d vertices = Matrix3d::Zero();
-
-    vertices << 0.0, 1.0, 0.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 0.0;
-
-    Triangle t(vertices);
-
-    double area = t.computeArea();
-    EXPECT_EQ(area, 0.5);
-}
-*///********************************
-/*
-TEST(FRACTURE_TEST, TestPlotParaviewFractures){
-
-    MatrixXd points = MatrixXd::Zero(3, 4);
-
-    points << 0.0, 1.0, 1.0, 0.0,
-        0.0, 0.0, 1.0, 1.0,
-        0.0, 0.0, 0.0, 0.0;
-
-    const std::vector<std::vector<unsigned int>> triangles =
-        {
-            { 0, 1, 3 },
-            { 1, 2, 3 }
-        };
-
-    Eigen::VectorXi materials(2);
-    materials << 0, 1;
-
-    Gedim::UCDUtilities exporter;
-
-    const std::vector<Gedim::UCDProperty<double> > points_properties = {};
-    const std::vector<Gedim::UCDProperty<double> > polygons_properties = {};
-
-    exporter.ExportPolygons("./Geometry2Ds.inp",
-                            points,
-                            triangles,
-                            points_properties,
-                            polygons_properties,
-                            materials);
-
-
-}
-/********************************
-TEST(POLYGONTEST, TestPlotParaviewPolygons){
-
-    MatrixXd points = MatrixXd::Zero(3, 4);
-
-    points << 0.0, 1.0, 1.0, 0.0,
-        0.0, 0.0, 1.0, 1.0,
-        0.0, 0.0, 0.0, 0.0;
-
-    vector<vector<unsigned int>> pol_vertices = { {0, 1, 2, 3}};
-
-    Polygons polygons(points,
-                     pol_vertices);
-    std::vector<std::vector<unsigned int>> triangles;
-    Eigen::VectorXi materials;
-
-    polygons.GedimInterface(triangles, materials);
-
-    Gedim::UCDUtilities exporter;
-
-    exporter.ExportPolygons("./Geometry2Ds.inp",
-                            points,
-                            triangles,
-                            {},
-                            {},
-                            materials);
-}
-/********************************
-*/
 
 
 double tol = 10e-10; //CAMBIARE LA TOLLERANZA
+
+
 
 //TEST 1: testiamo la funzione ImportaDati verificando che la prima frattura abbiamo quattro vertici.
 TEST(ImportaDatiTest, NumeroVertici)
@@ -228,7 +154,7 @@ TEST(pianiParalleliTest, PianiParalleli){
 //****************************************************************
 
 //TEST 8: testiamo la funzione ComputeTrace. Caso poligoni disgiunti.
-TEST(FindTracesTest, CasoTraccia1){
+TEST(CheckTracciaTest, CasoTraccia1){
 
     FractureStruct fract;
     TracesStruct trac;
@@ -252,14 +178,14 @@ TEST(FindTracesTest, CasoTraccia1){
     intersectionLine << 0.5, 0, 0,
                         0, 1, 0;
 
-    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    bool result = CheckTraccia(fract, trac, intersectionLine, n1, n2, tol);
     ASSERT_FALSE(result);
 
 }
 //****************************************************************
 
 //TEST 9: testiamo la funzione ComputeTrace. Caso traccia passante per la prima frattura ma non per la seconda.
-TEST(FindTracesTest, CasoTraccia2){
+TEST(CheckTracciaTest, CasoTraccia2){
 
     FractureStruct fract;
     TracesStruct trac;
@@ -284,7 +210,7 @@ TEST(FindTracesTest, CasoTraccia2){
     intersectionLine << 0.5, 1.5, 0,
                         0.5, 0.5, 0;
 
-    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    bool result = CheckTraccia(fract, trac, intersectionLine, n1, n2, tol);
     ASSERT_TRUE(result);
 
 }
@@ -292,7 +218,7 @@ TEST(FindTracesTest, CasoTraccia2){
 //****************************************************************
 
 //TEST 10: testiamo la funzione ComputeTrace. Caso traccia passante per la seconda frattura ma non per la prima.
-TEST(FindTracesTest, CasoTraccia3){
+TEST(CheckTracciaTest, CasoTraccia3){
 
     FractureStruct fract;
     TracesStruct trac;
@@ -317,14 +243,14 @@ TEST(FindTracesTest, CasoTraccia3){
     intersectionLine << 0.5, 1.5, 0,
                         0.5, 0.5, 0;
 
-    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    bool result = CheckTraccia(fract, trac, intersectionLine, n1, n2, tol);
     ASSERT_TRUE(result);
 
 }
 //****************************************************************
 
 //TEST 11: testiamo la funzione ComputeTrace. Caso traccia non passante per entrambe.
-TEST(FindTracesTest, CasoTraccia4){
+TEST(CheckTracciaTest, CasoTraccia4){
 
     FractureStruct fract;
     TracesStruct trac;
@@ -348,7 +274,7 @@ TEST(FindTracesTest, CasoTraccia4){
     intersectionLine << 0.5, 1.5, 0,
                         0.5, 0.5, 0;
 
-    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    bool result = CheckTraccia(fract, trac, intersectionLine, n1, n2, tol);
     ASSERT_TRUE(result);
 
 }
@@ -356,7 +282,7 @@ TEST(FindTracesTest, CasoTraccia4){
 //****************************************************************
 
 //TEST 12: testiamo la funzione ComputeTrace. Caso traccia passante per entrambe.
-TEST(FindTracesTest, CasoTraccia5){
+TEST(CheckTracciaTest, CasoTraccia5){
 
     FractureStruct fract;
     TracesStruct trac;
@@ -380,31 +306,13 @@ TEST(FindTracesTest, CasoTraccia5){
     intersectionLine << 0.5, 1.5, 0,
                         0.5, 0.5, 0;
 
-    bool result = FindTrace(fract, trac, intersectionLine, n1, n2, tol);
+    bool result = CheckTraccia(fract, trac, intersectionLine, n1, n2, tol);
     ASSERT_TRUE(result);
 
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/*/ ***************************************************************************
-TEST(SquareRootTest, NegativeNos)
-{
-    ASSERT_EQ(-1.0, squareRoot(-15.0));
-    ASSERT_EQ(-1.0, squareRoot(-0.2));
-}
-/*/
 
 
 

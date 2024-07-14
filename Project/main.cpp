@@ -19,7 +19,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR50_data.txt";
+    string NomeFile = "FR200_data.txt";
 
 
     /// Input dei dati
@@ -45,12 +45,12 @@ int main()
             for (unsigned int j =i+1; j<fract.NumeroFratture; j++)
             {
                 bool result = checkIntersezione(fract,trac,i,j,tol);
-                /*
+
                 if(result == false)
                     cout << "Main: NON c'e' intersezione tra: " <<i<< " e "<<j << endl;
                 else
                     cout << "Main: c'e' intersezione tra: " <<i<< " e " <<j << endl;
-                */
+
             }
         }
     }
@@ -61,7 +61,7 @@ int main()
     // un elenco dove per ogni frattura si indicano le tracce che gli appartengono ordinate per tip
     // e per lunghezza
 
-    if(Output(trac, fract) == false)
+    if(GeneralOutput(trac, fract) == false)
     {
         cerr << "Impossibile stampare i dati" << endl;
 
