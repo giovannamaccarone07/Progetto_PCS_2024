@@ -857,7 +857,7 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     if (tsinistra.empty())
     {    /// salvataggioDati
         vector<Vector3d> colonne = {};
-        cout << "punti di destra: "<< endl;
+        cout << "punti di sinistra: "<< endl;
         auto itor = sinistra.begin();
         while(itor != sinistra.end())
         {
