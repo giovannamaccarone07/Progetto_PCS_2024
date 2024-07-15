@@ -8,94 +8,105 @@ package FractureLibrary <<Folder>>
 
 struct FractureStruct{
 + NumeroFratture : unsigned int
-+ IdFratture : std::vector<unsigned int>
-+ NumeroVertici : std::vector<unsigned int>
-+ CoordinateVertici : std::vector<Eigen::MatrixXd>
-+ NumeroTracceN : std::vector<std::list<unsigned int>>
-+ NumeroTracceP : std::vector<std::list<unsigned int>>
-+ NormaleFrattura : std::vector<Eigen::Vector3d> 
-
-
-####
-+ Polygon(VerticesCoordinates, listVertices)
-+ void GedimInterface(vector<vector<unsigned int>>& triangles,
-                        \t \t \t  \t \t VectorXi& materials)
-+ vector<double> computePolygonsArea()
-+ vector<vector<vector<unsigned int>>> TriangulatePolygons()
-.. Non member function ..
-bool ImportaDati(const string& NomeFile, FractureStruct& Fract)
-
++ IdFratture : vector<unsigned int>
++ NumeroVertici : vector<unsigned int>
++ CoordinateVertici : vector<MatrixXd>
++ NumeroTracceN : vector<list<unsigned int>>
++ NumeroTracceP : vector<list<unsigned int>>
++ NormaleFrattura : vector<Vector3d> 
 }
 
 
 struct TracesStruct{
 + ct : unsigned int
-+ IdTracce : std::vector<unsigned int>
-+ EstremiTracce : std::vector<Eigen::Matrix<double,2,3>>
-+ LunghezzaTracce : std::vector<double>
-+ PNP : std::vector<Eigen::Matrix<unsigned int,2,2>> 
++ IdTracce : vector<unsigned int>
++ EstremiTracce : vector<Matrix<double,2,3>>
++ LunghezzaTracce : vector<double>
++ PNP : vector<Matrix<unsigned int,2,2>> 
 }
 
 
 struct PolygonalMesh{
 + NumberCell0D : unsigned int
-+ Cell0DId : std::vector<unsigned int>
-+ Cell0DCoordinates : std::vector<Eigen::Vector3d>
++ Cell0DId : vector<unsigned int>
++ Cell0DCoordinates : vector<Vector3d>
 + NumberCell1D : unsigned int
-+ Cell1DId : std::vector<unsigned int>
-+ Cell1DVertices : std::vector<Eigen::Vector2i>
++ Cell1DId : vector<unsigned int>
++ Cell1DVertices : vector<Vector2i>
 + NumberCell2D : unsigned int
-+ NumeroDiVertici : std::vector<unsigned int>
-+ NumeroDiLati : std::vector<unsigned int>
-+ Cell2DVertices : std::vector<Eigen::VectorXi>
-+ Cell2DEdges : std::vector<Eigen::VectorXi>
++ NumeroDiVertici : vector<unsigned int>
++ NumeroDiLati : vector<unsigned int>
++ Cell2DVertices : vector<VectorXi>
++ Cell2DEdges : vector<VectorXi>
 }
 
 
 
 
 
-package Utils <<Folder>>{
-
-abstract Funzione {
-+ bool ImportData(const string& fileName, FractureStruct& fract)
+package Main <<Folder>>{
 }
 
-FractureStruct - Funzione : costruisce <
-abstract Funzioni {
-+ bool ImportData(const string& fileName, FractureStruct& fract)
-+ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2)
-+ Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n)
-+ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol);
-+ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const  unsigned int& n2, const double& tol);
-+ bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2,const double& tol)
-+ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n, const double& tol)
-+ bool GeneralOutput(const TracesStruct& trac, const FractureStruct& frac);
-+ bool parallelPlanes(Vector4d& plane1, Vector4d& plane2, const double& tol);
-+ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac);
-+ bool OutputTraces(const TracesStruct& trac);
-+ void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigned int& num, const double& tol);
-+ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double, 2,3>>& coordEstremiTracce, list<MatrixXd>& sp, const Vector3d& normale,  const double& tol);
+Funzione_Input <--up- Main : chiama 
+Parte2   <-up-- Main : chiama ricorsivamente <
+Main --down--> CheckIntersezione : chiama 
+
+
+
+abstract Parte2{
++ subPolygons(verticiPolygons,  coordEstremiTracce,  sp, normale, tol): bool
+}
+Parte2 - PolygonalMesh : costruisce >
+
+
+abstract Funzione_Input{
++ ImportData(fileName, fract) : bool
+}
+FractureStruct <--up- Funzione_Input : costruisce <
+
+
+abstract CheckIntersezione{
++ checkIntersezione(fract, trac, n1, n2, tol) : bool
++ FracturePlane(fract, n) : Vector4d 
++ parallelPlanes(plane1, plane2, tol) : bool 
+}
+CheckIntersezione -> CalcoloTraccia : esegue 
+CheckIntersezione <-down--> BoundingBox : esegue controllo
+CheckIntersezione - FractureStruct : per ogni frattura
+
+abstract CalcoloTraccia{
++ IntersectionLine(plane1, plane2) : Matrix<double,2,3> 
++ CheckTraccia(fract,trac,intersectionLine,n1,n2,tol) : bool 
++ descendingOrder(trac, list, num, tol) : void 
+}
+CalcoloTraccia -down--> TracesStruct : salva traccia in >
+CalcoloTraccia -up--> FractureStruct : aggiorna >
+CalcoloTraccia <-down--> BoundingBox
+
+abstract BoundingBox{
++ BBoxIntersection(fract,n1, n2,tol) : bool
++ ComputeBoundingBox(fract, n, tol) : Matrix<double,2,3>
+}
+
+abstract Funzioni_Output{
++ GeneralOutput(trac, frac) : bool
++ OutputFractures(trac,frac) : bool
++ OutputTraces(trac) : bool
+}
+Main -up--> Funzioni_Output
+Funzioni_Output <- TracesStruct
+Funzioni_Output <- FractureStruct
+
 
 }
 
 
 
-}
 
-}
 
 
 package Gedim <<Frame>>
 {
 
 }
-
-
-' PlotPolygon relies upon Gedim
-Polygon::GedimInterface --right--> Gedim
-
-' Add notes and link it with an object thourgh the sumbol ..
-note "This is an external package" as GedimNote
-GedimNote .. Gedim
 @enduml
