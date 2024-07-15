@@ -35,6 +35,7 @@ int main()
         cout << "Dati importati correttamente" << endl;
 
 
+
         /// Analisi delle fratture
         // vengono chiamate in successione alcune funzioni che controllano
         // se c'è intersezione o meno fra due FRATTURE, eventualmente calcolo la retta di intersezione
@@ -46,11 +47,11 @@ int main()
             {
                 bool result = checkIntersezione(fract,trac,i,j,tol);
 
-                if(result == false)
+                /*if(result == false)
                     cout << "Main: NON c'e' intersezione tra: " <<i<< " e "<<j << endl;
                 else
                     cout << "Main: c'e' intersezione tra: " <<i<< " e " <<j << endl;
-
+                */
             }
         }
     }
@@ -61,7 +62,31 @@ int main()
     // un elenco dove per ogni frattura si indicano le tracce che gli appartengono ordinate per tip
     // e per lunghezza
 
-    if(GeneralOutput(trac, fract) == false)
+    bool printTraces = false;
+    bool printFractures = false;
+
+    if(OutputTraces(trac) == true)
+    {
+        printTraces = true;
+        cout << "Output tracce eseguito correttamente." << endl;
+    }
+    else
+    {
+        cerr << "Impossibile stampare le tracce." << endl;
+    }
+
+    if(OutputFractures(trac,fract) == true)
+    {
+        printFractures = true;
+        cout << "Output fratture eseguito correttamente." << endl;
+    }
+    else
+    {
+        cerr << "Impossibile stampare le fratture." << endl;
+    }
+
+    bool result = printTraces && printFractures;
+    if(result == false)
     {
         cerr << "Impossibile stampare i dati" << endl;
 
@@ -71,6 +96,7 @@ int main()
     {
         cout << "Dati stampati correttamente" << endl;
     }
+
 
 
     /// Parte 2 : suddivisione di una frattura in una mesh
@@ -86,11 +112,7 @@ int main()
         list<unsigned int> listaTracce = fract.NumeroTracceP[n];
         vector<Matrix<double,2,3>> coordEstremiTracce;
 
-        if(listaTracce.empty())
-        {
-            cout << "nessuna traccia P per frattura: " << n << endl;
-        }
-        else
+        if(!listaTracce.empty())
         {
             while(!listaTracce.empty())
             {
@@ -107,8 +129,8 @@ int main()
 
             bool taglio = subPolygons(verticiPolygons, coordEstremiTracce,sp, normale, tol);
 
-            if (taglio == true)
-                cout << "taglio a buon fine per frattura: "<< n <<endl;
+            /*if (taglio == false)
+                cout << "taglio a buon fine per frattura: "<< n <<endl;*/
         }
 
         /// Memorizzo le informazioni nella mesh

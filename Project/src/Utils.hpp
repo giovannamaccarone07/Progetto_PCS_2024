@@ -74,13 +74,6 @@ bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const
 ///
 Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n, const double& tol);
 
-///
-/// \brief Output
-/// \param trac
-/// \param frac
-/// \return
-///
-bool GeneralOutput(const TracesStruct& trac, const FractureStruct& frac);
 
 ///
 /// \brief pianiParalleli
