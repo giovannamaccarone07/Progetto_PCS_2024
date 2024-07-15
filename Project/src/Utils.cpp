@@ -38,8 +38,6 @@ bool ImportData(const string& fileName, FractureStruct& fract)
     fract.NumeroTracceP.resize(fract.NumeroFratture);
     fract.NormaleFrattura.resize(fract.NumeroFratture);
 
-    // Assegno un indice a ogni vertice: contatore di vertici per tutto il file.
-    unsigned int index = 0;
 
     // Leggo le righe in gruppi di 6 poichè a ogni frattura sono dedidicate 6 righe (avrò bisogno di 6 getline):
     for(unsigned int i = 0; i< n_fractures; i++)
@@ -57,18 +55,6 @@ bool ImportData(const string& fileName, FractureStruct& fract)
         //Leggo la TERZA riga: la scarto.
         getline(file, line);
 
-        /// Riempio l'oggetto IndiciVertici della struct fract
-        // IndiciVertici è un vector<vector<unsigned int>> quindi per ogni frattura devo costruire i rispettivi vector<unsigend int> più interni.
-        // Creo il vector di lunghezza indefinita per salvare gli indici dei vertici della frattura e successivamente effettuo un resize in base al numero di vertici della frattura
-
-        vector<unsigned int> indices;
-        indices.resize(n_vertices);
-        //Effettuo un ciclo per incrementare il contatore 'index' tante volte quante sono i vertici della frattura.
-        for (unsigned int in = 0; in < n_vertices; in++)
-        {
-            indices[in] = index;
-            index ++;
-        }
 
         fract.IdFratture[i] = id_fractures;
         fract.NumeroVertici[i] = n_vertices;

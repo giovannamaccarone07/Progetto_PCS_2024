@@ -7,16 +7,16 @@ package FractureLibrary <<Folder>>
 
 
 struct FractureStruct{
-' Visibility NameVaribale : Type
 + NumeroFratture : unsigned int
 + IdFratture : std::vector<unsigned int>
 + NumeroVertici : std::vector<unsigned int>
-+ IndiciVertici : std::vector<std::vector<unsigned int>>
 + CoordinateVertici : std::vector<Eigen::MatrixXd>
 + NumeroTracceN : std::vector<std::list<unsigned int>>
 + NumeroTracceP : std::vector<std::list<unsigned int>>
++ NormaleFrattura : std::vector<Eigen::Vector3d> 
 
 
+####
 + Polygon(VerticesCoordinates, listVertices)
 + void GedimInterface(vector<vector<unsigned int>>& triangles,
                         \t \t \t  \t \t VectorXi& materials)
@@ -25,9 +25,6 @@ struct FractureStruct{
 .. Non member function ..
 bool ImportaDati(const string& NomeFile, FractureStruct& Fract)
 
-.. TESTPOLYGON ..
-TestComputePolygonsArea
-TestGedimInterface
 }
 
 
@@ -36,8 +33,7 @@ struct TracesStruct{
 + IdTracce : std::vector<unsigned int>
 + EstremiTracce : std::vector<Eigen::Matrix<double,2,3>>
 + LunghezzaTracce : std::vector<double>
-.. TESTTRIANGLE ..
-TestComputeArea
++ PNP : std::vector<Eigen::Matrix<unsigned int,2,2>> 
 }
 
 
@@ -55,32 +51,37 @@ struct PolygonalMesh{
 + Cell2DEdges : std::vector<Eigen::VectorXi>
 }
 
+
+
+
+
 package Utils <<Folder>>{
+
+abstract Funzione {
++ bool ImportData(const string& fileName, FractureStruct& fract)
+}
+
+FractureStruct - Funzione : costruisce <
 abstract Funzioni {
-+ bool ImportaDati(const string& NomeFile, FractureStruct& Fract)
-+ Eigen::Matrix<double,2,3> RettaIntersezione(Vector4d& piano1, Vector4d& piano2)
-+ Eigen::Vector4d PianoPassantePerFrattura(const FractureStruct& fract, const unsigned int& n)
-+ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, const double& tol)
-+ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const  unsigned int& n2, const double& tol)
-+ bool IntersezioneBoundingBox(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2)
-+ bool ComputeTrace(TracesStruct& trac, FractureStruct& fract, double ts1, double ts2, const MatrixXd& rettaIntersezione, const unsigned int& n1, const unsigned int& n2, bool pass1,bool pass2)
-+ Eigen::Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n)
-+ bool Output(const TracesStruct& trac, const FractureStruct& frac)
-+ bool pianiParalleli(Vector4d& piano1, Vector4d& piano2, const double& tol)
-+ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
-+ bool OutputTraces(const TracesStruct& trac)
-+ void ordineDecrescente(TracesStruct& trac, list<unsigned int>& lista, const unsigned int& num)
-}
-
-
++ bool ImportData(const string& fileName, FractureStruct& fract)
++ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2)
++ Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n)
++ bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol);
++ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigned int& n1, const  unsigned int& n2, const double& tol);
++ bool BBoxIntersection(const FractureStruct& fract, const unsigned int& n1, const unsigned int& n2,const double& tol)
++ Matrix<double,2,3> ComputeBoundingBox(const FractureStruct& fract, unsigned int n, const double& tol)
++ bool GeneralOutput(const TracesStruct& trac, const FractureStruct& frac);
++ bool parallelPlanes(Vector4d& plane1, Vector4d& plane2, const double& tol);
++ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac);
++ bool OutputTraces(const TracesStruct& trac);
++ void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigned int& num, const double& tol);
++ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double, 2,3>>& coordEstremiTracce, list<MatrixXd>& sp, const Vector3d& normale,  const double& tol);
 
 }
-' Modeling relationship: https://blog.visual-paradigm.com/what-are-the-six-types-of-relationships-in-uml-class-diagrams/#:~:text=There%20are%20six%20main%20types,aggregation%20%2C%20association%2C%20and%20dependency%20.
 
-' Left, right, up, down to try to orient classes in the space based on their relationship
 
-' Aggregazione
-Polygon "1" o-left- "many" Triangle : is made up of
+
+}
 
 }
 

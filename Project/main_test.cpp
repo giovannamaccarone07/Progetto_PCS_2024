@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     FractureStruct fract;
 
 
-    string NomeFile = "FR200_data.txt";
+    string NomeFile = "FR50_data.txt";
 
     bool import = ImportData(NomeFile, fract);
     if(import == false)
@@ -51,6 +51,20 @@ int main(int argc, char **argv)
         c1 = c1+4;
     }
 
+    vector<vector<unsigned int>> indici(fract.NumeroFratture);
+
+    unsigned int count = 0;
+    for (unsigned int i = 0; i < fract.NumeroFratture;i++)
+    {
+        vector<unsigned int> in(fract.NumeroVertici[i]);
+        for (unsigned int j=0; j<fract.NumeroVertici[i];j++)
+        {
+            in[j] = count;
+            count++;
+        }
+        indici[i] = in;
+    }
+
     Eigen::VectorXi materials(2);
     materials << 0, 1;
 
@@ -58,7 +72,7 @@ int main(int argc, char **argv)
 
     exporter1.ExportPolygons("./Fractures2Ds.inp",
                             points1,
-                            fract.IndiciVertici,
+                            indici,
                             {},
                             {},
                             materials);
