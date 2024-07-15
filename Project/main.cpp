@@ -77,9 +77,9 @@ int main()
     // Ogni frattura viene tagliata seguendo le tracce che la attraversano e si memorizzano sulla
     // struct PolygonalMesh i poligoni che derivano dal taglio
 
-    //for(unsigned int n = 0; n < fract.NumeroFratture; n++)
-    //{
-    unsigned int n = 3;
+    for(unsigned int n = 0; n < fract.NumeroFratture; n++)
+    {
+
         list<MatrixXd> sp = {}; // serve per memorizzare i subPolygons
 
         Vector3d normale = fract.NormaleFrattura[n];
@@ -253,7 +253,7 @@ int main()
             mesh.NumeroDiLati = {};
             mesh.NumeroDiVertici = {};
         }
-    //}
+    }
 
 
 
