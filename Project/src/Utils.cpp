@@ -116,7 +116,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigne
  */
     if(BBoxIntersection(fract,n1,n2,tol) == false)
     {
-        cout << "Boundingbox: i poligono non si toccano" << endl;
+        //cout << "Boundingbox: i poligono non si toccano" << endl;
         return false;
     }
     else
@@ -565,6 +565,7 @@ bool OutputTraces(const TracesStruct& trac)
     return true;
 }
 
+
 //****************************************************************
 
 bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
@@ -609,36 +610,6 @@ bool OutputFractures(const TracesStruct& trac, const FractureStruct& frac)
     return true;
 }
 
-//****************************************************************
-
-bool GeneralOutput(const TracesStruct& trac, const FractureStruct& frac)
-{
-    bool printTraces = false;
-    bool printFractures = false;
-
-    if(OutputTraces(trac) == true)
-    {
-        printTraces = true;
-        cout << "Output tracce eseguito correttamente." << endl;
-    }
-    else
-    {
-        cerr << "Impossibile stampare le tracce." << endl;
-    }
-
-    if(OutputFractures(trac,frac) == true)
-    {
-        printFractures = true;
-        cout << "Output fratture eseguito correttamente." << endl;
-    }
-    else
-    {
-        cerr << "Impossibile stampare le fratture." << endl;
-    }
-
-    bool result = printTraces && printFractures;
-    return result;
-}
 
 //****************************************************************
 
@@ -821,13 +792,13 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         //UTILITà DI AVER FATTO PRIMA UNA LISTA DI VECTOR PER
         //POI TRAVASARE LA STESSA LISTA IN UN VETTORE DI VECTOR ////////////////////////////////// ///// //// ////// //// ///  // / //////
         vector<Vector3d> colonne = {};
-        cout << "punti di destra: "<< endl;
+        //cout << "punti di destra: "<< endl;
         auto itor = destra.begin();
         while(itor != destra.end())
         {
             Vector3d comp = (*itor);
             colonne.push_back(comp);
-            cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
+            //cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
             itor++;
         }
         unsigned int c = colonne.size();
@@ -846,13 +817,13 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     if (tsinistra.empty())
     {    /// salvataggioDati
         vector<Vector3d> colonne = {};
-        cout << "punti di sinistra: "<< endl;
+        //cout << "punti di sinistra: "<< endl;
         auto itor = sinistra.begin();
         while(itor != sinistra.end())
         {
             Vector3d comp = (*itor);
             colonne.push_back(comp);
-            cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
+            //cout << (*itor)[0] << " "<< (*itor)[1] << " "<< (*itor)[2] << endl;
             itor++;
         }
         unsigned int c = colonne.size();
