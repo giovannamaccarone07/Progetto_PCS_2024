@@ -122,7 +122,7 @@ bool checkIntersezione( FractureStruct& fract, TracesStruct& trac, const unsigne
     else
     {
         Matrix<double,2,3> rettaIntersezione = IntersectionLine(piano1,piano2);
-        if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2,tol)==false) //modificare una volta che si è modificata checktraccia
+        if(CheckTraccia(fract, trac, rettaIntersezione,n1,n2,tol)==false)
         {
             return false;
         }
@@ -164,7 +164,7 @@ Vector4d FracturePlane(FractureStruct& fract, const unsigned int& n)
 
 //****************************************************************
 
-Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda; testa]
+Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2)
 {
     //Individuo lle giaciture dei piani considerando i coefficienti a,b,c delle equazioni.
     Vector3d p1 = plane1.head(3);
@@ -190,11 +190,6 @@ Matrix<double,2,3> IntersectionLine(Vector4d& plane1, Vector4d& plane2) // [coda
 }
 
 //****************************************************************
-
-
-//VERIFICARE GLI INPUT IN REFERENZA
-/// CheckTraccia
-// controlla se la retta passa per la frattura che giace nel piano
 
 bool CheckTraccia(FractureStruct& fract, TracesStruct& trac, const MatrixXd& intersectionLine, const unsigned int& n1, const unsigned int& n2, const double& tol)
 {
@@ -439,7 +434,6 @@ void descendingOrder(TracesStruct& trac, list<unsigned int>& list, const unsigne
     if (list.empty())
     {
         list.push_back(num);
-
     }
 
 }
@@ -629,9 +623,9 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     }
 
 
-    list<Vector3d> destra = {}; //modificare unsigned int oppure solo int
+    list<Vector3d> destra = {};
     list<Vector3d> sinistra = {};
-    Vector3d traccia0 = coordEstremiTracce[0].row(0);  //seleziono la matrice PRIMA S nel vettore coordEstremiTracce (che le ha tutte) e poi estraggo le cordinate da wuella matrice
+    Vector3d traccia0 = coordEstremiTracce[0].row(0);
     Vector3d traccia1 = coordEstremiTracce[0].row(1);
     Vector3d dirTraccia = traccia1 - traccia0;
 
@@ -652,7 +646,8 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
         ///CASO ESTREMI TRACCIA
         // se uno dei due estremi della traccia appartiene al lato e lo salvo direttamente in entrambe le liste
-        // bisogna verificare se uno dei due estremi appartiene al segmento che sto considerando, in quel caso lo salvo nella lista
+        // bisogna verificare se uno dei due estremi appartiene al segmento che sto considerando,
+        // in quel caso lo salvo nella lista
         Vector3d u = verticeB - verticeA;
         Vector3d v0 = (traccia0 - verticeA);
         if(((u.cross(v0)).array().abs() <= tol).all())
@@ -683,7 +678,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
         }
         else if (abs(segno)< tol)
         {
-            cerr<< "problema nel prodotto misto";
             return false;
         }
         else
@@ -789,9 +783,7 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
     ///
     if (tdestra.empty())
     {   /// salvataggioDati
-        //UTILITà DI AVER FATTO PRIMA UNA LISTA DI VECTOR PER
-        //POI TRAVASARE LA STESSA LISTA IN UN VETTORE DI VECTOR ////////////////////////////////// ///// //// ////// //// ///  // / //////
-        vector<Vector3d> colonne = {};
+        vector<Vector3d> colonne(destra.size());
         //cout << "punti di destra: "<< endl;
         auto itor = destra.begin();
         while(itor != destra.end())
@@ -816,7 +808,7 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
     if (tsinistra.empty())
     {    /// salvataggioDati
-        vector<Vector3d> colonne = {};
+        vector<Vector3d> colonne(sinistra.size());
         //cout << "punti di sinistra: "<< endl;
         auto itor = sinistra.begin();
         while(itor != sinistra.end())
@@ -839,7 +831,6 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
 
     /// Chiamo subpolygons ricorsivamente sulle due liste
-    // esplorazione in profondità????? CONTROLLARE
     while (fermaEsplorazione == true)
     {
         bool fermaEsplorazioneDx = subPolygons(destra, tdestra, sp, normale, tol);
@@ -852,9 +843,17 @@ bool subPolygons(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>
 
 
 
-    return false; // se tutto è andato bene
-
+    return false; // se termina l'esplorazione
 }
+
+//****************************************************************
+
+
+
+
+
+
+
 
 } //namespace
 

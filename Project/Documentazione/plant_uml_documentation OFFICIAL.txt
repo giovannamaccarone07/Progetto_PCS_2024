@@ -48,7 +48,7 @@ package Main <<Folder>>{
 }
 
 Funzione_Input <--up- Main : chiama 
-Parte2   <-up-- Main : chiama ricorsivamente <
+Parte2   <-up-- Main : Per ogni frattura chiama ricorsivamente <
 Main --down--> CheckIntersezione : chiama 
 
 
@@ -58,11 +58,23 @@ abstract Parte2{
 }
 Parte2 - PolygonalMesh : costruisce >
 
+note top of Parte2
+taglia ricorsivamente i sottopoligoni seguendo un elenco di tracce
+verticiPolygons : list<Vector3d>
+coordEstremiTracce : const vector<Matrix<double, 2,3>>&
+sp : list<MatrixXd>&
+normale : const Vector3d&
+tol : const double&
+end note
 
 abstract Funzione_Input{
 + ImportData(fileName, fract) : bool
 }
 FractureStruct <--up- Funzione_Input : costruisce <
+note top of Funzione_Input
+filenName : const string&
+fract : FractureStruct& 
+end note
 
 
 abstract CheckIntersezione{
@@ -74,6 +86,24 @@ CheckIntersezione -> CalcoloTraccia : esegue
 CheckIntersezione <-down--> BoundingBox : esegue controllo
 CheckIntersezione - FractureStruct : per ogni frattura
 
+
+note right of CheckIntersezione::checkIntersezione
+Esegue controlli preliminari fra le fratture e poi chiama CheckTraccia
+fract : FractureStruct&
+trac : TracesStruct& 
+n1, n2 : const unsigned int&  
+tol : const double& 
+end note
+note right of CheckIntersezione::FracturePlane
+Calcola il Piano su cui giace la frattura
+fract : FractureStruct&
+n1 : const unsigned int&  
+end note
+note right of CheckIntersezione::parallelPlanes
+plane1,plane2 : Vector4d& 
+tol : const double&  
+end note
+
 abstract CalcoloTraccia{
 + IntersectionLine(plane1, plane2) : Matrix<double,2,3> 
 + CheckTraccia(fract,trac,intersectionLine,n1,n2,tol) : bool 
@@ -83,13 +113,48 @@ CalcoloTraccia -down--> TracesStruct : salva traccia in >
 CalcoloTraccia -up--> FractureStruct : aggiorna >
 CalcoloTraccia <-down--> BoundingBox
 
+
+
+note right of CalcoloTraccia::IntersectionLine
+Calcolala retta di intersezione fra i due piani 
+plane1, plane2 : Vector4d& 
+end note
+note right of CalcoloTraccia::CheckTraccia
+Calcola la traccia e memorizza le informazioni 
+fract : FractureStruct&
+trac : TracesStruct&
+intersectionLine : const MatrixXd&  
+n1, n2 : const unsigned int& 
+tol : const double& 
+end note
+note right of CalcoloTraccia::descendingOrder
+Viene chiamata da CheckTraccia, ordina le tracce per lunghezza 
+trac : TracesStruct&
+list : list<unsigned int>& 
+num : const unsigned int& 
+tol : const double& 
+end note
+
+
+
 abstract BoundingBox{
 + BBoxIntersection(fract,n1, n2,tol) : bool
 + ComputeBoundingBox(fract, n, tol) : Matrix<double,2,3>
 }
+note left of BoundingBox::BBoxIntersection
+Controlla se le bounding box si intersecano
+fract : const FractureStruct&
+n1, n2 : const unsigned int& 
+tol : const double& 
+end note
+note left of BoundingBox::ComputeBoundingBox
+Calcola la bounding box
+fract : const FractureStruct&
+n : const unsigned int& 
+tol : const double& 
+end note
 
 abstract Funzioni_Output{
-+ GeneralOutput(trac, frac) : bool
 + OutputFractures(trac,frac) : bool
 + OutputTraces(trac) : bool
 }
@@ -97,16 +162,11 @@ Main -up--> Funzioni_Output
 Funzioni_Output <- TracesStruct
 Funzioni_Output <- FractureStruct
 
+note right of Funzioni_Output
+trac : const TracesStruct&
+frac: const FractureStruct& 
+end note
 
 }
 
-
-
-
-
-
-package Gedim <<Frame>>
-{
-
-}
 @enduml

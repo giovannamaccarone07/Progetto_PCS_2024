@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     FractureStruct fract;
 
 
-    string NomeFile = "FR50_data.txt";
+    string NomeFile = "FR200_data.txt";
 
     bool import = ImportData(NomeFile, fract);
     if(import == false)

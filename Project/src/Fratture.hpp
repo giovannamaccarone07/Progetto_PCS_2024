@@ -23,7 +23,7 @@ struct FractureStruct
     /// CoordinateVertici
     // Vector che contiene in posizione i-esima la matrice dei vertici della frattura i-esima.
     // Ogni matrice ha dimensione 3xNumeroVertici
-    vector<MatrixXd> CoordinateVertici = {};            /// dim: MatrixXd x NumeroVertici
+    vector<MatrixXd> CoordinateVertici = {};
 
     ///NumeroTracceN
     // E' un vettore di liste di unsigned int in cui, in posizione i-esima, è salvata la lista contenente gli Id della trcce non passanti per la frattura i-esima.
@@ -98,8 +98,6 @@ struct PolygonalMesh
     vector<VectorXi> Cell2DVertices = {}; ///< Cell2D Vertices indices
     // Vector in cui sono salvati gli Id dei lati che formano il poligono
     vector<VectorXi> Cell2DEdges = {}; ///< Cell2D Cell1D indices
-
-
 
 };
 

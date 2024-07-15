@@ -19,7 +19,7 @@ int main()
     FractureStruct fract;
     TracesStruct trac;
     double tol = 10e-10;
-    string NomeFile = "FR50_data.txt";
+    string NomeFile = "FR200_data.txt";
 
 
     /// Input dei dati
@@ -282,7 +282,7 @@ int main()
 
 
     ///*******************************************************************
-    ///                     voglio stampare la mesh
+    /// Stampo l'ultima mesh che ho in memoria
     ///*******************************************************************
 
 
@@ -327,7 +327,7 @@ int main()
 
     exporter.ExportSegments(exportFolder + "/Mesh1Ds.inp",points,edges);
 
-    //exporter.ExportPolygons(exportFolder + "/Mesh2Ds.inp",points,indici);
+
 
 
 
@@ -338,57 +338,3 @@ int main()
 } // main
 
 
-/*
-
-bool extendTracesNP(list<Vector3d> verticiPolygons, const vector<Matrix<double,2,3>>& coordEstremiTracce, vector<Matrix<double,2,3>>& nuoveTracce, const double& tol)
-{
-    // in input dò le tracce non passanti e le faccio passare tutte
-    for(unsigned int t=0; t<coordEstremiTracce.size(); t++)
-    {
-        //prendo i due estremi della traccia da analizzare
-        Vector3d A = coordEstremiTracce[t].row(0);
-        Vector3d B = coordEstremiTracce[t].row(1);
-        Vector3d direzioneTraccia = B-A;
-        const unsigned int num = verticiPolygons.size();
-        // Inizializzo la nuova traccia che sarà data dai punti di intersezione tra la retta passante per la traccia e quella passante per i lati che interseca
-        // I lati che interseca ovviamente saranno due per cui con questo while cerco l'intersezione per ognuno dei quattro lati
-
-        Matrix<double,2,3> nuovaTraccia = {};
-        unsigned int e = 0;
-        while (e < num )
-        {
-            // vertici da analizzare
-            Vector3d verticeA = verticiPolygons.front();
-            verticiPolygons.push_back(verticeA);
-            verticiPolygons.pop_front();
-            Vector3d verticeB = verticiPolygons.front();
-            Vector3d direzioneLato = verticeB-verticeA;
-            // chatgpt ha detto che si può fare così a trovare le intersezioni tra due rette di cui siano direzione e punto di applicazione
-            Vector3d prodVet = direzioneTraccia.cross(direzioneLato);
-            Vector3d vetTraPunti = A-verticeA; // è il vettore tra punti di applicazione
-            double determinante = prodVet.dot(prodVet);
-            if (abs(determinante) > tol) // se il determinante fosse uguale a zero sarebbero parallele o coincidenti quindi non c'è intersezione
-            {
-                double t = (vetTraPunti.dot(direzioneLato.cross(prodVet)))/determinante;
-                Vector3d estremoNuovo = A + t*direzioneTraccia;
-                if (nuovaTraccia.row(0)[0]<tol, nuovaTraccia.row(0)[1]< tol, nuovaTraccia.row(0)[2]<tol)
-                {
-                    nuovaTraccia.row(0) = estremoNuovo;
-                }
-                else
-                {
-                    nuovaTraccia.row(1) = estremoNuovo;
-                }
-
-            }
-        }
-        ///// QUI BISOGNA FARE IN MODO CHE LA NUOVA TRACCIA CHE è UNA MATRICE CON SULLE RIGHE GLI ESTREMI SIA INSERITA NELLA LISTA DELLE TRACCE PASSANTI
-        nuoveTracce.push_back((nuovaTraccia));
-    }
-}
-
-
-
-
-
-*/
